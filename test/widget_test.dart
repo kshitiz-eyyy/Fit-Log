@@ -1,30 +1,22 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:fitlog/main.dart';
+import 'package:fitlog/exercise_details_screen.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('ExerciseDetailsScreen displays content correctly',
+          (WidgetTester tester) async {
+        // Build the ExerciseDetailsScreen
+        await tester.pumpWidget(MaterialApp(home: ExerciseDetailsScreen()));
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+        // Verify that the title and exercise name appear
+        expect(find.text('Chest'), findsOneWidget);
+        expect(find.text('Bench Press'), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
-  });
+        // Verify that instructions are visible
+        expect(find.textContaining('shoulder blades'), findsOneWidget);
+        expect(find.textContaining('elbows'), findsOneWidget);
+        expect(find.textContaining('glute'), findsOneWidget);
+        expect(find.textContaining('wrist'), findsOneWidget);
+        expect(find.textContaining('Lower the bar'), findsOneWidget);
+      });
 }
