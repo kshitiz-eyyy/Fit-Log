@@ -43,3 +43,28 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Flutter/Dart
+.dart_tool/
+.packages
+.pub/
+build/
+
+# IDE
+.idea/
+.vscode/
+
+# Android
+/android/.gradle/
+/android/app/build/
+
+# iOS
+/ios/Pods/
+/ios/.symlinks/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
