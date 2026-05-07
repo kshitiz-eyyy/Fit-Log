@@ -27,35 +27,37 @@ fun ChangePasswordScreen(
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
 
-    val backgroundColor = Color(0xFFa39b8b)
-    val inputBackgroundColor = Color(0xFFf5f5f5)
-    val textColor = Color(0xFF2d2d2d)
-    val secondaryTextColor = Color(0xFF6b6b6b)
+    val backgroundColor = Color(0xFFa29a8a)
+    val inputBackgroundColor = Color(0xFFf3f2f1)
+    val textColor = Color(0xFF000000)
+    val subtitleColor = Color(0xFF4a4a4a)
+    val requirementTextColor = Color(0xFFd1cdc5)
     val buttonColor = Color(0xFFd6d1c7)
+    val secondaryButtonColor = Color(0xFFb5afa1)
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(backgroundColor)
-            .padding(16.dp)
+            .padding(24.dp)
     ) {
-        IconButton(onClick = onBackClick) {
-            Box(modifier = Modifier.size(24.dp)) {
-                // Placeholder for back icon
-                Icon(
-                    painter = painterResource(id = android.R.drawable.ic_menu_revert), // Using a system icon as fallback
-                    contentDescription = stringResource(id = R.string.back_button_content_description),
-                    tint = textColor
-                )
-            }
+        IconButton(
+            onClick = onBackClick,
+            modifier = Modifier.size(32.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_back_arrow),
+                contentDescription = stringResource(id = R.string.back_button_content_description),
+                tint = textColor
+            )
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = stringResource(id = R.string.change_password_title),
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Black,
             color = textColor
         )
 
@@ -63,7 +65,7 @@ fun ChangePasswordScreen(
             text = stringResource(id = R.string.new_credentials_subtitle),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = secondaryTextColor
+            color = subtitleColor
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -73,49 +75,50 @@ fun ChangePasswordScreen(
             value = oldPassword,
             onValueChange = { oldPassword = it },
             backgroundColor = inputBackgroundColor,
-            textColor = textColor
+            textColor = subtitleColor
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         PasswordField(
             label = stringResource(id = R.string.new_password_label),
             value = newPassword,
             onValueChange = { newPassword = it },
             backgroundColor = inputBackgroundColor,
-            textColor = textColor
+            textColor = subtitleColor
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         PasswordField(
             label = stringResource(id = R.string.confirm_password_label),
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
             backgroundColor = inputBackgroundColor,
-            textColor = textColor
+            textColor = subtitleColor
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
-        PasswordRequirements(textColor = Color(0xFFe0e0e0))
+        PasswordRequirements(textColor = requirementTextColor)
 
         Spacer(modifier = Modifier.weight(1f))
 
         Button(
             onClick = onSubmitClick,
             modifier = Modifier
-                .fillMaxWidth(0.5f)
-                .height(48.dp)
+                .fillMaxWidth(0.65f)
+                .height(56.dp)
                 .align(Alignment.CenterHorizontally),
             colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
-            shape = RoundedCornerShape(24.dp)
+            shape = RoundedCornerShape(20.dp),
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
         ) {
             Text(
                 text = stringResource(id = R.string.submit_button),
-                color = Color.Black,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
+                color = textColor,
+                fontWeight = FontWeight.Black,
+                fontSize = 20.sp
             )
         }
 
@@ -124,21 +127,22 @@ fun ChangePasswordScreen(
         Button(
             onClick = onCancelClick,
             modifier = Modifier
-                .fillMaxWidth(0.5f)
-                .height(48.dp)
+                .fillMaxWidth(0.65f)
+                .height(56.dp)
                 .align(Alignment.CenterHorizontally),
-            colors = ButtonDefaults.buttonColors(containerColor = buttonColor.copy(alpha = 0.7f)),
-            shape = RoundedCornerShape(24.dp)
+            colors = ButtonDefaults.buttonColors(containerColor = secondaryButtonColor),
+            shape = RoundedCornerShape(20.dp),
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
         ) {
             Text(
                 text = stringResource(id = R.string.cancel_button),
-                color = textColor,
+                color = subtitleColor,
                 fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
+                fontSize = 20.sp
             )
         }
         
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }
 
@@ -155,10 +159,10 @@ fun PasswordField(
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = label,
-            fontSize = 14.sp,
+            fontSize = 15.sp,
             fontWeight = FontWeight.Bold,
             color = textColor,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 6.dp)
         )
         TextField(
             value = value,
@@ -166,14 +170,17 @@ fun PasswordField(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(16.dp),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = backgroundColor,
                 unfocusedContainerColor = backgroundColor,
                 disabledContainerColor = backgroundColor,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
-            )
+                disabledIndicatorColor = Color.Transparent,
+                cursorColor = Color.Black
+            ),
+            singleLine = true
         )
     }
 }
@@ -183,25 +190,26 @@ fun PasswordRequirements(
     textColor: Color,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        val fontSize = 16.sp
         Text(
             text = stringResource(id = R.string.password_requirement_length),
-            fontSize = 14.sp,
+            fontSize = fontSize,
             color = textColor
         )
         Text(
             text = stringResource(id = R.string.password_requirement_uppercase),
-            fontSize = 14.sp,
+            fontSize = fontSize,
             color = textColor
         )
         Text(
             text = stringResource(id = R.string.password_requirement_lowercase),
-            fontSize = 14.sp,
+            fontSize = fontSize,
             color = textColor
         )
         Text(
             text = stringResource(id = R.string.password_requirement_special),
-            fontSize = 14.sp,
+            fontSize = fontSize,
             color = textColor
         )
     }
