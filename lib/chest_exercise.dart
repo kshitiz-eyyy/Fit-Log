@@ -6,18 +6,8 @@ class ChestExerciseScreen extends StatelessWidget {
   final List<Map<String, String>> exercises = const [
     {
       "name": "Bench Press",
-      "reps": "3×12 reps",
+      "reps": "4×8 reps",
       "image": "assets/images/Benchpress.png"
-    },
-    {
-      "name": "Pec Dec Fly",
-      "reps": "3×12 reps",
-      "image": "assets/images/Pecdecfly.png"
-    },
-    {
-      "name": "Cable Crossover",
-      "reps": "3×12 reps",
-      "image": "assets/images/cablecrossover.png"
     },
     {
       "name": "Dumbbell Press",
@@ -25,13 +15,18 @@ class ChestExerciseScreen extends StatelessWidget {
       "image": "assets/images/Dumbellpress.png"
     },
     {
-      "name": "Machine Press",
+      "name": "Cable Crossover",
+      "reps": "3×15 reps",
+      "image": "assets/images/cablecrossover.png"
+    },
+    {
+      "name": "Pec Dec Fly",
       "reps": "3×12 reps",
-      "image": "assets/images/machinepress.png"
+      "image": "assets/images/Pecdecfly.png"
     },
     {
       "name": "Chest Dips",
-      "reps": "3×12 reps",
+      "reps": "3×Failure",
       "image": "assets/images/chestdips.png"
     },
   ];
@@ -39,54 +34,39 @@ class ChestExerciseScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF9E9486), // brownish background
+      backgroundColor: const Color(0xFF0E0E0E), // ✅ brown background
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF0E0E0E),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          "CHEST EXERCISES",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.lightGreenAccent,
+            fontSize: 22,
+          ),
+        ),
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 🔙 Back button
-              Align(
-                alignment: Alignment.topLeft,
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ),
-
-              const SizedBox(height: 10),
-
-              // 🏋️ Title
               const Text(
-                "Exercise Lists",
+                "CHEST / PECTORALS",
                 style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Colors.lightGreenAccent,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-
               const SizedBox(height: 20),
-
-              // 🔘 Category Button
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Text(
-                  "Chest Exercises",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // 📋 List
               Expanded(
                 child: ListView.builder(
                   itemCount: exercises.length,
@@ -105,48 +85,81 @@ class ChestExerciseScreen extends StatelessWidget {
   // 🔥 Exercise Card Widget
   Widget exerciseCard(Map<String, String> data) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.grey[300],
+        color: Colors.black, // ✅ white card background
         borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.white
+
+                .withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(2, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
           // 🖼 Image
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset(
+              data["image"]!,
+              width: 60,
+              height: 60,
+              fit: BoxFit.cover,
             ),
-            child: data["image"] != null
-                ? Image.asset(data["image"]!, fit: BoxFit.cover)
-                : const Icon(Icons.fitness_center),
           ),
 
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
 
-          // 📄 Text
+          // 📄 Text + Button
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   data["name"] ?? "",
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
                 ),
                 const SizedBox(height: 4),
-                Text(data["reps"] ?? ""),
-                const SizedBox(height: 4),
-                Row(
-                  children: const [
-                    Text("Play Video"),
-                    SizedBox(width: 6),
-                    Icon(Icons.play_circle_outline, size: 18),
-                  ],
-                )
+                Text(
+                  data["reps"] ?? "",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    // TODO: Add video navigation
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green, // ✅ green button
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 6, horizontal: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  icon: const Icon(Icons.play_circle_fill,
+                      size: 18, color: Colors.black),
+                  label: const Text(
+                    "PLAY VIDEO",
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
