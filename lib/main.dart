@@ -1,5 +1,7 @@
+import 'package:fitlog/exercise_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'chest_exercise.dart';
+import 'history.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Fitness App',
-      home: ChestExerciseScreen(), // this will show your chest exercise screen
+      home: ExerciseDetailsScreen(),
     );
   }
 }

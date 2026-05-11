@@ -4,8 +4,16 @@ class ExerciseDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text("Exercise Details"),
+        backgroundColor: Colors.black,
+        title: Text(
+          "Exercise Details",
+          style: TextStyle(
+            color: Colors.lightGreenAccent,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -18,6 +26,7 @@ class ExerciseDetailsScreen extends StatelessWidget {
               "Chest",
               style: TextStyle(
                 fontSize: 24,
+                color: Colors.lightGreenAccent, //
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -29,13 +38,14 @@ class ExerciseDetailsScreen extends StatelessWidget {
               "Bench Press",
               style: TextStyle(
                 fontSize: 20,
+                color: Colors.lightGreenAccent, //
                 fontWeight: FontWeight.w600,
               ),
             ),
 
             SizedBox(height: 16),
 
-            // Illustration (replace with your asset)
+            // Illustration
             Center(
               child: Image.asset(
                 "assets/images/Benchpress.png",
@@ -51,6 +61,7 @@ class ExerciseDetailsScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: Colors.lightGreenAccent,
               ),
             ),
 
@@ -80,11 +91,14 @@ class InstructionItem extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("• ", style: TextStyle(fontSize: 16)),
+          Text(
+            "• ",
+            style: TextStyle(fontSize: 16, color: Colors.white), //
+          ),
           Expanded(
             child: Text(
               text,
-              style: TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: 16, color: Colors.white),
             ),
           ),
         ],
