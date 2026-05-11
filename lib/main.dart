@@ -1,21 +1,29 @@
-import 'package:fitlog/exercise_details_screen.dart';
 import 'package:flutter/material.dart';
-import 'chest_exercise.dart';
-import 'history.dart';
+import 'dashboard_screen.dart';
+import 'dashboard_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(FitLogApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
+class FitLogApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Fitness App',
-      home: ExerciseDetailsScreen(),
+      title: 'FitLog',
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: Colors.black,
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.black,
+          titleTextStyle: TextStyle(
+            color: Colors.lightGreenAccent,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      home: DashboardScreen(),
     );
   }
 }
