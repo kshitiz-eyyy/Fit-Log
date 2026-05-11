@@ -22,12 +22,13 @@ class ExerciseListScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           final exercise = exercises[index];
           return Card(
-            color: Colors.white,
+            color: Colors.black,
             margin: EdgeInsets.all(8),
             child: ListTile(
               leading: Image.asset(exercise["image"]!, height: 50),
               title: Text(exercise["name"]!,
                   style: TextStyle(fontWeight: FontWeight.bold)),
+
               onTap: () {
                 Navigator.push(
                   context,

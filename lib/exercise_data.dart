@@ -1,7 +1,7 @@
 final Map<String, List<Map<String, String>>> exerciseData = {
   "Chest": [
     {"name": "Bench Press", "image": "assets/images/Benchpress.png"},
-    {"name": "Dumbbell Press", "image": "assets/images/Dumbbellpress.png"},
+    {"name": "Dumbbell Press", "image": "assets/images/Dumbellpress.png"},
     {"name": "Chest Dips", "image": "assets/images/chestdips.png"},
     {"name": "Cable Crossover", "image": "assets/images/cablecrossover.png"},
     {"name": "Cable Rear Delt Fly", "image": "assets/images/cablereardeltfly.png"},
@@ -10,7 +10,7 @@ final Map<String, List<Map<String, String>>> exerciseData = {
   "Back": [
     {"name": "Pull Ups", "image": "assets/images/pullups.png"},
     {"name": "Deadlift", "image": "assets/images/deadlift.png"},
-    {"name": "Barbell Row", "image": "assets/images/barbell row.png"},
+    {"name": "Barbell Row", "image": "assets/images/barbellrow.png"},
     {"name": "Lat Pulldown", "image": "assets/images/latspulldown.png"},
     {"name": "Seated Row", "image": "assets/images/seatedrow.png"},
     {"name": "Single Arm Dumbbell Row", "image": "assets/images/singlearmdumbellrow.png"},
