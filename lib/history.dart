@@ -1,128 +1,61 @@
 import 'package:flutter/material.dart';
 
-class PerformanceLogScreen extends StatelessWidget {
-  const PerformanceLogScreen({super.key});
-
-  final List<Map<String, String>> workouts = const [
-    {
-      "title": "UPPER BODY POWER",
-      "date": "OCT 24, 2023 - 08:30 AM",
-      "duration": "52 MIN",
-      "calories": "480 KCAL",
-      "completed": "8/8",
-      "records": "1 NEW"
-    },
-    {
-      "title": "HIIT INTERVALS",
-      "date": "OCT 22, 2023 - 06:15 PM",
-      "duration": "35 MIN",
-      "calories": "320 KCAL",
-      "completed": "",
-      "records": ""
-    },
-    {
-      "title": "ACTIVE RECOVERY",
-      "date": "OCT 20, 2023 - 07:00 AM",
-      "duration": "45 MIN",
-      "calories": "150 KCAL",
-      "completed": "",
-      "records": ""
-    },
-  ];
+class HistoryScreen extends StatelessWidget {
+  const HistoryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // ✅ black background
+      backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
-        title: const Text(
-          "FITLOG",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.green, // ✅ green title
-            fontSize: 22,
-          ),
-        ),
         centerTitle: true,
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "PERFORMANCE LOG",
-                style: TextStyle(
-                  color: Colors.green,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 6),
-              const Text(
-                "HISTORY",
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // 📋 Workout List
-              Expanded(
-                child: ListView.builder(
-                  itemCount: workouts.length,
-                  itemBuilder: (context, index) {
-                    return workoutCard(workouts[index]);
-                  },
-                ),
-              ),
-
-              // 📊 Weekly Summary
-              Container(
-                margin: const EdgeInsets.only(top: 12),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white, // ✅ white card
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.green.withOpacity(0.3),
-                      blurRadius: 6,
-                      offset: const Offset(2, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      "WEEKLY MOMENTUM",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Colors.black,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Text("Total Calories Burned: 1,240"),
-                    Text("Workouts Done: 4"),
-                  ],
-                ),
-              ),
-            ],
+        title: const Text(
+          "PERFORMANCE LOG HISTORY",
+          style: TextStyle(
+            color: Colors.yellow,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
           ),
         ),
       ),
-
-      // 🔽 Bottom Navigation Bar
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          _buildWorkoutCard(
+            title: "Upper Body Power",
+            date: "October 24, 2023 - 08:30 AM",
+            duration: "52 minutes",
+            calories: "480 kcal",
+            exercises: "8/8",
+            records: "2 new",
+            progress: 1.0,
+          ),
+          _buildWorkoutCard(
+            title: "HIIT Intervals",
+            date: "October 22, 2023 - 06:15 PM",
+            duration: "35 minutes",
+            calories: "320 kcal",
+            progress: 0.7,
+          ),
+          _buildWorkoutCard(
+            title: "Active Recovery",
+            date: "October 20, 2023 - 07:00 AM",
+            duration: "45 minutes",
+            calories: "150 kcal",
+            progress: 0.4,
+          ),
+          const SizedBox(height: 20),
+          _buildWeeklyMomentum(),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.black,
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.white70,
+        selectedItemColor: Colors.yellow,
+        unselectedItemColor: Colors.white,
+        currentIndex: 2, // History tab highlighted
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.library_books), label: "Library"),
@@ -130,53 +63,88 @@ class PerformanceLogScreen extends StatelessWidget {
           BottomNavigationBarItem(icon: Icon(Icons.video_library), label: "Videos"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
+        onTap: (index) {
+          // TODO: Add navigation logic
+        },
       ),
     );
   }
 
-  // 🔥 Workout Card Widget
-  Widget workoutCard(Map<String, String> data) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white, // ✅ white card
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.green.withOpacity(0.3),
-            blurRadius: 6,
-            offset: const Offset(2, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            data["title"] ?? "",
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-              color: Colors.black,
+  Widget _buildWorkoutCard({
+    required String title,
+    required String date,
+    required String duration,
+    required String calories,
+    double progress = 0.0,
+    String? exercises,
+    String? records,
+  }) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: Colors.grey[900],
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.fitness_center, color: Colors.yellow, size: 28),
+                const SizedBox(width: 8),
+                Text(title,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18)),
+              ],
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(data["date"] ?? "",
-              style: const TextStyle(color: Colors.black54)),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Duration: ${data["duration"]}"),
-              Text("Burned: ${data["calories"]}"),
-            ],
-          ),
-          if (data["completed"]!.isNotEmpty)
-            Text("Exercise Completed: ${data["completed"]}"),
-          if (data["records"]!.isNotEmpty)
-            Text("Personal Records: ${data["records"]}"),
-        ],
+            const SizedBox(height: 4),
+            Text(date, style: const TextStyle(color: Colors.grey)),
+            const SizedBox(height: 8),
+            Text("Duration: $duration", style: const TextStyle(color: Colors.white)),
+            Text("Calories: $calories", style: const TextStyle(color: Colors.white)),
+            if (exercises != null)
+              Text("Exercises: $exercises", style: const TextStyle(color: Colors.white)),
+            if (records != null)
+              Text("Personal Records: $records", style: const TextStyle(color: Colors.white)),
+            const SizedBox(height: 10),
+            // Progress bar
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 8,
+                backgroundColor: Colors.grey[700],
+                color: Colors.yellow,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWeeklyMomentum() {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: Colors.lightGreenAccent,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: const [
+            Text("Weekly Momentum",
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18)),
+            SizedBox(height: 8),
+            Text("🔥 Total Calories Burned: 1240",
+                style: TextStyle(color: Colors.black)),
+            Text("🏋️ Workouts Done: 4",
+                style: TextStyle(color: Colors.black)),
+          ],
+        ),
       ),
     );
   }

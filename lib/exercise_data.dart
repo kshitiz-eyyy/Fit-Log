@@ -20,7 +20,7 @@ final Map<String, List<Map<String, String>>> exerciseData = {
     {"name": "Barbell Curl", "image": "assets/images/bicepcurl.png"},
     {"name": "Hammer Curl", "image": "assets/images/hammercurl.png"},
     {"name": "Inclined Dumbbell Curl", "image": "assets/images/inclineddumbellcurl.png"},
-    {"name": "Preacher Curl", "image": "assets/images/preahercurl.png"},
+    {"name": "Preacher Curl", "image": "assets/images/preachercurl.png"},
   ],
 
   "Triceps": [

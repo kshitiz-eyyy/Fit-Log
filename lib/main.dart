@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dashboard_screen.dart';
-import 'dashboard_screen.dart';
+import 'history.dart';
 
 void main() {
   runApp(FitLogApp());
@@ -23,7 +23,7 @@ class FitLogApp extends StatelessWidget {
           ),
         ),
       ),
-      home: DashboardScreen(),
+      home: HistoryScreen(),
     );
   }
 }
