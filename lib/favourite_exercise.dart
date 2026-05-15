@@ -33,7 +33,7 @@ class FavouriteExerciseScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5), // light background
+      backgroundColor: const Color(0xFF00FF0A), // light background
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,7 +46,7 @@ class FavouriteExerciseScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: Colors.black,
                 ),
               ),
             ),
@@ -62,11 +62,11 @@ class FavouriteExerciseScreen extends StatelessWidget {
                         horizontal: 16, vertical: 8),
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Colors.green,
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.2),
+                          color: Colors.black,
                           blurRadius: 6,
                           offset: const Offset(0, 3),
                         ),
@@ -95,14 +95,15 @@ class FavouriteExerciseScreen extends StatelessWidget {
                               Text(
                                 "${exercise["category"]} • ${exercise["equipment"]}",
                                 style: const TextStyle(
-                                  color: Colors.black54,
+                                  color: Colors.black
+                                  ,
                                 ),
                               ),
                               if (exercise["level"]!.isNotEmpty)
                                 Text(
                                   "Level: ${exercise["level"]}",
                                   style: const TextStyle(
-                                    color: Colors.black54,
+                                    color: Colors.black,
                                     fontStyle: FontStyle.italic,
                                   ),
                                 ),
