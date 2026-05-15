@@ -1,190 +1,219 @@
 import 'package:flutter/material.dart';
+import 'exerciselistscreen.dart'; // ✅ Import your ExerciseListScreen
 
 class FavouriteExerciseScreen extends StatelessWidget {
-  const FavouriteExerciseScreen({super.key});
-
-  final List<Map<String, String>> favouriteExercises = const [
+  final List<Map<String, String>> exercises = [
     {
-      "name": "Barbell Bench Press",
-      "category": "Chest",
+      "name": "BARBELL BENCH PRESS",
+      "muscle": "Chest",
       "equipment": "Barbell",
-      "level": "Pro"
+      "level": "Advanced",
+      "image": "assets/images/benchpress.png",
     },
     {
-      "name": "Sumo Deadlift",
-      "category": "Posterior Chain",
+      "name": "DEADLIFT",
+      "muscle": "Posterior Chain",
       "equipment": "Barbell",
-      "level": "Elite"
+      "level": "Elite",
+      "image": "assets/images/deadlift.png",
     },
     {
-      "name": "Barbell Squat",
-      "category": "Legs",
+      "name": "SQUAT",
+      "muscle": "Legs",
       "equipment": "Barbell",
-      "level": "Advanced"
+      "level": "Advanced",
+      "image": "assets/images/squats.png",
     },
     {
-      "name": "Pull-Ups (Weighted)",
-      "category": "Back",
+      "name": "PULL-UPS",
+      "muscle": "Back",
       "equipment": "Bodyweight",
-      "level": "Pro"
+      "level": "Pro",
+      "image": "assets/images/pullups.png",
+    },
+    {
+      "name": "PEC DEC FLY",
+      "muscle": "Chest",
+      "equipment": "Machine",
+      "level": "Intermediate",
+      "image": "assets/images/Pecdecfly.png",
+    },
+    {
+      "name": "CABLE CROSSOVER",
+      "muscle": "Chest",
+      "equipment": "Cable",
+      "level": "Intermediate",
+      "image": "assets/images/cablecrossover.png",
     },
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF00FF0A), // light background
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 🔝 Title
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                "MY FAVOURITE EXERCISES",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-
-            // 📋 Exercise Cards
-            Expanded(
-              child: ListView.builder(
-                itemCount: favouriteExercises.length,
-                itemBuilder: (context, index) {
-                  final exercise = favouriteExercises[index];
-                  return Container(
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.green,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black,
-                          blurRadius: 6,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        // ❤️ Favourite Icon
-                        const Icon(Icons.favorite, color: Colors.red),
-
-                        const SizedBox(width: 12),
-
-                        // 📄 Exercise Info
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                exercise["name"]!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                "${exercise["category"]} • ${exercise["equipment"]}",
-                                style: const TextStyle(
-                                  color: Colors.black
-                                  ,
-                                ),
-                              ),
-                              if (exercise["level"]!.isNotEmpty)
-                                Text(
-                                  "Level: ${exercise["level"]}",
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontStyle: FontStyle.italic,
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            // 🔎 Discover Section
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                "DISCOVER EXERCISES",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-              ),
-            ),
-
-            // 📊 Stats Section
-            Container(
-              width: double.infinity,
+      backgroundColor: const Color(0xFFB2FF59), // Bright green background
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          "MY FAVOURITE EXERCISES",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+            letterSpacing: 1.2,
+          ),
+        ),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: GridView.builder(
               padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, // Grid layout
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 0.8,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
-                    "MY FAVOURITE EXERCISES",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("Saved routines: 04",
-                          style: TextStyle(color: Colors.white)),
-                      Text("Completion rate: 92%",
-                          style: TextStyle(color: Colors.white)),
-                      Text("Reps recorded: 18",
-                          style: TextStyle(color: Colors.white)),
+              itemCount: exercises.length,
+              itemBuilder: (context, index) {
+                final exercise = exercises[index];
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 6,
+                        offset: const Offset(2, 4),
+                      ),
                     ],
                   ),
-                ],
-              ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 🖼 Exercise Image
+                      ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          topRight: Radius.circular(12),
+                        ),
+                        child: Image.asset(
+                          exercise["image"]!,
+                          height: 100,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Align(
+                              alignment: Alignment.topRight,
+                              child: Icon(Icons.favorite, color: Colors.red),
+                            ),
+                            Text(
+                              exercise["name"]!,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "${exercise["muscle"]} • ${exercise["equipment"]}",
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "Level: ${exercise["level"]}",
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontStyle: FontStyle.italic,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+              ),
+              onPressed: () {
 
-            // 🔘 Bottom Navigation
-            Container(
-              color: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: const [
-                  Icon(Icons.home, color: Colors.black),
-                  Icon(Icons.library_books, color: Colors.black),
-                  Icon(Icons.history, color: Colors.black),
-                  Icon(Icons.play_circle_fill, color: Colors.black),
-                  Icon(Icons.person, color: Colors.black),
-                ],
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ExerciseListScreen(
+                          muscleGroup: "Chest",   // or whichever group you want
+                          exercises: exercises,
+                        ),
+                    ),
+                );
+              },
+              child: const Text(
+                "DISCOVER EXERCISES",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
             ),
-          ],
-        ),
+          ),
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: const [
+                Text("Saved routines: 06",
+                    style: TextStyle(color: Colors.black, fontSize: 12)),
+                Text("Completion rate: 92%",
+                    style: TextStyle(color: Colors.black, fontSize: 12)),
+                Text("Reps recorded: 24",
+                    style: TextStyle(color: Colors.black, fontSize: 12)),
+              ],
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.green,
+        unselectedItemColor: Colors.black,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "HOME"),
+          BottomNavigationBarItem(icon: Icon(Icons.library_books), label: "LIBRARY"),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: "HISTORY"),
+          BottomNavigationBarItem(icon: Icon(Icons.video_library), label: "VIDEO"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "PROFILE"),
+        ],
       ),
     );
   }

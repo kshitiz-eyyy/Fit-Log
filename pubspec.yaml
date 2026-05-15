@@ -60,32 +60,9 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/Benchpress.png
-    - assets/images/Pecdecfly.png
-    - assets/images/cablecrossover.png
-    - assets/images/Dumbellpress.png
-    - assets/images/machinepress.png
-    - assets/images/chestdips.png
-    - assets/images/barbellrow.png
-    - assets/images/bicepcurl.png
-    - assets/images/cablecrunches.png
-    - assets/images/cablepushdown.png
-    - assets/images/cablereardeltfly.png
-    - assets/images/calfraises.png
-    - assets/images/closegripBP.png
-    - assets/images/deadlift.png
-    - assets/images/frontraise.png
-    - assets/images/hammercurl.png
-    - assets/images/hanginglegraises.png
-    - assets/images/inclineddumbellcurl.png
-    - assets/images/lateralraise.png
-    - assets/images/latspulldown.png
-    - assets/images/legcurl.png
-    - assets/images/legextention.png
-    - assets/images/lunges.png
-    - assets/images/mountainclimbers.png
-    - assets/images/plank.png
-    - assets/images/preachercurl.png
+    - assets/
+    - assets/images/
+
 
 
 
