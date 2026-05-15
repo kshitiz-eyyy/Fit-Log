@@ -169,7 +169,8 @@ class FavouriteExerciseScreen extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => LibraryScreen(),
+                        builder: (context) => LibraryScreen(
+                        ),
                     ),
                 );
               },

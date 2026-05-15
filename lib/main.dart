@@ -24,7 +24,7 @@ class FitLogApp extends StatelessWidget {
           ),
         ),
       ),
-      home: FavouriteExerciseScreen(),
+      home: LibraryScreen(),
     );
   }
 }
