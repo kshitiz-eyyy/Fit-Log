@@ -1,3 +1,5 @@
+import 'package:fitlog/fitlog_login.dart';
+import 'package:fitlog/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'change_password_screen.dart';
 
@@ -17,7 +19,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const ChangePasswordScreen(),
+      home: const FitLogLogin(),
     );
   }
 }
