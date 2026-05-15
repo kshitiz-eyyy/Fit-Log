@@ -1,6 +1,6 @@
 final Map<String, List<Map<String, String>>> exerciseData = {
   "Chest": [
-    {"name": "Bench Press", "image": "assets/images/benchpress.png"},
+    {"name": "Bench Press", "image": "assets/images/benchpres.png"},
     {"name": "Dumbbell Press", "image": "assets/images/Dumbellpress.png"},
     {"name": "Chest Dips", "image": "assets/images/chestdips.png"},
     {"name": "Cable Crossover", "image": "assets/images/cablecrossover.png"},

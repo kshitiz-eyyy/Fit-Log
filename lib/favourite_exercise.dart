@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'exerciselistscreen.dart'; // ✅ Import your ExerciseListScreen
+import 'exerciselistscreen.dart';
+import 'library.dart';// ✅ Import your ExerciseListScreen
 
 class FavouriteExerciseScreen extends StatelessWidget {
   final List<Map<String, String>> exercises = [
@@ -8,7 +9,7 @@ class FavouriteExerciseScreen extends StatelessWidget {
       "muscle": "Chest",
       "equipment": "Barbell",
       "level": "Advanced",
-      "image": "assets/images/benchpress.png",
+      "image": "assets/images/benchpres.png",
     },
     {
       "name": "DEADLIFT",
@@ -168,10 +169,7 @@ class FavouriteExerciseScreen extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => ExerciseListScreen(
-                          muscleGroup: "Chest",   // or whichever group you want
-                          exercises: exercises,
-                        ),
+                        builder: (context) => LibraryScreen(),
                     ),
                 );
               },
@@ -207,14 +205,50 @@ class FavouriteExerciseScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         selectedItemColor: Colors.green,
         unselectedItemColor: Colors.black,
+        currentIndex: 0, // default to HOME
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => FavouriteExerciseScreen()),
+              );
+              break;
+            case 1:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => Placeholder()), // replace with FeaturesScreen
+              );
+              break;
+            case 2:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => LibraryScreen()), // ✅ import library.dart
+              );
+              break;
+            case 3:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => Placeholder()), // replace with ActivityScreen
+              );
+              break;
+            case 4:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => Placeholder()), // replace with ProfileScreen
+              );
+              break;
+          }
+        },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "HOME"),
-          BottomNavigationBarItem(icon: Icon(Icons.library_books), label: "LIBRARY"),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: "HISTORY"),
-          BottomNavigationBarItem(icon: Icon(Icons.video_library), label: "VIDEO"),
+          BottomNavigationBarItem(icon: Icon(Icons.featured_video_sharp), label: "Features"),
+          BottomNavigationBarItem(icon: Icon(Icons.library_add), label: "Library"),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: "Activity"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "PROFILE"),
         ],
       ),
+
     );
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dashboard_screen.dart';
+import 'library.dart';
 import 'history.dart';
 import 'favourite_exercise.dart';
 

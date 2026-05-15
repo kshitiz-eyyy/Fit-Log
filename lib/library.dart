@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'exercise_data.dart';
 import 'exerciselistscreen.dart';
 
-class DashboardScreen extends StatelessWidget {
+class LibraryScreen extends StatelessWidget {
   final muscleGroups = exerciseData.keys.toList();
 
   @override
@@ -136,11 +136,11 @@ class DashboardScreen extends StatelessWidget {
         selectedItemColor: Colors.lightGreenAccent,
         unselectedItemColor: Colors.grey,
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.fitness_center), label: "Workouts"),
-          BottomNavigationBarItem(icon: Icon(Icons.star), label: "Features"),
-          BottomNavigationBarItem(icon: Icon(Icons.timeline), label: "Tracking"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "HOME"),
+          BottomNavigationBarItem(icon: Icon(Icons.featured_video_sharp), label: "Features"),
+          BottomNavigationBarItem(icon: Icon(Icons.library_add), label: "Library"),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: "Activity"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "PROFILE"),
         ],
       ),
     );
