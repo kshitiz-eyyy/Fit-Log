@@ -30,4 +30,80 @@
     <string name="data_integrity_description">Changing your performance key will log out all other active training sessions across devices. This ensures your biometrics and goals remain synchronized only with your current hardware.</string>
     <string name="end_to_end_encrypted">END-TO-END ENCRYPTED</string>
     <string name="fitlog_logo">FITLOG</string>
+
+    <!-- Account Screen Strings -->
+    <string name="athlete_profile">ATHLETE PROFILE</string>
+    <string name="account_title">ACCOUNT</string>
+    <string name="member_since">Member Since\n%s</string>
+    <string name="personal_details">PERSONAL DETAILS</string>
+    <string name="edit_all">EDIT ALL</string>
+    <string name="full_name_label">FULL NAME</string>
+    <string name="email_address_label">EMAIL ADDRESS</string>
+    <string name="height_label">HEIGHT</string>
+    <string name="weight_label">WEIGHT</string>
+    <string name="body_fat_label">BODY FAT</string>
+    <string name="security_privacy">SECURITY &amp; PRIVACY</string>
+    <string name="update_password">Update Password</string>
+    <string name="biometric_authentication">Biometric Authentication</string>
+    <string name="data_export_history">Data Export History</string>
+    <string name="terminate_account">TERMINATE\nACCOUNT</string>
+    <string name="terminate_description">This action is permanent and cannot be undone. All workout history, physiological data, and earned badges will be purged from the Forge Performance servers.</string>
+    <string name="understand_risks">I UNDERSTAND THE DATA LOSS RISKS</string>
+    <string name="delete_account">DELETE ACCOUNT</string>
+    <string name="mfa_required">REQUIRES MULTI-FACTOR VERIFICATION</string>
+    <string name="nav_dash">Dash</string>
+    <string name="nav_train">Train</string>
+    <string name="nav_fuel">Fuel</string>
+    <string name="nav_goals">Goals</string>
+    <string name="nav_admin">Admin</string>
+
+    <!-- Create Profile Strings -->
+    <string name="create_profile_title">CREATE</string>
+    <string name="profile_title_accent">PROFILE</string>
+    <string name="create_profile_subtitle">Establish your athletic identifier for the ecosystem.</string>
+    <string name="athlete_handle_label">ATHLETE HANDLE</string>
+    <string name="athlete_handle_hint">Username</string>
+    <string name="email_protocol_label">EMAIL PROTOCOL</string>
+    <string name="email_protocol_hint">email@forge.performance</string>
+    <string name="comms_link_label">COMMS LINK (PHONE)</string>
+    <string name="comms_link_hint">+1 (555) 000-0000</string>
+    <string name="access_key_label">ACCESS KEY</string>
+    <string name="verify_key_label">VERIFY KEY</string>
+    <string name="athletic_objective_label">ATHLETIC OBJECTIVE (BIO)</string>
+    <string name="athletic_objective_hint">Tell us about your performance goals...</string>
+    <string name="accept_terms_prefix">Accept</string>
+    <string name="terms_and_conditions">Terms and Conditions</string>
+    <string name="initialize_performance">INITIALIZE PERFORMANCE</string>
+    <string name="step_count">STEP 01 / 03</string>
+    <string name="camera_icon_description">Change profile picture</string>
+
+    <!-- Hydration Settings Screen Strings -->
+    <string name="hydration_daily_target">DAILY TARGET</string>
+    <string name="hydration_motivation">Stay hydrated, perform better.</string>
+    <string name="intake_reminders_title">Intake Reminders</string>
+    <string name="intake_reminders_desc">Push notifications to drink water</string>
+    <string name="interval_frequency_title">INTERVAL FREQUENCY</string>
+    <string name="every_1h">Every 1H</string>
+    <string name="every_2h">Every 2H</string>
+    <string name="every_3h">Every 3H</string>
+    <string name="smart_reminder_title">Smart Reminder</string>
+    <string name="high_intensity">HIGH INTENSITY</string>
+    <string name="smart_reminder_desc">Dynamic frequency based on sweat rate &amp; activity heart rate.</string>
+    <string name="enabled_for_elite_pro">Enabled for Elite Pro</string>
+    <string name="monitoring_window_title">MONITORING WINDOW</string>
+    <string name="start_time_label">START TIME</string>
+    <string name="end_time_label">END TIME</string>
+    <string name="save_preferences">SAVE PREFERENCES</string>
+
+    <!-- Personal Details Screen Strings -->
+    <string name="personal_details_subtitle">Optimize your technical profile for precision tracking.</string>
+    <string name="identity_label">IDENTITY</string>
+    <string name="performance_email_label">PERFORMANCE EMAIL</string>
+    <string name="body_composition_label">BODY COMPOSITION</string>
+    <string name="cm_unit">CM</string>
+    <string name="kg_unit">KG</string>
+    <string name="bf_percentage_unit">BF%</string>
+    <string name="metrics_info_description">Update these metrics regularly for the most accurate metabolic and recovery calculations. Forge uses these to calibrate your intensity zones.</string>
+    <string name="save_changes_button">SAVE CHANGES</string>
+    <string name="reset_button_content_description">Reset</string>
 </resources>

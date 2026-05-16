@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'change_password_screen.dart';
+import 'personal_details_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,11 +14,10 @@ class MyApp extends StatelessWidget {
       title: 'FitLog',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+        brightness: Brightness.dark,
       ),
-      home: const ChangePasswordScreen(),
+      home: const PersonalDetailsScreen(),
     );
   }
 }
-
