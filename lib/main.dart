@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'library.dart';
-import 'history.dart';
+import 'activity_screen.dart';
 import 'favourite_exercise.dart';
 import 'change_password_screen.dart';
 

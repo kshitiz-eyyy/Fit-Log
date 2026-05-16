@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'exercise_data.dart';
 import 'exerciselistscreen.dart';
-import 'history.dart';
+import 'activity_screen.dart';
 
 class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key});
@@ -21,7 +21,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
     // Library (your current UI)
     _LibraryContent(),
     // Activity → History
-    HistoryScreen(),
+    ActivityScreen(),
     // Profile placeholder
     Center(child: Text("PROFILE", style: TextStyle(color: Colors.white))),
   ];
