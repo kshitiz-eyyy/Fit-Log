@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'video_screen.dart'; // 👈 make sure you create this file
+import 'video_screen.dart';
 import 'exercise_data.dart';
+import 'favourite_manager.dart'; // ✅ global favourites list
 
 class ExerciseListScreen extends StatelessWidget {
   final String muscleGroup;
@@ -30,13 +31,15 @@ class ExerciseListScreen extends StatelessWidget {
   }
 }
 
-// 🔥 Your exerciseCard widget
+// 🔥 Modified exerciseCard widget with favourites
 Widget exerciseCard(Map<String, String> data, BuildContext context) {
+  bool isFavourite = favouriteExercises.any((ex) => ex["name"] == data["name"]);
+
   return Container(
     margin: const EdgeInsets.only(bottom: 12),
     padding: const EdgeInsets.all(10),
     decoration: BoxDecoration(
-      color: Colors.grey[300],
+      color: Colors.green,
       borderRadius: BorderRadius.circular(12),
     ),
     child: Row(
@@ -46,7 +49,7 @@ Widget exerciseCard(Map<String, String> data, BuildContext context) {
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Colors.black,
             borderRadius: BorderRadius.circular(10),
           ),
           child: data["image"] != null
@@ -61,7 +64,7 @@ Widget exerciseCard(Map<String, String> data, BuildContext context) {
 
         const SizedBox(width: 12),
 
-        // 📄 Text + Video Button
+        // 📄 Text + Video Button + Favourite
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,22 +76,43 @@ Widget exerciseCard(Map<String, String> data, BuildContext context) {
               const SizedBox(height: 4),
               Text(data["reps"] ?? ""),
               const SizedBox(height: 4),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => VideoScreen(videoUrl: data["video"]!),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => VideoScreen(videoUrl: data["video"]!),
+                        ),
+                      );
+                    },
+                    child: Row(
+                      children: const [
+                        Text("Play Video", style: TextStyle(color: Colors.black)),
+                        SizedBox(width: 6),
+                        Icon(Icons.play_circle_outline,
+                            size: 18, color: Colors.black),
+                      ],
                     ),
-                  );
-                },
-                child: Row(
-                  children: const [
-                    Text("Play Video", style: TextStyle(color: Colors.green)),
-                    SizedBox(width: 6),
-                    Icon(Icons.play_circle_outline, size: 18, color: Colors.green),
-                  ],
-                ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: Icon(
+                      isFavourite ? Icons.favorite : Icons.favorite_border,
+                      color: Colors.red,
+                    ),
+                    onPressed: () {
+                      if (isFavourite) {
+                        favouriteExercises.removeWhere(
+                                (ex) => ex["name"] == data["name"]);
+                      } else {
+                        favouriteExercises.add(data);
+                      }
+                      (context as Element).markNeedsBuild(); // refresh UI
+                    },
+                  ),
+                ],
               ),
             ],
           ),
