@@ -1,6 +1,8 @@
 import 'package:fitlog/register_screen.dart';
 import 'package:flutter/material.dart';
 
+import 'forgot_password_screen.dart';
+
 class FitLogLogin extends StatelessWidget {
   const FitLogLogin({super.key});
 
@@ -64,22 +66,28 @@ class FitLogLogin extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              // Password Row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
 
-                  const _FieldLabel(label: 'PASSWORD', size: 16),
-                  TextButton(
-                    onPressed: () {},
-                    // --- INCREASED SIZE: Forgot Password ---
-                    child: const Text(
-                      'FORGOT PASSWORD?',
-                      style: TextStyle(color: Colors.grey, fontSize: 14),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const _FieldLabel(label: 'PASSWORD', size: 16),
+              TextButton(
+                onPressed: () {
+                  // Navigate to ForgotPasswordScreen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ForgotPasswordScreen(),
                     ),
-                  ),
-                ],
+                  );
+                },
+                child: const Text(
+                  'FORGOT PASSWORD?',
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
               ),
+            ],
+          ),
               const _CustomTextField(
                 hint: '********',
                 icon: Icons.lock_outline,
