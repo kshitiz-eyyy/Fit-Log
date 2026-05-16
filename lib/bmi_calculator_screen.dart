@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
+import 'bmi_brain.dart'; // <--- HERE IS WHERE WE IMPORT YOUR BRAIN FILE!
 
 void main() {
   runApp(const MaterialApp(
@@ -16,24 +16,23 @@ class BMICalculatorScreen extends StatefulWidget {
 }
 
 class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
-  // Controllers to capture user input
   final TextEditingController _heightController = TextEditingController();
   final TextEditingController _weightController = TextEditingController();
 
-  // State variables for output
+  // State elements to update the screen display
   double? _bmiResult;
   String _bmiCategory = "";
   String _bmiFeedback = "Enter your metrics above to calculate your current score.";
-  double _progressValue = 0.0; // From 0.0 to 1.0 for the progress bar
+  double _progressValue = 0.0;
 
-  // Custom Neon Colors based on design
   static const Color bgColor = Color(0xFF121212);
   static const Color cardBgColor = Color(0xFF1E1E1E);
+  static const Color inputBgColor = Color(0xFF161616);
   static const Color neonLime = Color(0xFFCCFF00);
   static const Color textGray = Color(0xFF8E8E93);
 
-  // Business Logic Function
-  void _calculateBMI() {
+  // This calls your separate BMIBrain when the button is clicked
+  void _executeCalculation() {
     final double? height = double.tryParse(_heightController.text);
     final double? weight = double.tryParse(_weightController.text);
 
@@ -44,31 +43,16 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
       return;
     }
 
-    // BMI Formula: kg / (m^2)
-    double heightInMeters = height / 100;
-    double bmi = weight / pow(heightInMeters, 2);
+    // Initialize the logic class we created in the other file
+    BMIBrain brain = BMIBrain(height: height, weight: weight);
+    double bmi = brain.calculateBMI();
 
+    // Pull calculations dynamically into our UI state
     setState(() {
       _bmiResult = bmi;
-
-      // Determine categories, dynamic text, and progress bar width
-      if (bmi < 18.5) {
-        _bmiCategory = "UNDERWEIGHT";
-        _bmiFeedback = "Based on your height and weight, you are below the standard range. Consider a nutrition plan.";
-        _progressValue = 0.3;
-      } else if (bmi >= 18.5 && bmi < 25) {
-        _bmiCategory = "NORMAL";
-        _bmiFeedback = "Based on your height and weight, you are in a healthy, optimal range. Keep maintaining your lifestyle!";
-        _progressValue = 0.5;
-      } else if (bmi >= 25 && bmi < 30) {
-        _bmiCategory = "OVERWEIGHT";
-        _bmiFeedback = "Based on your height and weight, you are within the athletic-overweight range. Focus on body composition.";
-        _progressValue = 0.75;
-      } else {
-        _bmiCategory = "OBESE";
-        _bmiFeedback = "Based on your height and weight, you are within the obese range. Focus on active cardio and dietary adjustments.";
-        _progressValue = 1.0;
-      }
+      _bmiCategory = brain.getCategory(bmi);
+      _bmiFeedback = brain.getFeedback(bmi);
+      _progressValue = brain.getProgressValue(bmi);
     });
   }
 
@@ -82,10 +66,8 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      // Swipe right to go back logic
       onHorizontalDragEnd: (details) {
         if (details.primaryVelocity! > 500) {
-          // Trigger back navigation
           Navigator.of(context).maybePop();
         }
       },
@@ -97,7 +79,6 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Top Custom App Bar Row
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -110,7 +91,7 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
                       style: TextStyle(
                         color: neonLime,
                         fontSize: 24,
-                        fontWeight: FontWeight.black,
+                        fontWeight: FontWeight.w900,
                         fontStyle: FontStyle.italic,
                         letterSpacing: 1.2,
                       ),
@@ -123,8 +104,6 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
                   ],
                 ),
                 const SizedBox(height: 32),
-
-                // Section Headers
                 const Text(
                   'PERFORMANCE METRICS',
                   style: TextStyle(
@@ -140,13 +119,11 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 32,
-                    fontWeight: FontWeight.black,
+                    fontWeight: FontWeight.w900,
                     fontStyle: FontStyle.italic,
                   ),
                 ),
                 const SizedBox(height: 24),
-
-                // Input Card Container
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -170,8 +147,6 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
                         controller: _weightController,
                       ),
                       const SizedBox(height: 24),
-
-                      // Calculate Button
                       SizedBox(
                         width: double.infinity,
                         height: 50,
@@ -183,11 +158,11 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
-                          onPressed: _calculateBMI,
+                          onPressed: _executeCalculation,
                           child: const Text(
                             'CALCULATE RESULT',
                             style: TextStyle(
-                              fontWeight: FontWeight.black,
+                              fontWeight: FontWeight.w900,
                               fontStyle: FontStyle.italic,
                               fontSize: 16,
                             ),
@@ -198,8 +173,6 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
-                // Results Card Container (Only styled brightly if score exists)
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
@@ -228,7 +201,7 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
                         style: const TextStyle(
                           color: neonLime,
                           fontSize: 54,
-                          fontWeight: FontWeight.black,
+                          fontWeight: FontWeight.w900,
                           fontStyle: FontStyle.italic,
                         ),
                       ),
@@ -242,8 +215,6 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-
-                      // Custom Linear Progress Indicator Bar
                       ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: LinearProgressIndicator(
@@ -274,7 +245,6 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
     );
   }
 
-  // Reusable Helper widget for building input text fields
   Widget _buildInputField({
     required String label,
     required String hint,
@@ -304,7 +274,7 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
               ),
             ),
             filled: true,
-            fillColor: Colors.black25,
+            fillColor: inputBgColor,
             enabledBorder: OutlineInputBorder(
               borderSide: const BorderSide(color: Colors.white12, width: 1),
               borderRadius: BorderRadius.circular(4),
