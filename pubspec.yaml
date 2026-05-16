@@ -28,6 +28,8 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+
+
   flutter:
     sdk: flutter
 
@@ -58,12 +60,10 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/Benchpress.png
-    - assets/images/Pecdecfly.png
-    - assets/images/cablecrossover.png
-    - assets/images/Dumbellpress.png
-    - assets/images/machinepress.png
-    - assets/images/chestdips.png
+    - assets/
+    - assets/images/
+
+
 
 
 

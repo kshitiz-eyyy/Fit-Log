@@ -1,24 +1,34 @@
 import 'package:flutter/material.dart';
+import 'library.dart';
+import 'history.dart';
+import 'favourite_exercise.dart';
 import 'change_password_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const FitLogApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class FitLogApp extends StatelessWidget {
+  const FitLogApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'FitLog',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+      title: 'FitLog',
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: Colors.black,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.black,
+          titleTextStyle: TextStyle(
+            color: Colors.lightGreenAccent,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
-      home: const ChangePasswordScreen(),
+      // 👇 Set your starting screen here
+      home: const LibraryScreen(),
     );
   }
 }
-

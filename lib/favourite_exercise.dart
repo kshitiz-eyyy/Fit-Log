@@ -1,0 +1,255 @@
+import 'package:flutter/material.dart';
+import 'exerciselistscreen.dart';
+import 'library.dart';// ✅ Import your ExerciseListScreen
+
+class FavouriteExerciseScreen extends StatelessWidget {
+  final List<Map<String, String>> exercises = [
+    {
+      "name": "BARBELL BENCH PRESS",
+      "muscle": "Chest",
+      "equipment": "Barbell",
+      "level": "Advanced",
+      "image": "assets/images/benchpres.png",
+    },
+    {
+      "name": "DEADLIFT",
+      "muscle": "Posterior Chain",
+      "equipment": "Barbell",
+      "level": "Elite",
+      "image": "assets/images/deadlift.png",
+    },
+    {
+      "name": "SQUAT",
+      "muscle": "Legs",
+      "equipment": "Barbell",
+      "level": "Advanced",
+      "image": "assets/images/squats.png",
+    },
+    {
+      "name": "PULL-UPS",
+      "muscle": "Back",
+      "equipment": "Bodyweight",
+      "level": "Pro",
+      "image": "assets/images/pullups.png",
+    },
+    {
+      "name": "PEC DEC FLY",
+      "muscle": "Chest",
+      "equipment": "Machine",
+      "level": "Intermediate",
+      "image": "assets/images/Pecdecfly.png",
+    },
+    {
+      "name": "CABLE CROSSOVER",
+      "muscle": "Chest",
+      "equipment": "Cable",
+      "level": "Intermediate",
+      "image": "assets/images/cablecrossover.png",
+    },
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFB2FF59), // Bright green background
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          "MY FAVOURITE EXERCISES",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+            letterSpacing: 1.2,
+          ),
+        ),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: GridView.builder(
+              padding: const EdgeInsets.all(16),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, // Grid layout
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 0.8,
+              ),
+              itemCount: exercises.length,
+              itemBuilder: (context, index) {
+                final exercise = exercises[index];
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 6,
+                        offset: const Offset(2, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 🖼 Exercise Image
+                      ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          topRight: Radius.circular(12),
+                        ),
+                        child: Image.asset(
+                          exercise["image"]!,
+                          height: 100,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Align(
+                              alignment: Alignment.topRight,
+                              child: Icon(Icons.favorite, color: Colors.red),
+                            ),
+                            Text(
+                              exercise["name"]!,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "${exercise["muscle"]} • ${exercise["equipment"]}",
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "Level: ${exercise["level"]}",
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontStyle: FontStyle.italic,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+              ),
+              onPressed: () {
+
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => LibraryScreen(
+                        ),
+                    ),
+                );
+              },
+              child: const Text(
+                "DISCOVER EXERCISES",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: const [
+                Text("Saved routines: 06",
+                    style: TextStyle(color: Colors.black, fontSize: 12)),
+                Text("Completion rate: 92%",
+                    style: TextStyle(color: Colors.black, fontSize: 12)),
+                Text("Reps recorded: 24",
+                    style: TextStyle(color: Colors.black, fontSize: 12)),
+              ],
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.green,
+        unselectedItemColor: Colors.black,
+        currentIndex: 0, // default to HOME
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => FavouriteExerciseScreen()),
+              );
+              break;
+            case 1:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => Placeholder()), // replace with FeaturesScreen
+              );
+              break;
+            case 2:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => LibraryScreen()), // ✅ import library.dart
+              );
+              break;
+            case 3:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => Placeholder()), // replace with ActivityScreen
+              );
+              break;
+            case 4:
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => Placeholder()), // replace with ProfileScreen
+              );
+              break;
+          }
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "HOME"),
+          BottomNavigationBarItem(icon: Icon(Icons.featured_video_sharp), label: "Features"),
+          BottomNavigationBarItem(icon: Icon(Icons.library_add), label: "Library"),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: "Activity"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "PROFILE"),
+        ],
+      ),
+
+    );
+  }
+}

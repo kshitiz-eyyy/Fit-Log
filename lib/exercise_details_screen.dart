@@ -1,11 +1,24 @@
 import 'package:flutter/material.dart';
 
 class ExerciseDetailsScreen extends StatelessWidget {
+  final String muscleGroup;
+  final String exerciseName;
+  final String imagePath;
+
+  ExerciseDetailsScreen({
+    required this.muscleGroup,
+    required this.exerciseName,
+    required this.imagePath,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text("Exercise Details"),
+        backgroundColor: Colors.black,
+        title: Text("Exercise Details",
+            style: TextStyle(color: Colors.lightGreenAccent)),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -13,54 +26,30 @@ class ExerciseDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Section Title
-            Text(
-              "Chest",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
+            Text(muscleGroup,
+                style: TextStyle(
+                    fontSize: 24,
+                    color: Colors.lightGreenAccent,
+                    fontWeight: FontWeight.bold)),
+            SizedBox(height: 12),
+            Text(exerciseName,
+                style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.lightGreenAccent,
+                    fontWeight: FontWeight.w600)),
             SizedBox(height: 16),
-
-            // Exercise Name
-            Text(
-              "Bench Press",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-
-            SizedBox(height: 16),
-
-            // Illustration (replace with your asset)
-            Center(
-              child: Image.asset(
-                "assets/images/Benchpress.png",
-                height: 200,
-              ),
-            ),
-
+            Center(child: Image.asset(imagePath, height: 200)),
             SizedBox(height: 24),
-
-            // Instructions
-            Text(
-              "Instructions:",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
+            Text("Instructions:",
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.lightGreenAccent)),
             SizedBox(height: 8),
-
-            InstructionItem("Keep your shoulder blades retracted throughout the lift for better joint stability."),
-            InstructionItem("Do not flare your elbows excessively—aim for ~45°–60° from the body."),
-            InstructionItem("Maintain a tight glute and leg drive to anchor your base."),
-            InstructionItem("Keep wrist alignment neutral to avoid strain."),
-            InstructionItem("Lower the bar under control; don’t bounce it off the chest."),
+            InstructionItem("Maintain proper form and controlled movement."),
+            InstructionItem("Avoid jerking or swinging the weights."),
+            InstructionItem("Focus on muscle contraction and breathing."),
+            InstructionItem("Perform 3–4 sets of 10–12 reps."),
           ],
         ),
       ),
@@ -68,7 +57,6 @@ class ExerciseDetailsScreen extends StatelessWidget {
   }
 }
 
-// Custom widget for bullet points
 class InstructionItem extends StatelessWidget {
   final String text;
   InstructionItem(this.text);
@@ -80,12 +68,10 @@ class InstructionItem extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("• ", style: TextStyle(fontSize: 16)),
+          Text("• ", style: TextStyle(fontSize: 16, color: Colors.white)),
           Expanded(
-            child: Text(
-              text,
-              style: TextStyle(fontSize: 16),
-            ),
+            child: Text(text,
+                style: TextStyle(fontSize: 16, color: Colors.white)),
           ),
         ],
       ),
