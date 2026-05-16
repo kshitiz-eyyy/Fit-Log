@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 
 class ExerciseDetailsScreen extends StatelessWidget {
-  final String muscleGroup;
   final String exerciseName;
+  final String muscleGroup;
   final String imagePath;
+  final String instructions;
 
-  ExerciseDetailsScreen({
-    required this.muscleGroup,
+  const ExerciseDetailsScreen({
+    super.key,
     required this.exerciseName,
+    required this.muscleGroup,
     required this.imagePath,
+    required this.instructions,
   });
 
   @override
@@ -16,64 +19,56 @@ class ExerciseDetailsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: Text("Exercise Details",
-            style: TextStyle(color: Colors.lightGreenAccent)),
+        backgroundColor: Colors.green.shade700,
+        title: Text(
+          exerciseName,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(muscleGroup,
-                style: TextStyle(
-                    fontSize: 24,
-                    color: Colors.lightGreenAccent,
-                    fontWeight: FontWeight.bold)),
-            SizedBox(height: 12),
-            Text(exerciseName,
-                style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.lightGreenAccent,
-                    fontWeight: FontWeight.w600)),
-            SizedBox(height: 16),
-            Center(child: Image.asset(imagePath, height: 200)),
-            SizedBox(height: 24),
-            Text("Instructions:",
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.lightGreenAccent)),
-            SizedBox(height: 8),
-            InstructionItem("Maintain proper form and controlled movement."),
-            InstructionItem("Avoid jerking or swinging the weights."),
-            InstructionItem("Focus on muscle contraction and breathing."),
-            InstructionItem("Perform 3–4 sets of 10–12 reps."),
+            // 🖼 Exercise Image
+            if (imagePath.isNotEmpty)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  imagePath,
+                  height: 200,
+                  fit: BoxFit.cover,
+                ),
+              )
+            else
+              const Icon(Icons.fitness_center, size: 100, color: Colors.white),
+
+            const SizedBox(height: 20),
+
+            // 📝 Instructions
+            Text(
+              instructions,
+              style: const TextStyle(color: Colors.white70, fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+
+            const SizedBox(height: 20),
+
+            // 💪 Muscle Group
+            Text(
+              "Muscle Group: $muscleGroup",
+              style: const TextStyle(
+                color: Colors.lightGreenAccent,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class InstructionItem extends StatelessWidget {
-  final String text;
-  InstructionItem(this.text);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("• ", style: TextStyle(fontSize: 16, color: Colors.white)),
-          Expanded(
-            child: Text(text,
-                style: TextStyle(fontSize: 16, color: Colors.white)),
-          ),
-        ],
       ),
     );
   }

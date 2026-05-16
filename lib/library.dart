@@ -14,15 +14,10 @@ class _LibraryScreenState extends State<LibraryScreen> {
   int _selectedIndex = 2; // Default to Library tab
 
   final List<Widget> _screens = [
-    // Home placeholder
     Center(child: Text("HOME", style: TextStyle(color: Colors.white))),
-    // Features placeholder
     Center(child: Text("FEATURES", style: TextStyle(color: Colors.white))),
-    // Library (your current UI)
     _LibraryContent(),
-    // Activity → History
     ActivityScreen(),
-    // Profile placeholder
     Center(child: Text("PROFILE", style: TextStyle(color: Colors.white))),
   ];
 
@@ -55,7 +50,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
   }
 }
 
-// 👇 Extracted your original Library UI into its own widget
 class _LibraryContent extends StatelessWidget {
   final muscleGroups = exerciseData.keys.toList();
 
@@ -64,77 +58,79 @@ class _LibraryContent extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        elevation: 0,
+        backgroundColor: Colors.black87,
+        elevation: 10,
         title: const Text(
-          "COMMAND CENTER",
+          "Library",
           style: TextStyle(
             color: Colors.lightGreenAccent,
             fontWeight: FontWeight.bold,
-            letterSpacing: 1.5,
+            letterSpacing: 2,
+            fontSize: 22,
           ),
         ),
         centerTitle: true,
       ),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Greeting + Motivation
-          Padding(
-            padding: const EdgeInsets.all(16.0),
+          // Hero Banner with black + green gradient
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.black, Colors.green.shade800],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: [
+                BoxShadow(color: Colors.greenAccent.withOpacity(0.5), blurRadius: 12, offset: Offset(0, 6)),
+              ],
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "WELCOME BACK, COMMANDER",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                const Text(
-                  "PUSH YOUR LIMITS TODAY",
-                  style: TextStyle(
-                    color: Colors.lightGreenAccent,
-                    fontSize: 14,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.lightGreenAccent,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Starting workout...")),
-                    );
-                  },
-                  icon: const Icon(Icons.play_arrow),
-                  label: const Text(
-                    "START WORKOUT",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
+              children: const [
+                Text("WELCOME BACK, COMMANDER",
+                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                SizedBox(height: 6),
+                Text("PUSH YOUR LIMITS TODAY",
+                    style: TextStyle(color: Colors.lightGreenAccent, fontSize: 16, fontStyle: FontStyle.italic)),
               ],
             ),
           ),
 
-          // Grid of muscle groups
+          const SizedBox(height: 16),
+
+          // Neon Start Workout Button
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.lightGreenAccent,
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              side: BorderSide(color: Colors.lightGreenAccent, width: 2),
+              elevation: 12,
+              shadowColor: Colors.greenAccent,
+            ),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Starting workout...")),
+              );
+            },
+            icon: const Icon(Icons.play_arrow, size: 28),
+            label: const Text("START WORKOUT", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Grid of muscle groups with black depth + glow
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.all(16),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
+                crossAxisSpacing: 14,
+                mainAxisSpacing: 14,
               ),
               itemCount: muscleGroups.length,
               itemBuilder: (context, index) {
@@ -151,31 +147,35 @@ class _LibraryContent extends StatelessWidget {
                       ),
                     );
                   },
-                  child: Container(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Colors.lightGreenAccent, Colors.black],
+                      gradient: LinearGradient(
+                        colors: [Colors.black87, Colors.green.shade700],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(18),
                       boxShadow: [
-                        BoxShadow(
-                          color: Colors.lightGreenAccent.withOpacity(0.5),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
+                        BoxShadow(color: Colors.greenAccent.withOpacity(0.4), blurRadius: 12, offset: Offset(0, 6)),
                       ],
                     ),
                     child: Center(
-                      child: Text(
-                        group.toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          letterSpacing: 1.2,
-                        ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.sports_gymnastics, color: Colors.lightGreenAccent, size: 40),
+                          const SizedBox(height: 10),
+                          Text(
+                            group.toUpperCase(),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
