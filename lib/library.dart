@@ -61,7 +61,7 @@ class _LibraryContent extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage("assets/images/gym.png"), // add your background image
+              image: AssetImage("assets/images/gym.png"), // global background
               fit: BoxFit.cover,
               colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.7), BlendMode.darken),
             ),
@@ -85,7 +85,7 @@ class _LibraryContent extends StatelessWidget {
           ),
           body: Column(
             children: [
-              // Hero banner with motivational text
+              // Hero banner
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
@@ -132,7 +132,7 @@ class _LibraryContent extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // Grid of muscle groups with attractive cards
+              // Grid of muscle groups with image cards
               Expanded(
                 child: GridView.builder(
                   padding: const EdgeInsets.all(16),
@@ -140,6 +140,7 @@ class _LibraryContent extends StatelessWidget {
                     crossAxisCount: 2,
                     crossAxisSpacing: 14,
                     mainAxisSpacing: 14,
+                    childAspectRatio: 0.9,
                   ),
                   itemCount: muscleGroups.length,
                   itemBuilder: (context, index) {
@@ -158,33 +159,65 @@ class _LibraryContent extends StatelessWidget {
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage("assets/images/${group.toLowerCase()}.jpg"), // add per-group images
-                            fit: BoxFit.cover,
-                            colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.6), BlendMode.darken),
-                          ),
-                          borderRadius: BorderRadius.circular(18),
+                          borderRadius: BorderRadius.circular(20),
                           boxShadow: [
-                            BoxShadow(color: Colors.greenAccent.withOpacity(0.5), blurRadius: 12, offset: Offset(0, 6)),
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.6),
+                              blurRadius: 12,
+                              offset: const Offset(0, 6),
+                            ),
                           ],
                         ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.sports_gymnastics, color: Colors.lightGreenAccent, size: 40),
-                              const SizedBox(height: 10),
-                              Text(
-                                group.toUpperCase(),
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  letterSpacing: 1.5,
+                        child: Stack(
+                          children: [
+                            // Background image per muscle group
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Image.asset(
+                                "assets/images/${group.toLowerCase()}.jpg", // chest.jpg, back.jpg, etc.
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: double.infinity,
+                              ),
+                            ),
+
+                            // Gradient overlay
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.black.withOpacity(0.7),
+                                    Colors.transparent,
+                                    Colors.green.withOpacity(0.4),
+                                  ],
+                                  begin: Alignment.bottomCenter,
+                                  end: Alignment.topCenter,
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+
+                            // Content overlay
+                            Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.fitness_center,
+                                      color: Colors.lightGreenAccent, size: 42),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    group.toUpperCase(),
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      letterSpacing: 1.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     );
