@@ -76,7 +76,7 @@ final Map<String, List<Map<String, String>>> exerciseData = {
     {
       "name": "Lat Pulldown",
       "image": "assets/images/latspulldown.png",
-      "video": "https://www.youtube.com/watch?v=CAwf7n6Luuc",
+      "video": "https://www.youtube.com/shorts/hnSqbBk15tw",
       "instructions": "Muscles Worked: Lats, biceps. "
           "How to Perform: Pull bar to chest, return slowly. "
           "Tips: Avoid leaning back excessively."
