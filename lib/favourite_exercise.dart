@@ -8,7 +8,7 @@ class FavouriteExerciseScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFB2FF59), // Bright green background
+      backgroundColor: const Color(0xFFB2FF0A), // Bright green background
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,

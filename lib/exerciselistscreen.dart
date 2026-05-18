@@ -19,7 +19,7 @@ class ExerciseListScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.green.shade700,
+        backgroundColor: Colors.green,
         elevation: 8,
         title: Text(
           muscleGroup.toUpperCase(),

@@ -32,15 +32,15 @@ class _LibraryScreenState extends State<LibraryScreen> {
     return Scaffold(
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.black,
-        selectedItemColor: Colors.lightGreenAccent,
+        backgroundColor: const Color(0xFF121212),
+        selectedItemColor: const Color(0xFFCCFF00),
         unselectedItemColor: Colors.grey,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "HOME"),
-          BottomNavigationBarItem(icon: Icon(Icons.featured_video_sharp), label: "Features"),
+          BottomNavigationBarItem(icon: Icon(Icons.featured_video_outlined), label: "Features"),
           BottomNavigationBarItem(icon: Icon(Icons.library_add), label: "Library"),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: "Activity"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "PROFILE"),
@@ -53,6 +53,18 @@ class _LibraryScreenState extends State<LibraryScreen> {
 class _LibraryContent extends StatelessWidget {
   final muscleGroups = exerciseData.keys.toList();
 
+  // Map muscle groups to their images
+  final Map<String, String> muscleGroupImages = {
+    "Chest": "assets/images/chestdash.png",
+    "Back": "assets/images/backdash.png",
+    "Legs": "assets/images/legsdash.png",
+    "Biceps": "assets/images/bicepsdash.png",
+    "Triceps": "assets/images/tricepsdash.png",
+    "Shoulders": "assets/images/shoulderdash.png",
+    "Abs": "assets/images/absdash.png",
+    // Add more as needed
+  };
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -61,21 +73,24 @@ class _LibraryContent extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage("assets/images/gym.png"), // global background
+              image: AssetImage("assets/images/gym.png"),
               fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.7), BlendMode.darken),
+              colorFilter: ColorFilter.mode(
+                const Color(0xFF121212).withOpacity(0.7),
+                BlendMode.darken,
+              ),
             ),
           ),
         ),
         Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            backgroundColor: Colors.black.withOpacity(0.8),
+            backgroundColor: const Color(0xFF121212),
             elevation: 10,
             title: const Text(
               "Library",
               style: TextStyle(
-                color: Colors.lightGreenAccent,
+                color: Color(0xFFCCFF00),
                 fontWeight: FontWeight.bold,
                 letterSpacing: 2,
                 fontSize: 22,
@@ -91,7 +106,10 @@ class _LibraryContent extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [Colors.black.withOpacity(0.8), Colors.green.shade900.withOpacity(0.7)],
+                    colors: [
+                      const Color(0xFF121212),
+                      const Color(0xFF1E1E1E),
+                    ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -103,7 +121,7 @@ class _LibraryContent extends StatelessWidget {
                         style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                     SizedBox(height: 6),
                     Text("PUSH YOUR LIMITS TODAY",
-                        style: TextStyle(color: Colors.lightGreenAccent, fontSize: 16, fontStyle: FontStyle.italic)),
+                        style: TextStyle(color: Color(0xFFCCFF00), fontSize: 16, fontStyle: FontStyle.italic)),
                   ],
                 ),
               ),
@@ -113,13 +131,13 @@ class _LibraryContent extends StatelessWidget {
               // Neon Start Workout Button
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.lightGreenAccent,
+                  backgroundColor: const Color(0xFF121212),
+                  foregroundColor: const Color(0xFFCCFF00),
                   padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  side: BorderSide(color: Colors.lightGreenAccent, width: 2),
+                  side: const BorderSide(color: Color(0xFFCCFF00), width: 2),
                   elevation: 20,
-                  shadowColor: Colors.greenAccent,
+                  shadowColor: const Color(0xFFCCFF00),
                 ),
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -145,6 +163,8 @@ class _LibraryContent extends StatelessWidget {
                   itemCount: muscleGroups.length,
                   itemBuilder: (context, index) {
                     final group = muscleGroups[index];
+                    final imagePath = muscleGroupImages[group] ?? "assets/images/default.png";
+
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -162,7 +182,7 @@ class _LibraryContent extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.6),
+                              color: const Color(0xFFCCFF00).withOpacity(0.4),
                               blurRadius: 12,
                               offset: const Offset(0, 6),
                             ),
@@ -174,7 +194,7 @@ class _LibraryContent extends StatelessWidget {
                             ClipRRect(
                               borderRadius: BorderRadius.circular(20),
                               child: Image.asset(
-                                "assets/images/${group.toLowerCase()}.jpg", // chest.jpg, back.jpg, etc.
+                                imagePath,
                                 fit: BoxFit.cover,
                                 width: double.infinity,
                                 height: double.infinity,
@@ -189,7 +209,7 @@ class _LibraryContent extends StatelessWidget {
                                   colors: [
                                     Colors.black.withOpacity(0.7),
                                     Colors.transparent,
-                                    Colors.green.withOpacity(0.4),
+                                    const Color(0xFFCCFF00).withOpacity(0.3),
                                   ],
                                   begin: Alignment.bottomCenter,
                                   end: Alignment.topCenter,
@@ -203,7 +223,7 @@ class _LibraryContent extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(Icons.fitness_center,
-                                      color: Colors.lightGreenAccent, size: 42),
+                                      color: const Color(0xFFCCFF00), size: 42),
                                   const SizedBox(height: 10),
                                   Text(
                                     group.toUpperCase(),
@@ -212,6 +232,13 @@ class _LibraryContent extends StatelessWidget {
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                       letterSpacing: 1.5,
+                                      shadows: [
+                                        Shadow(
+                                          color: Colors.black,
+                                          blurRadius: 6,
+                                          offset: Offset(2, 2),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
