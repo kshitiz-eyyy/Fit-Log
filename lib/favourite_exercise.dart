@@ -1,57 +1,14 @@
 import 'package:flutter/material.dart';
-import 'exerciselistscreen.dart';
-import 'library.dart';// ✅ Import your ExerciseListScreen
+import 'library.dart';
+import 'favourite_manager.dart'; // ✅ global favourites list
 
 class FavouriteExerciseScreen extends StatelessWidget {
-  final List<Map<String, String>> exercises = [
-    {
-      "name": "BARBELL BENCH PRESS",
-      "muscle": "Chest",
-      "equipment": "Barbell",
-      "level": "Advanced",
-      "image": "assets/images/benchpres.png",
-    },
-    {
-      "name": "DEADLIFT",
-      "muscle": "Posterior Chain",
-      "equipment": "Barbell",
-      "level": "Elite",
-      "image": "assets/images/deadlift.png",
-    },
-    {
-      "name": "SQUAT",
-      "muscle": "Legs",
-      "equipment": "Barbell",
-      "level": "Advanced",
-      "image": "assets/images/squats.png",
-    },
-    {
-      "name": "PULL-UPS",
-      "muscle": "Back",
-      "equipment": "Bodyweight",
-      "level": "Pro",
-      "image": "assets/images/pullups.png",
-    },
-    {
-      "name": "PEC DEC FLY",
-      "muscle": "Chest",
-      "equipment": "Machine",
-      "level": "Intermediate",
-      "image": "assets/images/Pecdecfly.png",
-    },
-    {
-      "name": "CABLE CROSSOVER",
-      "muscle": "Chest",
-      "equipment": "Cable",
-      "level": "Intermediate",
-      "image": "assets/images/cablecrossover.png",
-    },
-  ];
+  const FavouriteExerciseScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFB2FF59), // Bright green background
+      backgroundColor: const Color(0xFFB2FF0A), // Bright green background
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -66,20 +23,28 @@ class FavouriteExerciseScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: Column(
+      body: favouriteExercises.isEmpty
+          ? const Center(
+        child: Text(
+          "No favourites yet",
+          style: TextStyle(color: Colors.black, fontSize: 16),
+        ),
+      )
+          : Column(
         children: [
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.all(16),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate:
+              const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2, // Grid layout
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
                 childAspectRatio: 0.8,
               ),
-              itemCount: exercises.length,
+              itemCount: favouriteExercises.length,
               itemBuilder: (context, index) {
-                final exercise = exercises[index];
+                final exercise = favouriteExercises[index];
                 return Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -115,7 +80,15 @@ class FavouriteExerciseScreen extends StatelessWidget {
                           children: [
                             Align(
                               alignment: Alignment.topRight,
-                              child: Icon(Icons.favorite, color: Colors.red),
+                              child: IconButton(
+                                icon: const Icon(Icons.favorite,
+                                    color: Colors.red),
+                                onPressed: () {
+                                  // remove from favourites
+                                  favouriteExercises.removeAt(index);
+                                  (context as Element).markNeedsBuild();
+                                },
+                              ),
                             ),
                             Text(
                               exercise["name"]!,
@@ -127,7 +100,7 @@ class FavouriteExerciseScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              "${exercise["muscle"]} • ${exercise["equipment"]}",
+                              "${exercise["muscle"] ?? ""} • ${exercise["equipment"] ?? ""}",
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey,
@@ -135,7 +108,7 @@ class FavouriteExerciseScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              "Level: ${exercise["level"]}",
+                              "Level: ${exercise["level"] ?? ""}",
                               style: const TextStyle(
                                 fontSize: 12,
                                 fontStyle: FontStyle.italic,
@@ -165,13 +138,11 @@ class FavouriteExerciseScreen extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => LibraryScreen(
-                        ),
-                    ),
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LibraryScreen(),
+                  ),
                 );
               },
               child: const Text(
@@ -186,70 +157,23 @@ class FavouriteExerciseScreen extends StatelessWidget {
           ),
           Container(
             color: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding:
+            const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                Text("Saved routines: 06",
+              children: [
+                Text("Saved routines: ${favouriteExercises.length}",
+                    style: const TextStyle(
+                        color: Colors.black, fontSize: 12)),
+                const Text("Completion rate: 92%",
                     style: TextStyle(color: Colors.black, fontSize: 12)),
-                Text("Completion rate: 92%",
-                    style: TextStyle(color: Colors.black, fontSize: 12)),
-                Text("Reps recorded: 24",
+                const Text("Reps recorded: 24",
                     style: TextStyle(color: Colors.black, fontSize: 12)),
               ],
             ),
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: Colors.green,
-        unselectedItemColor: Colors.black,
-        currentIndex: 0, // default to HOME
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => FavouriteExerciseScreen()),
-              );
-              break;
-            case 1:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => Placeholder()), // replace with FeaturesScreen
-              );
-              break;
-            case 2:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => LibraryScreen()), // ✅ import library.dart
-              );
-              break;
-            case 3:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => Placeholder()), // replace with ActivityScreen
-              );
-              break;
-            case 4:
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => Placeholder()), // replace with ProfileScreen
-              );
-              break;
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "HOME"),
-          BottomNavigationBarItem(icon: Icon(Icons.featured_video_sharp), label: "Features"),
-          BottomNavigationBarItem(icon: Icon(Icons.library_add), label: "Library"),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: "Activity"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "PROFILE"),
-        ],
-      ),
-
     );
   }
 }

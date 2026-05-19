@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'library.dart';
-import 'history.dart';
+import 'activity_screen.dart';
 import 'favourite_exercise.dart';
 import 'change_password_screen.dart';
+import 'dashboard.dart';
 
 void main() {
   runApp(const FitLogApp());
@@ -28,7 +29,7 @@ class FitLogApp extends StatelessWidget {
         ),
       ),
       // 👇 Set your starting screen here
-      home: const LibraryScreen(),
+      home: const DashboardScreen(),
     );
   }
 }
