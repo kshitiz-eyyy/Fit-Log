@@ -5,6 +5,7 @@ import 'package:fitlog/register_screen.dart';
 import 'package:fitlog/workout_timer_screen.dart';
 import 'package:flutter/material.dart';
 import 'change_password_screen.dart';
+import 'features_screen.dart';
 import 'splash_screen.dart';
 
 void main() {
@@ -16,9 +17,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: WorkoutTimerScreen(),
+      home: FeaturesScreen(),
     );
   }
 }
