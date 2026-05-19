@@ -19,12 +19,12 @@ class ExerciseListScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.green,
+        backgroundColor: const Color(0xFFCCFF00), // ✅ Neon lime accent
         elevation: 8,
         title: Text(
           muscleGroup.toUpperCase(),
           style: const TextStyle(
-            color: Colors.white,
+            color: Colors.black, // better contrast on neon lime
             fontWeight: FontWeight.bold,
             letterSpacing: 2,
           ),
@@ -66,19 +66,20 @@ Widget exerciseCard(Map<String, String> data, BuildContext context, String muscl
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.black87, Colors.green.shade700],
+        gradient: const LinearGradient(
+          colors: [Colors.black87, Color(0xFF1E1E1E)], // dark gradient
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.greenAccent.withOpacity(0.4),
+            color: const Color(0xFFCCFF00).withOpacity(0.4), // ✅ Neon lime glow
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
         ],
+        border: Border.all(color: const Color(0xFFCCFF00), width: 1.5),
       ),
       child: Row(
         children: [
@@ -89,6 +90,7 @@ Widget exerciseCard(Map<String, String> data, BuildContext context, String muscl
             decoration: BoxDecoration(
               color: Colors.black,
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFCCFF00), width: 1),
             ),
             child: (data["image"] != null && data["image"]!.isNotEmpty)
                 ? Image.asset(
@@ -141,10 +143,10 @@ Widget exerciseCard(Map<String, String> data, BuildContext context, String muscl
                       child: Row(
                         children: const [
                           Text("Play Video",
-                              style: TextStyle(color: Colors.lightGreenAccent)),
+                              style: TextStyle(color: Color(0xFFCCFF00))), // ✅ Neon lime
                           SizedBox(width: 6),
                           Icon(Icons.play_circle_outline,
-                              size: 20, color: Colors.lightGreenAccent),
+                              size: 20, color: Color(0xFFCCFF00)), // ✅ Neon lime
                         ],
                       ),
                     ),

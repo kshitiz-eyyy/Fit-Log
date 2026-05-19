@@ -22,7 +22,7 @@ class ExerciseDetailsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.green.shade700,
+        backgroundColor: Colors.lightGreenAccent,
         elevation: 12,
         title: Text(
           exerciseName,
@@ -80,7 +80,7 @@ class ExerciseDetailsScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.75),
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: Colors.greenAccent, width: 2),
+                  border: Border.all(color: Colors.lightGreenAccent, width: 2),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.greenAccent.withOpacity(0.4),
@@ -126,7 +126,7 @@ class ExerciseDetailsScreen extends StatelessWidget {
                   letterSpacing: 1.5,
                   shadows: [
                     Shadow(
-                      color: Colors.greenAccent,
+                      color: Colors.lightGreenAccent,
                       blurRadius: 12,
                       offset: Offset(0, 0),
                     ),
@@ -140,7 +140,7 @@ class ExerciseDetailsScreen extends StatelessWidget {
               if (videoUrl != null && videoUrl!.isNotEmpty)
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green.shade700,
+                    backgroundColor: Colors.lightGreenAccent,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 28, vertical: 14),
                     shape: RoundedRectangleBorder(
