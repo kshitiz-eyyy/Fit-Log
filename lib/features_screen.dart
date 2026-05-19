@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'bmi_calculator_screen.dart';
 
 class AppColors {
   static const Color background = Color(0xFF121212);
@@ -79,7 +80,6 @@ class FeaturesScreen extends StatelessWidget {
                 'F',
                 style: TextStyle(
                   color: Colors.black,
-                  // FIXED: Changed from FontWeight.black to FontWeight.w900
                   fontWeight: FontWeight.w900,
                   fontSize: 14,
                 ),
@@ -87,7 +87,7 @@ class FeaturesScreen extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             const Text(
-              'FITLOG', // ignore: linter_ignore_if_typo_plugin_warns
+              'FITLOG',
               style: TextStyle(
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.bold,
@@ -109,7 +109,6 @@ class FeaturesScreen extends StatelessWidget {
                 style: TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 32,
-                  // FIXED: Changed from FontWeight.black to FontWeight.w900
                   fontWeight: FontWeight.w900,
                   letterSpacing: 1.0,
                 ),
@@ -150,7 +149,6 @@ class FeaturesScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceCard,
         borderRadius: BorderRadius.circular(12),
-        // FIXED: Removed invalid characters and Border.规律 syntax
         border: Border.all(
           color: Colors.white.withValues(alpha: 0.05),
           width: 1,
@@ -161,8 +159,22 @@ class FeaturesScreen extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
           onTap: () {
-            // FIXED: Removed print() statement to satisfy production linting rules.
-            // Add your navigation code here.
+            // <--- CONNECTED NAVIGATION TRACKING HERE
+            if (item.title == 'BMI Calculator') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const BMICalculatorScreen(),
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('${item.title} screen coming soon!'),
+                  duration: const Duration(seconds: 1),
+                ),
+              );
+            }
           },
           child: Padding(
             padding: const EdgeInsets.all(16.0),
