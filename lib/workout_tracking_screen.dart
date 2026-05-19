@@ -41,12 +41,9 @@ class WorkoutTrackingScreen extends StatelessWidget {
                 children: [
                   const CircleAvatar(
                     radius: 22,
-                    backgroundImage: NetworkImage(
-                      "https://i.pravatar.cc/300",
-                    ),
+                    backgroundImage: AssetImage("assets/images/logo.png"),
                   ),
                   const SizedBox(width: 14),
-
                   const Text(
                     "PERFORMANCE",
                     style: TextStyle(
@@ -55,12 +52,10 @@ class WorkoutTrackingScreen extends StatelessWidget {
                       color: Colors.white,
                     ),
                   ),
-
                   const Spacer(),
-
                   Icon(
                     Icons.notifications_none,
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                   ),
                 ],
               ),
@@ -76,7 +71,7 @@ class WorkoutTrackingScreen extends StatelessWidget {
                   border: Border.all(color: Colors.white10),
                   boxShadow: [
                     BoxShadow(
-                      color: neon.withOpacity(0.1),
+                      color: neon.withValues(alpha: 0.1),
                       blurRadius: 30,
                     ),
                   ],
@@ -96,11 +91,9 @@ class WorkoutTrackingScreen extends StatelessWidget {
                               value: 0.75,
                               strokeWidth: 14,
                               backgroundColor: Colors.white10,
-                              valueColor:
-                              const AlwaysStoppedAnimation(neon),
+                              valueColor: const AlwaysStoppedAnimation(neon),
                             ),
                           ),
-
                           Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: const [
@@ -125,9 +118,7 @@ class WorkoutTrackingScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 15),
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -142,15 +133,10 @@ class WorkoutTrackingScreen extends StatelessWidget {
                               ),
                             ),
                             SizedBox(height: 4),
-                            Text(
-                              "STEPS",
-                              style: TextStyle(color: Colors.white70),
-                            ),
+                            Text("STEPS", style: TextStyle(color: Colors.white70)),
                           ],
                         ),
-
                         const SizedBox(width: 50),
-
                         Column(
                           children: const [
                             Text(
@@ -162,201 +148,8 @@ class WorkoutTrackingScreen extends StatelessWidget {
                               ),
                             ),
                             SizedBox(height: 4),
-                            Text(
-                              "MINS",
-                              style: TextStyle(color: Colors.white70),
-                            ),
+                            Text("MINS", style: TextStyle(color: Colors.white70)),
                           ],
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 22),
-
-              /// STATS
-              Row(
-                children: [
-                  Expanded(
-                    child: statCard(
-                      icon: Icons.favorite_border,
-                      title: "BPM",
-                      value: "142",
-                      subtitle: "PEAK LEVEL",
-                      neon: neon,
-                    ),
-                  ),
-
-                  const SizedBox(width: 16),
-
-                  Expanded(
-                    child: statCard(
-                      icon: Icons.local_fire_department_outlined,
-                      title: "KCAL",
-                      value: "842",
-                      subtitle: "BURNED",
-                      neon: neon,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 22),
-
-              /// STREAK CARD
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF111111),
-                  borderRadius: BorderRadius.circular(28),
-                  border: Border.all(color: Colors.white10),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      height: 60,
-                      width: 60,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: neon,
-                      ),
-                      child: const Icon(
-                        Icons.bolt,
-                        color: Colors.black,
-                      ),
-                    ),
-
-                    const SizedBox(width: 18),
-
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          "12 DAY STREAK",
-                          style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(height: 6),
-                        Text(
-                          "PERSONAL RECORD",
-                          style: TextStyle(
-                            color: Colors.white70,
-                            letterSpacing: 1,
-                          ),
-                        )
-                      ],
-                    ),
-
-                    const Spacer(),
-
-                    const Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      color: Colors.white70,
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 35),
-
-              /// INTENSITY MAP
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Intensity Map",
-                        style: TextStyle(
-                          fontSize: 42,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(height: 6),
-                      Text(
-                        "Last 30 days activity volume",
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    "VIEW ALL",
-                    style: TextStyle(
-                      color: neon,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-                ],
-              ),
-
-              const SizedBox(height: 18),
-
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF111111),
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(color: Colors.white10),
-                ),
-                child: Column(
-                  children: [
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: 28,
-                      gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 7,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                      ),
-                      itemBuilder: (context, index) {
-                        final colors = [
-                          Colors.green.shade900,
-                          Colors.lime.shade700,
-                          neon,
-                          Colors.lime.shade900,
-                        ];
-
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: colors[index % 4],
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        );
-                      },
-                    ),
-
-                    const SizedBox(height: 18),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "LESS",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        Row(
-                          children: [
-                            dot(Colors.green.shade900),
-                            dot(Colors.lime.shade900),
-                            dot(Colors.lime.shade700),
-                            dot(neon),
-                          ],
-                        ),
-                        const Text(
-                          "MORE",
-                          style: TextStyle(color: Colors.white),
                         ),
                       ],
                     )
@@ -372,9 +165,7 @@ class WorkoutTrackingScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(35),
                   image: const DecorationImage(
-                    image: NetworkImage(
-                      "https://images.unsplash.com/photo-1517836357463-d25dfeac3438",
-                    ),
+                    image: AssetImage("assets/images/logo.png"),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -384,8 +175,8 @@ class WorkoutTrackingScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(35),
                     gradient: LinearGradient(
                       colors: [
-                        Colors.black.withOpacity(0.8),
-                        Colors.black.withOpacity(0.2),
+                        Colors.black.withValues(alpha: 0.8),
+                        Colors.black.withValues(alpha: 0.2),
                       ],
                     ),
                   ),
@@ -397,9 +188,9 @@ class WorkoutTrackingScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              "Morning\nHIIT",
+                              "Morning\nHIT",
                               style: TextStyle(
-                                fontSize: 38,
+                                fontSize: 37,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
@@ -415,12 +206,8 @@ class WorkoutTrackingScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 35,
-                          vertical: 18,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 18),
                         decoration: BoxDecoration(
                           color: neon,
                           borderRadius: BorderRadius.circular(40),
@@ -436,10 +223,7 @@ class WorkoutTrackingScreen extends StatelessWidget {
                               ),
                             ),
                             SizedBox(width: 8),
-                            Icon(
-                              Icons.play_arrow,
-                              color: Colors.black,
-                            )
+                            Icon(Icons.play_arrow, color: Colors.black),
                           ],
                         ),
                       )
@@ -456,17 +240,12 @@ class WorkoutTrackingScreen extends StatelessWidget {
     );
   }
 
-  static Widget dot(Color color) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 3),
-      width: 14,
-      height: 14,
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(3),
-      ),
-    );
-  }
+  static Widget dot(Color color) => Container(
+    margin: const EdgeInsets.symmetric(horizontal: 3),
+    width: 14,
+    height: 14,
+    decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(3)),
+  );
 
   static Widget statCard({
     required IconData icon,
@@ -485,40 +264,14 @@ class WorkoutTrackingScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Icon(icon, color: neon),
-              Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontWeight: FontWeight.bold,
-                ),
-              )
-            ],
-          ),
-
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Icon(icon, color: neon),
+            Text(title, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold)),
+          ]),
           const SizedBox(height: 18),
-
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 52,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-
+          Text(value, style: const TextStyle(fontSize: 52, fontWeight: FontWeight.bold, color: Colors.white)),
           const SizedBox(height: 6),
-
-          Text(
-            subtitle,
-            style: TextStyle(
-              color: neon,
-              fontWeight: FontWeight.bold,
-            ),
-          )
+          Text(subtitle, style: TextStyle(color: neon, fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -530,12 +283,7 @@ class BottomItem extends StatelessWidget {
   final String label;
   final bool active;
 
-  const BottomItem(
-      this.icon,
-      this.label,
-      this.active, {
-        super.key,
-      });
+  const BottomItem(this.icon, this.label, this.active, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -546,25 +294,11 @@ class BottomItem extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: active ? neon : Colors.transparent,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            icon,
-            color: active ? Colors.black : Colors.white70,
-          ),
+          decoration: BoxDecoration(color: active ? neon : Colors.transparent, shape: BoxShape.circle),
+          child: Icon(icon, color: active ? Colors.black : Colors.white70),
         ),
-
         const SizedBox(height: 6),
-
-        Text(
-          label,
-          style: TextStyle(
-            color: active ? neon : Colors.white70,
-            fontWeight: FontWeight.w600,
-          ),
-        )
+        Text(label, style: TextStyle(color: active ? neon : Colors.white70, fontWeight: FontWeight.w600)),
       ],
     );
   }
