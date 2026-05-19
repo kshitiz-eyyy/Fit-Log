@@ -232,7 +232,7 @@ class FitnessCoachChatScreen extends StatelessWidget {
       body: const Center(
         child: Text(
           "Chat with your AI Fitness Coach here...",
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.black),
         ),
       ),
     );
