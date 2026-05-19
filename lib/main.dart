@@ -1,6 +1,5 @@
 import 'package:fitlog/chest_exercise.dart';
 import 'package:flutter/material.dart';
-import 'change_password_screen.dart';
 import 'workout_tracking_screen.dart';
 
 void main() {
