@@ -32,7 +32,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   ];
 
   void _onItemTapped(int index) {
-    setState(() => _selectedIndex = index);
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   @override
@@ -89,6 +91,7 @@ class _DashboardContentState extends State<_DashboardContent> {
   @override
   Widget build(BuildContext context) {
     final DateTime membershipStart = DateTime.now();
+
     final DateTime membershipEnd =
     membershipStart.add(const Duration(days: 30));
 
@@ -103,6 +106,7 @@ class _DashboardContentState extends State<_DashboardContent> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
+
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFFCCFF00),
         child: const Icon(Icons.chat, color: Colors.black),
@@ -115,24 +119,27 @@ class _DashboardContentState extends State<_DashboardContent> {
           );
         },
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
+
         child: Column(
           children: [
-            // Hero Banner
+
+            // HERO SECTION
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
+
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
                     Color(0xFF121212),
                     Color(0xFF1E1E1E),
                   ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
                 ),
               ),
+
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
@@ -144,7 +151,9 @@ class _DashboardContentState extends State<_DashboardContent> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+
                   SizedBox(height: 6),
+
                   Text(
                     "A step ahead than yesterday",
                     style: TextStyle(
@@ -157,23 +166,30 @@ class _DashboardContentState extends State<_DashboardContent> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
 
-            // Circular Progress Ring
+            // PROGRESS RING
             SizedBox(
               height: 180,
               width: 180,
+
               child: Stack(
                 alignment: Alignment.center,
+
                 children: [
-                  CircularProgressIndicator(
-                    value: 0.75,
-                    strokeWidth: 12,
-                    backgroundColor: Colors.grey.shade800,
-                    valueColor: const AlwaysStoppedAnimation(
-                      Color(0xFFCCFF00),
+                  Container(
+                    height: 160,
+                    width: 160,
+
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: const Color(0xFFCCFF00),
+                        width: 12,
+                      ),
                     ),
                   ),
+
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
@@ -184,7 +200,9 @@ class _DashboardContentState extends State<_DashboardContent> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+
                       SizedBox(height: 8),
+
                       Text(
                         "1,240 STEPS\n45 MINS",
                         textAlign: TextAlign.center,
@@ -198,7 +216,7 @@ class _DashboardContentState extends State<_DashboardContent> {
 
             const SizedBox(height: 20),
 
-            // Quick Stats
+            // QUICK STATS
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -207,6 +225,7 @@ class _DashboardContentState extends State<_DashboardContent> {
                   "Peak Level",
                   Icons.favorite,
                 ),
+
                 _statCard(
                   "842 KCAL",
                   "Burned",
@@ -217,7 +236,7 @@ class _DashboardContentState extends State<_DashboardContent> {
 
             const SizedBox(height: 20),
 
-            // Progress Bars
+            // PROGRESS BARS
             _progressBar(
               "Steps Goal",
               0.75,
@@ -242,9 +261,10 @@ class _DashboardContentState extends State<_DashboardContent> {
 
             const SizedBox(height: 20),
 
-            // Streak Tracker
+            // STREAK TRACKER
             Container(
               padding: const EdgeInsets.all(16),
+
               decoration: BoxDecoration(
                 color: Colors.black,
                 borderRadius: BorderRadius.circular(12),
@@ -253,9 +273,11 @@ class _DashboardContentState extends State<_DashboardContent> {
                   width: 2,
                 ),
               ),
+
               child: const Text(
                 "12 DAY STREAK\nPERSONAL RECORD",
                 textAlign: TextAlign.center,
+
                 style: TextStyle(
                   color: Color(0xFFCCFF00),
                   fontWeight: FontWeight.bold,
@@ -266,10 +288,10 @@ class _DashboardContentState extends State<_DashboardContent> {
 
             const SizedBox(height: 20),
 
-            // Membership Tracker
+            // MEMBERSHIP TRACKER
             Container(
               padding: const EdgeInsets.all(16),
-              margin: const EdgeInsets.symmetric(horizontal: 20),
+
               decoration: BoxDecoration(
                 color: Colors.black,
                 borderRadius: BorderRadius.circular(12),
@@ -278,8 +300,10 @@ class _DashboardContentState extends State<_DashboardContent> {
                   width: 2,
                 ),
               ),
+
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+
                 children: [
                   const Text(
                     "Membership Status",
@@ -289,7 +313,9 @@ class _DashboardContentState extends State<_DashboardContent> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+
                   const SizedBox(height: 8),
+
                   Text(
                     "Days Remaining: $remainingDays",
                     style: const TextStyle(
@@ -298,7 +324,9 @@ class _DashboardContentState extends State<_DashboardContent> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+
                   const SizedBox(height: 12),
+
                   LinearProgressIndicator(
                     value: progress,
                     backgroundColor: Colors.grey,
@@ -311,52 +339,11 @@ class _DashboardContentState extends State<_DashboardContent> {
 
             const SizedBox(height: 20),
 
-            // Calendar Grid
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate:
-              const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 6,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-              ),
-              itemCount: totalDays,
-              itemBuilder: (context, index) {
-                final dayNumber = index + 1;
-
-                final isLastWeek =
-                    dayNumber > (totalDays - 7);
-
-                return Container(
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: isLastWeek
-                        ? Colors.redAccent
-                        : const Color(0xFF1E1E1E),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: const Color(0xFFCCFF00),
-                      width: 1,
-                    ),
-                  ),
-                  child: Text(
-                    "$dayNumber",
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                );
-              },
-            ),
-
-            const SizedBox(height: 20),
-
-            // Water & Meal Buttons
+            // WATER + MEAL BUTTONS
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+
                 ElevatedButton.icon(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -365,12 +352,15 @@ class _DashboardContentState extends State<_DashboardContent> {
                       ),
                     );
                   },
+
                   icon: const Icon(Icons.water_drop),
                   label: const Text("Log Water"),
+
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                   ),
                 ),
+
                 ElevatedButton.icon(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -379,8 +369,10 @@ class _DashboardContentState extends State<_DashboardContent> {
                       ),
                     );
                   },
+
                   icon: const Icon(Icons.restaurant),
                   label: const Text("Log Meal"),
+
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orangeAccent,
                   ),
@@ -390,15 +382,17 @@ class _DashboardContentState extends State<_DashboardContent> {
 
             const SizedBox(height: 20),
 
-            // Energy Slider
+            // ENERGY SLIDER
             Slider(
               value: energyLevel,
               min: 0,
               max: 1,
               divisions: 2,
+
               label: energyLevel < 0.5
                   ? "Low Energy"
                   : "High Energy",
+
               onChanged: (val) {
                 setState(() {
                   energyLevel = val;
@@ -410,24 +404,24 @@ class _DashboardContentState extends State<_DashboardContent> {
               energyLevel < 0.5
                   ? "Recommended: Gentle Yoga / Stretching"
                   : "Recommended: Intense Cardio / HIIT",
+
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 14,
               ),
             ),
 
             const SizedBox(height: 20),
 
-            // Fatigue Warning
+            // FATIGUE WARNING
             if (fatigueWarning)
               Container(
                 padding: const EdgeInsets.all(16),
-                margin:
-                const EdgeInsets.symmetric(vertical: 10),
+
                 decoration: BoxDecoration(
                   color: Colors.redAccent,
                   borderRadius: BorderRadius.circular(12),
                 ),
+
                 child: const Text(
                   "⚠️ Muscle fatigue is high. Stretch or recover today!",
                   style: TextStyle(
@@ -439,7 +433,7 @@ class _DashboardContentState extends State<_DashboardContent> {
 
             const SizedBox(height: 20),
 
-            // Daily Flash Audio
+            // DAILY FLASH AUDIO
             ElevatedButton.icon(
               onPressed: () async {
                 await _audioPlayer.play(
@@ -448,8 +442,10 @@ class _DashboardContentState extends State<_DashboardContent> {
                   ),
                 );
               },
+
               icon: const Icon(Icons.play_circle_fill),
               label: const Text("Daily Flash"),
+
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.purpleAccent,
               ),
@@ -457,25 +453,8 @@ class _DashboardContentState extends State<_DashboardContent> {
 
             const SizedBox(height: 20),
 
-            // Start Workout Button
+            // START WORKOUT BUTTON
             ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                foregroundColor: const Color(0xFFCCFF00),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 28,
-                  vertical: 14,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                side: const BorderSide(
-                  color: Color(0xFFCCFF00),
-                  width: 2,
-                ),
-                elevation: 20,
-                shadowColor: const Color(0xFFCCFF00),
-              ),
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -483,49 +462,51 @@ class _DashboardContentState extends State<_DashboardContent> {
                   ),
                 );
               },
-              icon: const Icon(
-                Icons.play_arrow,
-                size: 28,
-              ),
-              label: const Text(
-                "START WORKOUT",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+
+              icon: const Icon(Icons.play_arrow),
+              label: const Text("START WORKOUT"),
+
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+                foregroundColor: const Color(0xFFCCFF00),
               ),
             ),
 
             const SizedBox(height: 30),
 
-            // Motivational Quote
+            // MOTIVATIONAL QUOTE SECTION
             Container(
-              margin:
-              const EdgeInsets.symmetric(horizontal: 20),
+              margin: const EdgeInsets.symmetric(horizontal: 20),
               padding: const EdgeInsets.all(16),
+
               decoration: BoxDecoration(
                 color: const Color(0xFF1E1E1E),
                 borderRadius: BorderRadius.circular(16),
+
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFFCCFF00)
-                        .withOpacity(0.4),
+                    color: const Color(0xFFCCFF00).withOpacity(0.4),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
                 ],
               ),
+
               child: Column(
                 children: const [
+
                   Icon(
                     Icons.format_quote,
                     color: Color(0xFFCCFF00),
                     size: 28,
                   ),
+
                   SizedBox(height: 8),
+
                   Text(
                     "“Discipline is the bridge between goals and accomplishment.”",
                     textAlign: TextAlign.center,
+
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -543,7 +524,6 @@ class _DashboardContentState extends State<_DashboardContent> {
     );
   }
 
-  // Stat Card
   static Widget _statCard(
       String value,
       String label,
@@ -552,18 +532,12 @@ class _DashboardContentState extends State<_DashboardContent> {
     return Container(
       width: 150,
       padding: const EdgeInsets.all(16),
+
       decoration: BoxDecoration(
         color: Colors.black,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color:
-            const Color(0xFFCCFF00).withOpacity(0.4),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
+
       child: Column(
         children: [
           Icon(
@@ -571,28 +545,26 @@ class _DashboardContentState extends State<_DashboardContent> {
             color: const Color(0xFFCCFF00),
             size: 32,
           ),
+
           const SizedBox(height: 8),
+
           Text(
             value,
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
-              fontSize: 18,
             ),
           ),
+
           Text(
             label,
-            style: const TextStyle(
-              color: Colors.grey,
-              fontSize: 14,
-            ),
+            style: const TextStyle(color: Colors.grey),
           ),
         ],
       ),
     );
   }
 
-  // Progress Bar
   static Widget _progressBar(
       String label,
       double progress,
@@ -601,14 +573,14 @@ class _DashboardContentState extends State<_DashboardContent> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-          ),
+          style: const TextStyle(color: Colors.white),
         ),
+
         const SizedBox(height: 6),
+
         LinearProgressIndicator(
           value: progress,
           backgroundColor: Colors.grey,
@@ -620,7 +592,7 @@ class _DashboardContentState extends State<_DashboardContent> {
   }
 }
 
-// AI Fitness Coach Screen
+// AI FITNESS COACH SCREEN
 class FitnessCoachChatScreen extends StatelessWidget {
   const FitnessCoachChatScreen({super.key});
 
@@ -628,8 +600,10 @@ class FitnessCoachChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
+
       appBar: AppBar(
         backgroundColor: const Color(0xFF121212),
+
         title: const Text(
           "AI Fitness Coach",
           style: TextStyle(
@@ -637,6 +611,7 @@ class FitnessCoachChatScreen extends StatelessWidget {
           ),
         ),
       ),
+
       body: const Center(
         child: Text(
           "Chat with your AI Fitness Coach here...",
