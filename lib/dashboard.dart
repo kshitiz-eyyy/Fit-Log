@@ -255,3 +255,191 @@ class _DashboardContent extends StatelessWidget {
           },
           icon: const Icon(Icons.restaurant),
           label: const Text("Log Meal"),
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.orangeAccent),
+        ),
+              ],
+          ),
+
+              const SizedBox(height: 20),
+
+              // Mood & Energy Check-In
+              Slider(
+                value: energyLevel,
+                min: 0,
+                max: 1,
+                divisions: 2,
+                label: energyLevel < 0.5 ? "Low Energy" : "High Energy",
+                onChanged: (val) {
+                  // You can add setState if you make this Stateful
+                },
+              ),
+              Text(
+                energyLevel < 0.5
+                    ? "Recommended: Gentle Yoga / Stretching"
+                    : "Recommended: Intense Cardio / HIIT",
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Fatigue Warning
+              if (fatigueWarning)
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.redAccent,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    "⚠️ Muscle fatigue is high. Stretch or recover today!",
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ),
+
+              const SizedBox(height: 20),
+
+              // Audio-Guided Daily Flash
+              ElevatedButton.icon(
+                onPressed: () {
+                  // Integrate audioplayers package here to play audio
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Playing Daily Flash...")),
+                  );
+                },
+                icon: const Icon(Icons.play_circle_fill),
+                label: const Text("Daily Flash"),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.purpleAccent),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Start Workout Button
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  foregroundColor: const Color(0xFFCCFF00),
+                  padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  side: const BorderSide(color: Color(0xFFCCFF00), width: 2),
+                  elevation: 20,
+                  shadowColor: const Color(0xFFCCFF00),
+                ),
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Starting workout...")),
+                  );
+                },
+                icon: const Icon(Icons.play_arrow, size: 28),
+                label: const Text("START WORKOUT",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              ),
+
+              const SizedBox(height: 30),
+
+              // Motivational Quote Section
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1E1E1E),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFCCFF00).withOpacity(0.4),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: const [
+                    Icon(Icons.format_quote, color: Color(0xFFCCFF00), size: 28),
+                    SizedBox(height: 8),
+                    Text(
+                      "“Discipline is the bridge between goals and accomplishment.”",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontStyle: FontStyle.italic),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 30),
+            ],
+          ),
+        ),
+    );
+  }
+
+  // Reusable stat card
+  static Widget _statCard(String value, String label, IconData icon) {
+    return Container(
+      width: 150,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+              color: const Color(0xFFCCFF00).withOpacity(0.4),
+              blurRadius: 8,
+              offset: const Offset(0, 4)),
+        ],
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: const Color(0xFFCCFF00), size: 32),
+          const SizedBox(height: 8),
+          Text(value,
+              style: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 14)),
+        ],
+      ),
+    );
+  }
+
+  // Progress Bar Widget
+  static Widget _progressBar(String label, double progress, Color color) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(color: Colors.white, fontSize: 14)),
+        const SizedBox(height: 6),
+        LinearProgressIndicator(
+          value: progress,
+          backgroundColor: Colors.grey[800],
+          color: color,
+          minHeight: 10,
+        ),
+      ],
+    );
+  }
+}
+
+// Placeholder for AI Fitness Coach Chat Screen
+class FitnessCoachChatScreen extends StatelessWidget {
+  const FitnessCoachChatScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF121212),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF121212),
+        title: const Text("AI Fitness Coach", style: TextStyle(color: Color(0xFFCCFF00))),
+      ),
+      body: const Center(
+        child: Text(
+          "Chat with your AI Fitness Coach here...",
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+  }
+}
+
