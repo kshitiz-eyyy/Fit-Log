@@ -61,7 +61,7 @@ class _DashboardContent extends StatelessWidget {
         children: [
           // Welcome Banner
           const Text(
-            "WELCOME BACK, COMMANDER",
+            "WELCOME BACK, COMMANDO",
             style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 6),
