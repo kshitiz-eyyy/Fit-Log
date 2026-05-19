@@ -99,8 +99,9 @@ class _LibraryContent extends StatelessWidget {
           ),
           body: Column(
             children: [
-              // Muscle Group Grid
+              // Muscle Group Grid (full screen focus)
               Expanded(
+                flex: 3,
                 child: GridView.builder(
                   padding: const EdgeInsets.all(16),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -196,8 +197,9 @@ class _LibraryContent extends StatelessWidget {
                 ),
               ),
 
-              // Training Splits Section
+              // Splits Section at bottom
               Expanded(
+                flex: 1,
                 child: ListView(
                   children: trainingSplits.keys.map((splitName) {
                     return Card(
