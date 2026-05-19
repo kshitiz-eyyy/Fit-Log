@@ -54,213 +54,209 @@ class _DashboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Membership dates (example: 1 year membership from Jan 1, 2026)
+    final DateTime membershipStart = DateTime(2026, 1, 1);
+    final DateTime membershipEnd = DateTime(2027, 1, 1);
+
+    final int remainingDays = membershipEnd.difference(DateTime.now()).inDays;
+    final int totalDays = membershipEnd.difference(membershipStart).inDays;
+    final double progress = (totalDays - remainingDays) / totalDays;
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
           // Hero Banner
           Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF121212), Color(0xFF1E1E1E)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text("WELCOME BACK, COMMANDER",
-                    style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
-                SizedBox(height: 6),
-                Text("PUSH YOUR LIMITS TODAY",
-                    style: TextStyle(color: Color(0xFFCCFF00), fontSize: 16, fontStyle: FontStyle.italic)),
-              ],
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF121212), Color(0xFF1E1E1E)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
           ),
-
-          const SizedBox(height: 20),
-
-          // Circular Progress Ring
-          SizedBox(
-            height: 180,
-            width: 180,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                CircularProgressIndicator(
-                  value: 0.75, // 75% goal
-                  strokeWidth: 12,
-                  backgroundColor: Colors.grey.shade800,
-                  valueColor: const AlwaysStoppedAnimation(Color(0xFFCCFF00)),
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Text("75% DAILY GOAL",
-                        style: TextStyle(color: Color(0xFFCCFF00), fontWeight: FontWeight.bold)),
-                    SizedBox(height: 8),
-                    Text("1,240 STEPS\n45 MINS",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // Quick Stats
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _statCard("142 BPM", "Peak Level", Icons.favorite),
-              _statCard("842 KCAL", "Burned", Icons.local_fire_department),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Text("WELCOME BACK, COMMANDER",
+                  style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+              SizedBox(height: 6),
+              Text("PUSH YOUR LIMITS TODAY",
+                  style: TextStyle(color: Color(0xFFCCFF00), fontSize: 16, fontStyle: FontStyle.italic)),
             ],
           ),
+        ),
 
-          const SizedBox(height: 20),
+        const SizedBox(height: 20),
 
-          // Progress Bars
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              children: [
-                _progressBar("Steps Goal", 0.75, Colors.greenAccent),
-                const SizedBox(height: 12),
-                _progressBar("Calories Burned", 0.65, Colors.orangeAccent),
-                const SizedBox(height: 12),
-                _progressBar("Workout Time", 0.45, Colors.blueAccent),
-              ],
-            ),
+        // Circular Progress Ring
+        SizedBox(
+          height: 180,
+          width: 180,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              CircularProgressIndicator(
+                value: 0.75, // 75% goal
+                strokeWidth: 12,
+                backgroundColor: Colors.grey.shade800,
+                valueColor: const AlwaysStoppedAnimation(Color(0xFFCCFF00)),
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Text("75% DAILY GOAL",
+                      style: TextStyle(color: Color(0xFFCCFF00), fontWeight: FontWeight.bold)),
+                  SizedBox(height: 8),
+                  Text("1,240 STEPS\n45 MINS",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white)),
+                ],
+              ),
+            ],
           ),
+        ),
 
-          const SizedBox(height: 20),
+        const SizedBox(height: 20),
 
-          // Streak Tracker
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFCCFF00), width: 2),
-            ),
-            child: const Text(
-              "12 DAY STREAK\nPERSONAL RECORD",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  color: Color(0xFFCCFF00), fontWeight: FontWeight.bold, fontSize: 16),
-            ),
+        // Quick Stats
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _statCard("142 BPM", "Peak Level", Icons.favorite),
+            _statCard("842 KCAL", "Burned", Icons.local_fire_department),
+          ],
+        ),
+
+        const SizedBox(height: 20),
+
+        // Progress Bars
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            children: [
+              _progressBar("Steps Goal", 0.75, Colors.greenAccent),
+              const SizedBox(height: 12),
+              _progressBar("Workout Time", 0.45, Colors.blueAccent),
+              const SizedBox(height: 12),
+              _progressBar("Calories Burned", 0.65, Colors.orangeAccent),
+            ],
           ),
+        ),
 
-          const SizedBox(height: 20),
+        const SizedBox(height: 20),
 
-          // Start Workout Button
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
-              foregroundColor: const Color(0xFFCCFF00),
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              side: const BorderSide(color: Color(0xFFCCFF00), width: 2),
-              elevation: 20,
-              shadowColor: const Color(0xFFCCFF00),
-            ),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Starting workout...")),
-              );
-            },
-            icon: const Icon(Icons.play_arrow, size: 28),
-            label: const Text("START WORKOUT",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        // Streak Tracker
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFCCFF00), width: 2),
           ),
+          child: const Text(
+            "12 DAY STREAK\nPERSONAL RECORD",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: Color(0xFFCCFF00), fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+        ),
 
-          const SizedBox(height: 30),
+        const SizedBox(height: 20),
 
-          // Motivational Quote Section
-          Container(
+        // Membership Tracker
+        Container(
+          padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFCCFF00), width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFCCFF00).withOpacity(0.4),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text("Membership Status",
+                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              Text("Days Remaining: $remainingDays",
+                  style: const TextStyle(color: Color(0xFFCCFF00), fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              LinearProgressIndicator(
+                value: progress,
+                backgroundColor: Colors.grey[800],
+                color: Colors.greenAccent,
+                minHeight: 10,
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 20),
+
+        // Daily Challenge
+        Container(
+          padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E1E1E),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFCCFF00).withOpacity(0.4),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            children: const [
+              Text("🔥 Today’s Challenge",
+                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              SizedBox(height: 8),
+              Text("50 Pushups + 20 Squats",
+                  style: TextStyle(color: Color(0xFFCCFF00), fontSize: 16)),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 20),
+
+        // Start Workout Button
+        ElevatedButton.icon(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.black,
+            foregroundColor: const Color(0xFFCCFF00),
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            side: const BorderSide(color: Color(0xFFCCFF00), width: 2),
+            elevation: 20,
+            shadowColor: const Color(0xFFCCFF00),
+          ),
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Starting workout...")),
+            );
+          },
+          icon: const Icon(Icons.play_arrow, size: 28),
+          label: const Text("START WORKOUT",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        ),
+
+        const SizedBox(height: 30),
+
+        // Motivational Quote Section
+        Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1E1E1E),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFFCCFF00).withOpacity(0.4),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              children: const [
-                Icon(Icons.format_quote, color: Color(0xFFCCFF00), size: 28),
-                SizedBox(height: 8),
-                Text(
-                  "“Discipline is the bridge between goals and accomplishment.”",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontStyle: FontStyle.italic),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 30),
-        ],
-      ),
-    );
-  }
-
-  // Reusable stat card
-  static Widget _statCard(String value, String label, IconData icon) {
-    return Container(
-      width: 150,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-              color: const Color(0xFFCCFF00).withOpacity(0.4),
-              blurRadius: 8,
-              offset: const Offset(0, 4)),
-        ],
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: const Color(0xFFCCFF00), size: 32),
-          const SizedBox(height: 8),
-          Text(value,
-              style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 14)),
-        ],
-      ),
-    );
-  }
-
-  // Progress Bar Widget
-  static Widget _progressBar(String label, double progress, Color color) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: const TextStyle(color: Colors.white, fontSize: 14)),
-        const SizedBox(height: 6),
-        LinearProgressIndicator(
-          value: progress,
-          backgroundColor: Colors.grey[800],
-          color: color,
-          minHeight: 10,
-        ),
-      ],
-    );
-  }
-}
+            decoration
