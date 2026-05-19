@@ -22,12 +22,12 @@ class ExerciseDetailsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.green.shade700,
+        backgroundColor: const Color(0xFFCCFF00), // ✅ Neon lime accent
         elevation: 12,
         title: Text(
           exerciseName,
           style: const TextStyle(
-            color: Colors.white,
+            color: Colors.black, // better contrast on neon lime
             fontWeight: FontWeight.bold,
             letterSpacing: 2,
           ),
@@ -53,7 +53,7 @@ class ExerciseDetailsScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.greenAccent.withOpacity(0.6),
+                        color: const Color(0xFFCCFF00).withOpacity(0.6), // ✅ Neon lime glow
                         blurRadius: 25,
                         offset: const Offset(0, 10),
                       ),
@@ -80,10 +80,10 @@ class ExerciseDetailsScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.75),
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: Colors.greenAccent, width: 2),
+                  border: Border.all(color: const Color(0xFFCCFF00), width: 2), // ✅ Neon lime border
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.greenAccent.withOpacity(0.4),
+                      color: const Color(0xFFCCFF00).withOpacity(0.4), // ✅ Neon lime glow
                       blurRadius: 15,
                       offset: const Offset(0, 8),
                     ),
@@ -120,13 +120,13 @@ class ExerciseDetailsScreen extends StatelessWidget {
               Text(
                 "Muscle Group: $muscleGroup",
                 style: const TextStyle(
-                  color: Colors.lightGreenAccent,
+                  color: Color(0xFFCCFF00), // ✅ Neon lime accent
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.5,
                   shadows: [
                     Shadow(
-                      color: Colors.greenAccent,
+                      color: Color(0xFFCCFF00), // ✅ Neon lime glow
                       blurRadius: 12,
                       offset: Offset(0, 0),
                     ),
@@ -140,7 +140,7 @@ class ExerciseDetailsScreen extends StatelessWidget {
               if (videoUrl != null && videoUrl!.isNotEmpty)
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green.shade700,
+                    backgroundColor: const Color(0xFFCCFF00), // ✅ Neon lime accent
                     padding: const EdgeInsets.symmetric(
                         horizontal: 28, vertical: 14),
                     shape: RoundedRectangleBorder(
@@ -157,11 +157,11 @@ class ExerciseDetailsScreen extends StatelessWidget {
                     );
                   },
                   icon: const Icon(Icons.play_circle_fill,
-                      color: Colors.white, size: 26),
+                      color: Colors.black, size: 26), // contrast on lime
                   label: const Text(
                     "Play Tutorial",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.black, // contrast on lime
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                       letterSpacing: 1.2,
@@ -185,7 +185,7 @@ class ExerciseDetailsScreen extends StatelessWidget {
           Text(
             "$title:",
             style: const TextStyle(
-              color: Colors.lightGreenAccent,
+              color: Color(0xFFCCFF00), // ✅ Neon lime accent
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),

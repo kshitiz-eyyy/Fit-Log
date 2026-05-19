@@ -42,7 +42,7 @@ class _VideoScreenState extends State<VideoScreen> {
             : const CircularProgressIndicator(),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.lightGreenAccent,
+        backgroundColor: const Color(0xFFCCFF00), // ✅ Neon lime accent
         onPressed: () {
           setState(() {
             _controller.value.isPlaying
