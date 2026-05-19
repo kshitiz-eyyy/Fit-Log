@@ -66,7 +66,7 @@ class MealTrackingScreen extends StatelessWidget {
                       shape: BoxShape.circle,
                       border: Border.all(color: neon.withOpacity(0.5)),
                       image: const DecorationImage(
-                        image: AssetImage("assets/logo.png"),
+                        image: AssetImage("assets/images/logo.png"),
                         fit: BoxFit.cover,
                       ),
                     ),
