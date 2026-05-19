@@ -31,21 +31,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color(0xFF121212),
-        selectedItemColor: const Color(0xFFCCFF00),
-        unselectedItemColor: Colors.grey,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "HOME"),
-          BottomNavigationBarItem(icon: Icon(Icons.featured_video_outlined), label: "Features"),
-          BottomNavigationBarItem(icon: Icon(Icons.library_add), label: "Library"),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: "Activity"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "PROFILE"),
-        ],
-      ),
+      // 🚫 Removed BottomNavigationBar
     );
   }
 }
@@ -53,7 +39,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
 class _LibraryContent extends StatelessWidget {
   final muscleGroups = exerciseData.keys.toList();
 
-  // Map muscle groups to their images
   final Map<String, String> muscleGroupImages = {
     "Chest": "assets/images/chestdash.png",
     "Back": "assets/images/backdash.png",
@@ -62,14 +47,12 @@ class _LibraryContent extends StatelessWidget {
     "Triceps": "assets/images/tricepsdash.png",
     "Shoulders": "assets/images/shoulderdash.png",
     "Abs": "assets/images/absdash.png",
-    // Add more as needed
   };
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // Background image with dark overlay
         Container(
           decoration: BoxDecoration(
             image: DecorationImage(
@@ -100,16 +83,12 @@ class _LibraryContent extends StatelessWidget {
           ),
           body: Column(
             children: [
-              // Hero banner
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
-                      const Color(0xFF121212),
-                      const Color(0xFF1E1E1E),
-                    ],
+                    colors: [Color(0xFF121212), Color(0xFF1E1E1E)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -125,10 +104,7 @@ class _LibraryContent extends StatelessWidget {
                   ],
                 ),
               ),
-
               const SizedBox(height: 16),
-
-              // Neon Start Workout Button
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF121212),
@@ -147,10 +123,7 @@ class _LibraryContent extends StatelessWidget {
                 icon: const Icon(Icons.play_arrow, size: 28),
                 label: const Text("START WORKOUT", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ),
-
               const SizedBox(height: 20),
-
-              // Grid of muscle groups with image cards
               Expanded(
                 child: GridView.builder(
                   padding: const EdgeInsets.all(16),
@@ -190,7 +163,6 @@ class _LibraryContent extends StatelessWidget {
                         ),
                         child: Stack(
                           children: [
-                            // Background image per muscle group
                             ClipRRect(
                               borderRadius: BorderRadius.circular(20),
                               child: Image.asset(
@@ -200,8 +172,6 @@ class _LibraryContent extends StatelessWidget {
                                 height: double.infinity,
                               ),
                             ),
-
-                            // Gradient overlay
                             Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
@@ -216,8 +186,6 @@ class _LibraryContent extends StatelessWidget {
                                 ),
                               ),
                             ),
-
-                            // Content overlay
                             Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
