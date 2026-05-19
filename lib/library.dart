@@ -96,7 +96,7 @@ class _LibraryContent extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
-                    Text("WELCOME BACK, COMMANDER",
+                    Text("WELCOME COMMANDER",
                         style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                     SizedBox(height: 6),
                     Text("PUSH YOUR LIMITS TODAY",
