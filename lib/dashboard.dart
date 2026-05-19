@@ -255,8 +255,85 @@ class _DashboardContent extends StatelessWidget {
 
         const SizedBox(height: 30),
 
-        // Motivational Quote Section
-        Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20),
-            padding: const EdgeInsets.all(16),
-            decoration
+            // Motivational Quote Section
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E1E1E),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFCCFF00).withOpacity(0.4),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: const [
+                  Icon(Icons.format_quote, color: Color(0xFFCCFF00), size: 28),
+                  SizedBox(height: 8),
+                  Text(
+                    "“Discipline is the bridge between goals and accomplishment.”",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontStyle: FontStyle.italic),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 30),
+          ],
+        ),
+    );
+  }
+
+  // Reusable stat card
+  static Widget _statCard(String value, String label, IconData icon) {
+    return Container(
+      width: 150,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+              color: const Color(0xFFCCFF00).withOpacity(0.4),
+              blurRadius: 8,
+              offset: const Offset(0, 4)),
+        ],
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: const Color(0xFFCCFF00), size: 32),
+          const SizedBox(height: 8),
+          Text(value,
+              style: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 14)),
+        ],
+      ),
+    );
+  }
+
+  // Progress Bar Widget
+  static Widget _progressBar(String label, double progress, Color color) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(color: Colors.white, fontSize: 14)),
+        const SizedBox(height: 6),
+        LinearProgressIndicator(
+          value: progress,
+          backgroundColor: Colors.grey[800],
+          color: color,
+          minHeight: 10,
+        ),
+      ],
+    );
+  }
+}
