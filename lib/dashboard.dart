@@ -3,6 +3,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'activity_screen.dart';
 import 'library.dart';
 import 'bmi_calculator_screen.dart';
+import 'workout_timer_screen.dart'; // <-- IMPORTED YOUR TIMER SCREEN HERE
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -313,7 +314,10 @@ class _DashboardContentState extends State<_DashboardContent> {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Water logged!")));
                   },
                   icon: const Icon(Icons.water_drop),
-                  label: const Text("Log Water"),
+                  label: const Text(
+                    "Log Water",
+                    style: TextStyle(color: Colors.black),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                   ),
@@ -323,7 +327,10 @@ class _DashboardContentState extends State<_DashboardContent> {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Meal logged!")));
                   },
                   icon: const Icon(Icons.restaurant),
-                  label: const Text("Log Meal"),
+                  label: const Text(
+                    "Log Meal",
+                    style: TextStyle(color: Colors.black),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orangeAccent,
                   ),
@@ -381,10 +388,15 @@ class _DashboardContentState extends State<_DashboardContent> {
             ),
             const SizedBox(height: 20),
 
-            // START WORKOUT BUTTON
+            // START WORKOUT BUTTON (CONNECTED TO YOUR TIMER)
             ElevatedButton.icon(
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Starting workout...")));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const WorkoutTimerScreen(),
+                  ),
+                );
               },
               icon: const Icon(Icons.play_arrow, size: 28),
               label: const Text("START WORKOUT", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
@@ -409,7 +421,7 @@ class _DashboardContentState extends State<_DashboardContent> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFFCCFF00).withOpacity(0.4),
+                    color: const Color(0xFFCCFF00).withValues(alpha: 0.4), // Fixed .withOpacity warning
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -451,7 +463,7 @@ class _DashboardContentState extends State<_DashboardContent> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFCCFF00).withOpacity(0.4),
+            color: const Color(0xFFCCFF00).withValues(alpha: 0.4), // Fixed .withOpacity warning
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
