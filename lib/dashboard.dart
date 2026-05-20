@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'activity_screen.dart';
 import 'library.dart';
-import 'bmi_calculator_screen.dart'; // Ensure this matches your path structure
+import 'bmi_calculator_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -16,7 +16,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   final List<Widget> _screens = [
     const _DashboardContent(),
-    FeaturesScreen(), // <--- Replaced placeholder with your working grid UI!
+    FeaturesScreen(),
     LibraryScreen(),
     ActivityScreen(),
     const Center(
@@ -118,7 +118,7 @@ class _DashboardContentState extends State<_DashboardContent> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // HERO SECTION
+
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
@@ -502,7 +502,7 @@ class _DashboardContentState extends State<_DashboardContent> {
   }
 }
 
-// --- FEATURES TAB SUB-CONTENT ---
+
 class AppColors {
   static const Color background = Color(0xFF121212);
   static const Color surfaceCard = Color(0xFF1E1E1E);
