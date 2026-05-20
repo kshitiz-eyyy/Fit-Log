@@ -145,7 +145,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       trailing: Switch(
                         value: _biometricEnabled,
                         onChanged: (val) => setState(() => _biometricEnabled = val),
-                        activeColor: Colors.black,
+                        activeThumbColor: Colors.black,
                         activeTrackColor: accentColor,
                         inactiveThumbColor: Colors.white,
                         inactiveTrackColor: const Color(0xFF333333),

@@ -180,7 +180,7 @@ class _HydrationSettingsScreenState extends State<HydrationSettingsScreen> {
                           Switch(
                             value: _intakeRemindersEnabled,
                             onChanged: (val) => setState(() => _intakeRemindersEnabled = val),
-                            activeColor: Colors.white,
+                            activeThumbColor: Colors.white,
                             activeTrackColor: accentColor,
                           ),
                         ],
@@ -267,7 +267,7 @@ class _HydrationSettingsScreenState extends State<HydrationSettingsScreen> {
                               Switch(
                                 value: _smartReminderEnabled,
                                 onChanged: (val) => setState(() => _smartReminderEnabled = val),
-                                activeColor: Colors.white,
+                                activeThumbColor: Colors.white,
                                 activeTrackColor: orangeColor,
                               ),
                               const SizedBox(width: 8),

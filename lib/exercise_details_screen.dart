@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ExerciseDetailsScreen extends StatelessWidget {
+  const ExerciseDetailsScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,7 +73,7 @@ class ExerciseDetailsScreen extends StatelessWidget {
 // Custom widget for bullet points
 class InstructionItem extends StatelessWidget {
   final String text;
-  InstructionItem(this.text);
+  const InstructionItem(this.text, {super.key});
 
   @override
   Widget build(BuildContext context) {
