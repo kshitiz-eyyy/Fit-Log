@@ -30,11 +30,7 @@ environment:
 dependencies:
   video_player: ^2.7.0
   audioplayers: ^5.2.0
-<<<<<<< HEAD
-=======
   http: ^1.2.0
->>>>>>> development
-
 
   flutter:
     sdk: flutter
@@ -68,13 +64,6 @@ flutter:
   assets:
     - assets/
     - assets/images/
-<<<<<<< HEAD
-
-
-=======
->>>>>>> development
-
-
 
   # To add assets to your application, add an assets section, like this:
   # assets:
