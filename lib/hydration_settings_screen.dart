@@ -1,253 +1,455 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'dart:math' as math;
 
-class HydrationSettingsScreen extends StatefulWidget {
-  const HydrationSettingsScreen({super.key});
+class HydrationPreferencesScreen extends StatefulWidget {
+  const HydrationPreferencesScreen({super.key});
 
   @override
-  State<HydrationSettingsScreen> createState() => _HydrationSettingsScreenState();
+  State<HydrationPreferencesScreen> createState() => _HydrationPreferencesScreenState();
 }
 
-class _HydrationSettingsScreenState extends State<HydrationSettingsScreen> {
-  bool _intakeRemindersEnabled = true;
-  bool _smartReminderEnabled = true;
-  String _selectedFrequency = 'Every 1H';
+class _HydrationPreferencesScreenState extends State<HydrationPreferencesScreen> {
+  // --- STATE VARIABLES ---
+  double _dailyTargetLiters = 3.5;
+  double _currentIntakeLiters = 1.25; // Pre-filled sample starting data
+  bool _intakeReminders = true;
+  int _selectedIntervalHours = 2; // 1, 2, or 3 Hours
+  bool _smartReminder = true;
+
+  // Dynamic Next Drink Tracking
+  late DateTime _nextDrinkTime;
+  String _timeRemainingStr = "";
+  Timer? _countdownTimer;
+
+  // --- DESIGN SYSTEM COLORS ---
+  static const backgroundColor = Color(0xFF0C0C0C);
+  static const accentColor = Color(0xFFD4FF00); // Lime Green
+  static const cardColor = Color(0xFF141414);
+  static const surfaceColor = Color(0xFF1A1A1A);
+  static const textColor = Colors.white;
+  static const secondaryTextColor = Color(0xFF8E8E8E);
+  static const warningColor = Color(0xFFFF5A1F);
 
   @override
-  Widget build(BuildContext context) {
-    const backgroundColor = Color(0xFF0D0D0D);
-    const cardColor = Color(0xFF1C1C1E);
-    const accentColor = Color(0xFFD0FD3E);
-    const orangeColor = Color(0xFFFF5722);
-    const textColor = Colors.white;
-    const secondaryTextColor = Color(0xFF8E8E93);
+  void initState() {
+    super.initState();
+    _calculateNextDrinkTime();
+    _startCountdownTimer();
+  }
 
-    return Scaffold(
-      backgroundColor: backgroundColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Top Bar
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  @override
+  void dispose() {
+    _countdownTimer?.cancel();
+    super.dispose();
+  }
+
+  // --- HELPER LOGIC ---
+  void _calculateNextDrinkTime() {
+    // Calculates a mockup next target time from "now" based on selected user frequency
+    _nextDrinkTime = DateTime.now().add(Duration(hours: _selectedIntervalHours));
+    _updateCountdownString();
+  }
+
+  void _updateCountdownString() {
+    final now = DateTime.now();
+    final difference = _nextDrinkTime.difference(now);
+
+    if (difference.isNegative) {
+      setState(() {
+        _timeRemainingStr = "Due Now";
+      });
+    } else {
+      final hours = difference.inHours;
+      final minutes = difference.inMinutes.remainder(60);
+      setState(() {
+        _timeRemainingStr = hours > 0 ? "${hours}h ${minutes}m" : "${minutes}m left";
+      });
+    }
+  }
+
+  void _startCountdownTimer() {
+    _countdownTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      if (mounted) _updateCountdownString();
+    });
+  }
+
+  void _logWater(double amountLiters) {
+    setState(() {
+      _currentIntakeLiters = (_currentIntakeLiters + amountLiters).clamp(0.0, _dailyTargetLiters + 2.0);
+      // Reset the window timer whenever user logs water intake
+      _calculateNextDrinkTime();
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Logged +${(amountLiters * 1000).toInt()}ml of water!'),
+        duration: const Duration(seconds: 2),
+        backgroundColor: cardColor,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  // Ring progress multiplier configuration
+  double get _progressRatio {
+    if (_dailyTargetLiters <= 0) return 0.0;
+    return (_currentIntakeLiters / _dailyTargetLiters).clamp(0.0, 1.0);
+  }
+
+  // --- BOTTOM DIALOG INTERFACE ---
+  void _showSetTargetBottomSheet() {
+    double tempTarget = _dailyTargetLiters;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: cardColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: const Icon(Icons.arrow_back, color: accentColor, size: 24),
-                  ),
                   const Text(
-                    'FITLOG',
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 2,
-                    ),
+                    'ADJUST DAILY TARGET',
+                    style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: 1),
                   ),
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: cardColor,
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Set your target daily fluid consumption limits.',
+                    style: TextStyle(color: secondaryTextColor, fontSize: 13),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.remove_circle_outline, color: accentColor, size: 32),
+                        onPressed: () => setModalState(() => tempTarget = (tempTarget - 0.25).clamp(1.0, 8.0)),
+                      ),
+                      const SizedBox(width: 24),
+                      Text(
+                        '${tempTarget.toStringAsFixed(2)} L',
+                        style: const TextStyle(color: textColor, fontSize: 36, fontWeight: FontWeight.w900),
+                      ),
+                      const SizedBox(width: 24),
+                      IconButton(
+                        icon: const Icon(Icons.add_circle_outline, color: accentColor, size: 32),
+                        onPressed: () => setModalState(() => tempTarget = (tempTarget + 0.25).clamp(1.0, 8.0)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: accentColor,
+                        foregroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      onPressed: () {
+                        setState(() => _dailyTargetLiters = tempTarget);
+                        Navigator.pop(context);
+                      },
+                      child: const Text('CONFIRM TARGET', style: TextStyle(fontWeight: FontWeight.w900)),
                     ),
-                    child: const Icon(Icons.person_outline, color: Colors.grey, size: 20),
                   ),
                 ],
               ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: backgroundColor,
+      appBar: AppBar(
+        backgroundColor: backgroundColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: accentColor, size: 24),
+          onPressed: () => Navigator.maybePop(context),
+        ),
+        title: const Text(
+          'FITLOG',
+          style: TextStyle(color: textColor, fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 2),
+        ),
+        centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Center(
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0xFF222222)),
+                  color: cardColor,
+                ),
+                child: const Icon(Icons.person_outline, color: secondaryTextColor, size: 22),
+              ),
             ),
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 32),
-                    // Daily Target Circle
-                    SizedBox(
-                      width: 220,
-                      height: 220,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          CustomPaint(
-                            size: const Size(200, 200),
-                            painter: CircleProgressPainter(
-                              progress: 0.83,
-                              color: accentColor,
-                              backgroundColor: const Color(0xFF2C2C2E),
-                            ),
-                          ),
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
+                    const SizedBox(height: 16),
+
+                    // --- CIRCULAR ANIMATED/INTERACTIVE INDICATOR ---
+                    GestureDetector(
+                      onTap: _showSetTargetBottomSheet,
+                      behavior: HitTestBehavior.opaque,
+                      child: Tooltip(
+                        message: "Tap to adjust goal",
+                        child: Center(
+                          child: Stack(
+                            alignment: Alignment.center,
                             children: [
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: const [
-                                  Text(
-                                    '3.5',
-                                    style: TextStyle(
-                                      color: accentColor,
-                                      fontSize: 60,
-                                      fontWeight: FontWeight.w900,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(bottom: 12, left: 4),
-                                    child: Text(
-                                      'L',
-                                      style: TextStyle(
-                                        color: accentColor,
-                                        fontSize: 28,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const Text(
-                                'DAILY TARGET',
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1,
+                              SizedBox(
+                                width: 220,
+                                height: 220,
+                                child: CustomPaint(
+                                  painter: HydrationProgressPainter(progress: _progressRatio),
                                 ),
                               ),
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        _currentIntakeLiters.toStringAsFixed(1),
+                                        style: const TextStyle(
+                                          color: accentColor,
+                                          fontSize: 54,
+                                          fontWeight: FontWeight.w900,
+                                          letterSpacing: -1,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 10, left: 1),
+                                        child: Text(
+                                          '/ ${_dailyTargetLiters.toStringAsFixed(1)}L',
+                                          style: const TextStyle(
+                                            color: secondaryTextColor,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 2),
+                                  const Text(
+                                    'COMPLETED',
+                                    style: TextStyle(
+                                      color: textColor,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w900, // Fixed: Changed from FontWeight.black
+                                      letterSpacing: 1,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  const Text(
+                                    '👉 TAP TO CHANGE TARGET',
+                                    style: TextStyle(color: secondaryTextColor, fontSize: 8, fontWeight: FontWeight.bold),
+                                  )
+                                ],
+                              ),
                             ],
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // --- PREDICTIVE DYNAMIC NEXT TIMER ROW ---
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF111600),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xFF2B3300)),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.hourglass_top_rounded, color: accentColor, size: 16),
+                          const SizedBox(width: 8),
+                          Text(
+                            _intakeReminders ? 'NEXT REMINDER: $_timeRemainingStr' : 'REMINDERS ARE OFF',
+                            style: const TextStyle(color: accentColor, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 40),
-                    // Motivation Row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.local_fire_department, color: orangeColor, size: 16),
-                        SizedBox(width: 12),
-                        Text(
-                          'Stay hydrated, perform better.',
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
+
+                    const SizedBox(height: 24),
+
+                    // --- NEW FUNCTIONALITY: QUICK WATER INTAKE LOGGING SECTION ---
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'LOG RECENT INTAKE',
+                          style: TextStyle(color: secondaryTextColor, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: InkWell(
+                                onTap: () => _logWater(0.25),
+                                child: Container(
+                                  height: 60,
+                                  decoration: BoxDecoration(color: cardColor, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFF222222))),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Icon(Icons.local_cafe_outlined, color: textColor, size: 20),
+                                      SizedBox(height: 2),
+                                      Text('+250 ml (Cup)', style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: InkWell(
+                                onTap: () => _logWater(0.50),
+                                child: Container(
+                                  height: 60,
+                                  decoration: BoxDecoration(color: cardColor, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFF222222))),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: const [
+                                      Icon(Icons.water_drop_outlined, color: accentColor, size: 20),
+                                      SizedBox(height: 2),
+                                      Text('+500 ml (Bottle)', style: TextStyle(color: accentColor, fontSize: 12, fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    const SizedBox(height: 32),
-                    // Intake Reminders Card
-                    _buildSettingsCard(
-                      cardColor: cardColor,
+
+                    const SizedBox(height: 24),
+
+                    // --- CARD 1: INTAKE REMINDERS TOGGLE ---
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(color: cardColor, borderRadius: BorderRadius.circular(20)),
                       child: Row(
                         children: [
                           Container(
-                            width: 44,
-                            height: 44,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF252527),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(Icons.notifications_none, color: accentColor, size: 24),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(color: const Color(0xFF1C1C1E), borderRadius: BorderRadius.circular(14)),
+                            child: const Icon(Icons.notifications_none_outlined, color: accentColor, size: 24),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: const [
-                                Text(
-                                  'Intake Reminders',
-                                  style: TextStyle(
-                                    color: textColor,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  'Push notifications to drink water',
-                                  style: TextStyle(
-                                    color: secondaryTextColor,
-                                    fontSize: 12,
-                                  ),
-                                ),
+                                Text('Intake Reminders', style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.bold)),
+                                SizedBox(height: 4),
+                                Text('Push notifications to drink water', style: TextStyle(color: secondaryTextColor, fontSize: 12)),
                               ],
                             ),
                           ),
                           Switch(
-                            value: _intakeRemindersEnabled,
-                            onChanged: (val) => setState(() => _intakeRemindersEnabled = val),
-                            activeThumbColor: Colors.white,
+                            value: _intakeReminders,
+                            onChanged: (val) {
+                              setState(() {
+                                _intakeReminders = val;
+                              });
+                            },
+                            activeThumbColor: Colors.black,
                             activeTrackColor: accentColor,
+                            inactiveThumbColor: Colors.white,
+                            inactiveTrackColor: const Color(0xFF2C2C2E),
                           ),
                         ],
                       ),
                     ),
+
                     const SizedBox(height: 16),
-                    // Interval Frequency
-                    _buildSettingsCard(
-                      cardColor: cardColor,
+
+                    // --- CARD 2: INTERVAL FREQUENCY SELECTOR ---
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(color: cardColor, borderRadius: BorderRadius.circular(20)),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
                             'INTERVAL FREQUENCY',
-                            style: TextStyle(
-                              color: secondaryTextColor,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
-                            ),
+                            style: TextStyle(color: secondaryTextColor, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 16),
                           Row(
                             children: [
-                              Expanded(child: _buildFrequencyButton('Every 1H', accentColor)),
-                              const SizedBox(width: 8),
-                              Expanded(child: _buildFrequencyButton('Every 2H', accentColor)),
-                              const SizedBox(width: 8),
-                              Expanded(child: _buildFrequencyButton('Every 3H', accentColor)),
+                              Expanded(child: _buildIntervalButton('Every 1H', 1)),
+                              const SizedBox(width: 10),
+                              Expanded(child: _buildIntervalButton('Every 2H', 2)),
+                              const SizedBox(width: 10),
+                              Expanded(child: _buildIntervalButton('Every 3H', 3)),
                             ],
                           ),
                         ],
                       ),
                     ),
+
                     const SizedBox(height: 16),
-                    // Smart Reminder
-                    _buildSettingsCard(
-                      cardColor: cardColor,
+
+                    // --- CARD 3: SMART REMINDER CARD ---
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(color: cardColor, borderRadius: BorderRadius.circular(20)),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
-                              const Icon(Icons.bolt, color: orangeColor, size: 16),
-                              const SizedBox(width: 12),
-                              const Text(
-                                'Smart Reminder',
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
+                              const Icon(Icons.flash_on, color: warningColor, size: 18),
+                              const SizedBox(width: 6),
+                              const Text('Smart Reminder', style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.bold)),
+                              const SizedBox(width: 10),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF3A2016),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(color: const Color(0xFF2C140E), borderRadius: BorderRadius.circular(6)),
                                 child: const Text(
                                   'HIGH INTENSITY',
-                                  style: TextStyle(
-                                    color: orangeColor,
-                                    fontSize: 8,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: TextStyle(color: warningColor, fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 0.5), // Fixed: Changed from FontWeight.black
                                 ),
                               ),
                             ],
@@ -255,148 +457,87 @@ class _HydrationSettingsScreenState extends State<HydrationSettingsScreen> {
                           const SizedBox(height: 8),
                           const Text(
                             'Dynamic frequency based on sweat rate & activity heart rate.',
-                            style: TextStyle(
-                              color: secondaryTextColor,
-                              fontSize: 12,
-                              height: 1.4,
-                            ),
+                            style: TextStyle(color: secondaryTextColor, fontSize: 13, height: 1.4),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 20),
                           Row(
                             children: [
                               Switch(
-                                value: _smartReminderEnabled,
-                                onChanged: (val) => setState(() => _smartReminderEnabled = val),
+                                value: _smartReminder,
+                                onChanged: (val) => setState(() => _smartReminder = val),
                                 activeThumbColor: Colors.white,
-                                activeTrackColor: orangeColor,
+                                activeTrackColor: warningColor,
+                                inactiveThumbColor: Colors.grey,
+                                inactiveTrackColor: const Color(0xFF2C2C2E),
                               ),
                               const SizedBox(width: 8),
-                              const Text(
-                                'Enabled for Elite Pro',
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    // Monitoring Window
-                    _buildSettingsCard(
-                      cardColor: cardColor,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'MONITORING WINDOW',
-                            style: TextStyle(
-                              color: secondaryTextColor,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              Expanded(child: _buildTimeInput('START TIME', '07:00')),
-                              const SizedBox(width: 12),
-                              Expanded(child: _buildTimeInput('END TIME', '22:00')),
+                              const Text('Enabled for Elite Pro', style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w600)),
                             ],
                           ),
                         ],
                       ),
                     ),
                     const SizedBox(height: 32),
-                    // Save Button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 64,
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: accentColor,
-                          foregroundColor: Colors.black,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          elevation: 0,
-                        ),
-                        child: const Text(
-                          'SAVE PREFERENCES',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 48),
                   ],
+                ),
+              ),
+            ),
+
+            // --- FIXED SAVE BUTTON BLOCK ---
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+              child: SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Preferences saved successfully!'),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: accentColor,
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'SAVE PREFERENCES',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: 1),
+                  ),
                 ),
               ),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.black,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: accentColor,
-        unselectedItemColor: Colors.white,
-        selectedFontSize: 10,
-        unselectedFontSize: 10,
-        currentIndex: 3,
-        items: [
-          const BottomNavigationBarItem(icon: Icon(Icons.dashboard_outlined), label: 'Dash'),
-          const BottomNavigationBarItem(icon: Icon(Icons.fitness_center), label: 'Train'),
-          const BottomNavigationBarItem(icon: Icon(Icons.restaurant_menu), label: 'Fuel'),
-          BottomNavigationBarItem(
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: accentColor,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.analytics, color: Colors.black, size: 22),
-            ),
-            label: 'Goals',
-          ),
-          const BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Admin'),
-        ],
-      ),
     );
   }
 
-  Widget _buildSettingsCard({required Color cardColor, required Widget child}) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: child,
-    );
-  }
-
-  Widget _buildFrequencyButton(String text, Color accentColor) {
-    bool isSelected = _selectedFrequency == text;
+  Widget _buildIntervalButton(String label, int valueHours) {
+    final isSelected = _selectedIntervalHours == valueHours;
     return GestureDetector(
-      onTap: () => setState(() => _selectedFrequency = text),
-      child: Container(
-        height: 50,
-        alignment: Alignment.center,
+      onTap: () {
+        setState(() {
+          _selectedIntervalHours = valueHours;
+          _calculateNextDrinkTime();
+        });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        height: 48,
         decoration: BoxDecoration(
-          color: isSelected ? accentColor : const Color(0xFF2C2C2E),
-          borderRadius: BorderRadius.circular(10),
+          color: isSelected ? accentColor : surfaceColor,
+          borderRadius: BorderRadius.circular(12),
         ),
+        alignment: Alignment.center,
         child: Text(
-          text,
+          label,
           style: TextStyle(
-            color: isSelected ? Colors.black : Colors.white,
+            color: isSelected ? Colors.black : textColor,
             fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
@@ -404,82 +545,45 @@ class _HydrationSettingsScreenState extends State<HydrationSettingsScreen> {
       ),
     );
   }
-
-  Widget _buildTimeInput(String label, String time) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Color(0xFF8E8E93),
-            fontSize: 10,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Container(
-          height: 50,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: const Color(0xFF2C2C2E),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Text(
-            time,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 }
 
-class CircleProgressPainter extends CustomPainter {
+// --- DYNAMIC ARC PROGRESS PAINTER ---
+class HydrationProgressPainter extends CustomPainter {
   final double progress;
-  final Color color;
-  final Color backgroundColor;
-
-  CircleProgressPainter({
-    required this.progress,
-    required this.color,
-    required this.backgroundColor,
-  });
+  HydrationProgressPainter({required this.progress});
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = math.min(size.width / 2, size.height / 2);
+    final radius = (size.width / 2) - 10;
     const strokeWidth = 10.0;
 
-    final backgroundPaint = Paint()
-      ..color = backgroundColor
-      ..strokeWidth = strokeWidth
+    // Track Background ring
+    final trackPaint = Paint()
+      ..color = const Color(0xFF1C1C1E)
       ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
+      ..strokeWidth = strokeWidth;
+    canvas.drawCircle(center, radius, trackPaint);
 
+    // Active Highlight Progress Segment
     final progressPaint = Paint()
-      ..color = color
-      ..strokeWidth = strokeWidth
+      ..color = const Color(0xFFD4FF00)
       ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round;
 
-    canvas.drawCircle(center, radius, backgroundPaint);
-
-    double sweepAngle = 2 * math.pi * progress;
+    // Draw active arc from top center (-pi / 2)
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
       -math.pi / 2,
-      sweepAngle,
+      2 * math.pi * progress,
       false,
       progressPaint,
     );
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  bool shouldRepaint(covariant HydrationProgressPainter oldDelegate) {
+    return oldDelegate.progress != progress;
+  }
 }

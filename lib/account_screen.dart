@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+// Make sure this path matches your project structure
+import 'change_password_screen.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
@@ -15,7 +17,6 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget build(BuildContext context) {
     const backgroundColor = Color(0xFF0C0C0C);
     const accentColor = Color(0xFFD4FF00);
-    const surfaceColor = Color(0xFF1A1A1A);
     const cardColor = Color(0xFF141414);
     const textColor = Colors.white;
     const secondaryTextColor = Color(0xFF8E8E8E);
@@ -130,12 +131,23 @@ class _AccountScreenState extends State<AccountScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
+
+                    // Update Password Button (With Navigation Built-In)
                     _buildSecurityOption(
                       icon: Icons.lock_outline,
                       title: 'Update Password',
                       cardColor: cardColor,
                       accentColor: accentColor,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ChangePasswordScreen(),
+                          ),
+                        );
+                      },
                     ),
+
                     const SizedBox(height: 12),
                     _buildSecurityOption(
                       icon: Icons.fingerprint,
@@ -364,25 +376,29 @@ class _AccountScreenState extends State<AccountScreen> {
     required Color cardColor,
     required Color accentColor,
     Widget? trailing,
+    VoidCallback? onTap, // Added onTap callback parameter
   }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: accentColor, size: 22),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: accentColor, size: 22),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500),
+              ),
             ),
-          ),
-          trailing ?? const Icon(Icons.chevron_right, color: Colors.white, size: 18),
-        ],
+            trailing ?? const Icon(Icons.chevron_right, color: Colors.white, size: 18),
+          ],
+        ),
       ),
     );
   }
