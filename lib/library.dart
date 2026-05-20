@@ -31,7 +31,6 @@ class _LibraryScreenState extends State<LibraryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_selectedIndex],
-      // 🚫 Removed BottomNavigationBar
     );
   }
 }
@@ -47,6 +46,23 @@ class _LibraryContent extends StatelessWidget {
     "Triceps": "assets/images/tricepsdash.png",
     "Shoulders": "assets/images/shoulderdash.png",
     "Abs": "assets/images/absdash.png",
+  };
+
+  // Training splits definition
+  final Map<String, Map<String, List<Map<String, String>>>> trainingSplits = {
+    "Push/Pull/Legs": {
+      "Push": exerciseData["Chest"]! + exerciseData["Shoulders"]! + exerciseData["Triceps"]!,
+      "Pull": exerciseData["Back"]! + exerciseData["Biceps"]!,
+      "Legs": exerciseData["Legs"]!,
+    },
+    "Bro Split": {
+      "Chest Day": exerciseData["Chest"]!,
+      "Back Day": exerciseData["Back"]!,
+      "Shoulder Day": exerciseData["Shoulders"]!,
+      "Arm Day": exerciseData["Biceps"]! + exerciseData["Triceps"]!,
+      "Leg Day": exerciseData["Legs"]!,
+      "Abs Day": exerciseData["Abs"]!,
+    },
   };
 
   @override
@@ -83,48 +99,9 @@ class _LibraryContent extends StatelessWidget {
           ),
           body: Column(
             children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFF121212), Color(0xFF1E1E1E)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text("WELCOME COMMANDER",
-                        style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 6),
-                    Text("PUSH YOUR LIMITS TODAY",
-                        style: TextStyle(color: Color(0xFFCCFF00), fontSize: 16, fontStyle: FontStyle.italic)),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF121212),
-                  foregroundColor: const Color(0xFFCCFF00),
-                  padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  side: const BorderSide(color: Color(0xFFCCFF00), width: 2),
-                  elevation: 20,
-                  shadowColor: const Color(0xFFCCFF00),
-                ),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Starting workout...")),
-                  );
-                },
-                icon: const Icon(Icons.play_arrow, size: 28),
-                label: const Text("START WORKOUT", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              ),
-              const SizedBox(height: 20),
+              // Muscle Group Grid (full screen focus)
               Expanded(
+                flex: 3,
                 child: GridView.builder(
                   padding: const EdgeInsets.all(16),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -219,10 +196,96 @@ class _LibraryContent extends StatelessWidget {
                   },
                 ),
               ),
+
+              // Splits Section at bottom
+              Expanded(
+                flex: 1,
+                child: ListView(
+                  children: trainingSplits.keys.map((splitName) {
+                    return Card(
+                      color: const Color(0xFF1E1E1E),
+                      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                      child: ListTile(
+                        title: Text(splitName,
+                            style: const TextStyle(
+                                color: Color(0xFFCCFF00),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18)),
+                        trailing: const Icon(Icons.chevron_right, color: Colors.white),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => SplitScreen(
+                                splitName: splitName,
+                                splitData: trainingSplits[splitName]!,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
             ],
           ),
         ),
       ],
+    );
+  }
+}
+
+class SplitScreen extends StatelessWidget {
+  final String splitName;
+  final Map<String, List<Map<String, String>>> splitData;
+
+  const SplitScreen({super.key, required this.splitName, required this.splitData});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF121212),
+        title: Text(splitName,
+            style: const TextStyle(color: Color(0xFFCCFF00), fontWeight: FontWeight.bold)),
+        centerTitle: true,
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: splitData.keys.map((dayName) {
+          final exercises = splitData[dayName]!;
+          return Card(
+            color: const Color(0xFF1E1E1E),
+            margin: const EdgeInsets.symmetric(vertical: 10),
+            child: ExpansionTile(
+              title: Text(dayName,
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              children: exercises.map((exercise) {
+                return ListTile(
+                  title: Text(exercise["name"] ?? "",
+                      style: const TextStyle(color: Colors.white)),
+                  subtitle: Text("Sets: 3–4 • Reps: ${exercise["reps"] ?? "10"}",
+                      style: const TextStyle(color: Colors.white70)),
+                  trailing: const Icon(Icons.fitness_center, color: Color(0xFFCCFF00)),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ExerciseListScreen(
+                          muscleGroup: dayName,
+                          exercises: exercises,
+                        ),
+                      ),
+                    );
+                  },
+                );
+              }).toList(),
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
 }

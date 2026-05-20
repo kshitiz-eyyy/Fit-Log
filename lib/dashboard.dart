@@ -14,7 +14,6 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
 
-
   final List<Widget> _screens = [
     const _DashboardContent(),
     FeaturesScreen(), // <--- Replaced placeholder with your working grid UI!
@@ -29,7 +28,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   ];
 
   void _onItemTapped(int index) {
-    setState(() => _selectedIndex = index);
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   @override
@@ -86,10 +87,18 @@ class _DashboardContentState extends State<_DashboardContent> {
   @override
   Widget build(BuildContext context) {
     final DateTime membershipStart = DateTime.now();
-    final DateTime membershipEnd = membershipStart.add(const Duration(days: 30));
-    final int remainingDays = membershipEnd.difference(DateTime.now()).inDays;
-    final int totalDays = membershipEnd.difference(membershipStart).inDays;
-    final double progress = (totalDays - remainingDays) / totalDays;
+
+    final DateTime membershipEnd =
+    membershipStart.add(const Duration(days: 30));
+
+    final int remainingDays =
+        membershipEnd.difference(DateTime.now()).inDays;
+
+    final int totalDays =
+        membershipEnd.difference(membershipStart).inDays;
+
+    final double progress =
+        (totalDays - remainingDays) / totalDays;
 
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
@@ -109,12 +118,16 @@ class _DashboardContentState extends State<_DashboardContent> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            // HERO SECTION
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0xFF121212), Color(0xFF1E1E1E)],
+                  colors: [
+                    Color(0xFF121212),
+                    Color(0xFF1E1E1E),
+                  ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -142,7 +155,9 @@ class _DashboardContentState extends State<_DashboardContent> {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
+
+            // PROGRESS RING
             SizedBox(
               height: 180,
               width: 180,
@@ -177,20 +192,38 @@ class _DashboardContentState extends State<_DashboardContent> {
               ),
             ),
             const SizedBox(height: 20),
+
+            // QUICK STATS
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _statCard("142 BPM", "Peak Level", Icons.favorite),
-                _statCard("842 KCAL", "Burned", Icons.local_fire_department),
+                _statCard(
+                  "142 BPM",
+                  "Peak Level",
+                  Icons.favorite,
+                ),
+                _statCard(
+                  "842 KCAL",
+                  "Burned",
+                  Icons.local_fire_department,
+                ),
               ],
             ),
             const SizedBox(height: 20),
-            _progressBar("Steps Goal", 0.75, Colors.greenAccent),
+
+            // PROGRESS BARS
+            _progressBar(
+              "Steps Goal",
+              0.75,
+              Colors.greenAccent,
+            ),
             const SizedBox(height: 12),
             _progressBar("Workout Time", 0.45, Colors.blueAccent),
             const SizedBox(height: 12),
             _progressBar("Calories Burned", 0.65, Colors.orangeAccent),
             const SizedBox(height: 20),
+
+            // STREAK TRACKER
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -209,9 +242,10 @@ class _DashboardContentState extends State<_DashboardContent> {
               ),
             ),
             const SizedBox(height: 20),
+
+            // MEMBERSHIP TRACKER
             Container(
               padding: const EdgeInsets.all(16),
-              margin: const EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
                 color: Colors.black,
                 borderRadius: BorderRadius.circular(12),
@@ -240,6 +274,8 @@ class _DashboardContentState extends State<_DashboardContent> {
               ),
             ),
             const SizedBox(height: 20),
+
+            // Your custom totalDays remaining layout grid
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -267,6 +303,8 @@ class _DashboardContentState extends State<_DashboardContent> {
               },
             ),
             const SizedBox(height: 20),
+
+            // WATER + MEAL BUTTONS
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -276,7 +314,9 @@ class _DashboardContentState extends State<_DashboardContent> {
                   },
                   icon: const Icon(Icons.water_drop),
                   label: const Text("Log Water"),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                  ),
                 ),
                 ElevatedButton.icon(
                   onPressed: () {
@@ -284,43 +324,70 @@ class _DashboardContentState extends State<_DashboardContent> {
                   },
                   icon: const Icon(Icons.restaurant),
                   label: const Text("Log Meal"),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.orangeAccent),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orangeAccent,
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 20),
+
+            // ENERGY SLIDER
             Slider(
               value: energyLevel,
               divisions: 2,
               label: energyLevel < 0.5 ? "Low Energy" : "High Energy",
-              onChanged: (val) => setState(() => energyLevel = val),
+              onChanged: (val) {
+                setState(() {
+                  energyLevel = val;
+                });
+              },
             ),
             Text(
-              energyLevel < 0.5 ? "Recommended: Gentle Yoga / Stretching" : "Recommended: Intense Cardio / HIIT",
-              style: const TextStyle(color: Colors.white, fontSize: 14),
+              energyLevel < 0.5
+                  ? "Recommended: Gentle Yoga / Stretching"
+                  : "Recommended: Intense Cardio / HIIT",
+              style: const TextStyle(
+                color: Colors.white,
+              ),
             ),
             const SizedBox(height: 20),
+
+            // FATIGUE WARNING
             if (fatigueWarning)
               Container(
                 padding: const EdgeInsets.all(16),
-                margin: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(12)),
+                decoration: BoxDecoration(
+                  color: Colors.redAccent,
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: const Text(
                   "⚠️ Muscle fatigue is high. Stretch or recover today!",
                   style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
             const SizedBox(height: 20),
+
+            // DAILY FLASH AUDIO
             ElevatedButton.icon(
               onPressed: () async {
                 await _audioPlayer.play(UrlSource("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"));
               },
               icon: const Icon(Icons.play_circle_fill),
               label: const Text("Daily Flash"),
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.purpleAccent),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.purpleAccent,
+              ),
             ),
             const SizedBox(height: 20),
+
+            // START WORKOUT BUTTON
             ElevatedButton.icon(
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Starting workout...")));
+              },
+              icon: const Icon(Icons.play_arrow, size: 28),
+              label: const Text("START WORKOUT", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
                 foregroundColor: const Color(0xFFCCFF00),
@@ -330,13 +397,10 @@ class _DashboardContentState extends State<_DashboardContent> {
                 elevation: 20,
                 shadowColor: const Color(0xFFCCFF00),
               ),
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Starting workout...")));
-              },
-              icon: const Icon(Icons.play_arrow, size: 28),
-              label: const Text("START WORKOUT", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             ),
             const SizedBox(height: 30),
+
+            // MOTIVATIONAL QUOTE SECTION
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               padding: const EdgeInsets.all(16),
@@ -344,17 +408,29 @@ class _DashboardContentState extends State<_DashboardContent> {
                 color: const Color(0xFF1E1E1E),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
-                  BoxShadow(color: const Color(0xFFCCFF00).withOpacity(0.4), blurRadius: 8, offset: const Offset(0, 4)),
+                  BoxShadow(
+                    color: const Color(0xFFCCFF00).withOpacity(0.4),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
                 ],
               ),
               child: Column(
                 children: const [
-                  Icon(Icons.format_quote, color: Color(0xFFCCFF00), size: 28),
+                  Icon(
+                    Icons.format_quote,
+                    color: Color(0xFFCCFF00),
+                    size: 28,
+                  ),
                   SizedBox(height: 8),
                   Text(
                     "“Discipline is the bridge between goals and accomplishment.”",
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white, fontSize: 16, fontStyle: FontStyle.italic),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontStyle: FontStyle.italic,
+                    ),
                   ),
                 ],
               ),
@@ -374,15 +450,33 @@ class _DashboardContentState extends State<_DashboardContent> {
         color: Colors.black,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
-          BoxShadow(color: const Color(0xFFCCFF00).withOpacity(0.4), blurRadius: 8, offset: const Offset(0, 4)),
+          BoxShadow(
+            color: const Color(0xFFCCFF00).withOpacity(0.4),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Column(
         children: [
-          Icon(icon, color: const Color(0xFFCCFF00), size: 32),
+          Icon(
+            icon,
+            color: const Color(0xFFCCFF00),
+            size: 32,
+          ),
           const SizedBox(height: 8),
-          Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 14)),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.grey, fontSize: 14),
+          ),
         ],
       ),
     );
@@ -392,9 +486,17 @@ class _DashboardContentState extends State<_DashboardContent> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Colors.white, fontSize: 14)),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white, fontSize: 14),
+        ),
         const SizedBox(height: 6),
-        LinearProgressIndicator(value: progress, backgroundColor: Colors.grey, color: color, minHeight: 10),
+        LinearProgressIndicator(
+          value: progress,
+          backgroundColor: Colors.grey,
+          color: color,
+          minHeight: 10,
+        ),
       ],
     );
   }
@@ -435,7 +537,6 @@ class FeaturesScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
-        // CHANGED: Removed manual leading back arrow because it is a navigation tab view now!
         automaticallyImplyLeading: false,
         title: Row(
           children: [
@@ -554,7 +655,6 @@ class FeaturesScreen extends StatelessWidget {
   }
 }
 
-// --- COACH CHAT SUB-CONTENT ---
 class FitnessCoachChatScreen extends StatelessWidget {
   const FitnessCoachChatScreen({super.key});
 
@@ -564,7 +664,12 @@ class FitnessCoachChatScreen extends StatelessWidget {
       backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
         backgroundColor: const Color(0xFF121212),
-        title: const Text("AI Fitness Coach", style: TextStyle(color: Color(0xFFCCFF00))),
+        title: const Text(
+          "AI Fitness Coach",
+          style: TextStyle(
+            color: Color(0xFFCCFF00),
+          ),
+        ),
       ),
       body: const Center(
         child: Text("Chat with your AI Fitness Coach here...", style: TextStyle(color: Colors.white)),

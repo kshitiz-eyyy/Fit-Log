@@ -36,12 +36,12 @@ class ActivityScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "PERFORMANCE LOG HISTORY",
           style: TextStyle(
               fontWeight: FontWeight.bold, color: Colors.white, fontSize: 20),
         ),
-        backgroundColor: Colors.green.shade700,
+        backgroundColor: const Color(0xFFCCFF00), // ✅ Neon lime accent
         centerTitle: true,
         elevation: 8,
       ),
@@ -53,39 +53,40 @@ class ActivityScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 final log = logs[index];
                 return Container(
-                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.green.shade800, Colors.green.shade400],
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF1E1E1E), Color(0xFF121212)], // dark gradient
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                          color: Colors.black45,
+                          color: const Color(0xFFCCFF00).withOpacity(0.4), // ✅ Neon lime glow
                           blurRadius: 8,
-                          offset: Offset(2, 4)),
+                          offset: const Offset(2, 4)),
                     ],
+                    border: Border.all(color: const Color(0xFFCCFF00), width: 1.5),
                   ),
                   child: ListTile(
-                    leading: Icon(log["icon"], color: Colors.white, size: 36),
+                    leading: Icon(log["icon"], color: const Color(0xFFCCFF00), size: 36), // ✅ Neon lime icon
                     title: Text(
                       log["title"],
-                      style: TextStyle(
+                      style: const TextStyle(
                           color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                     subtitle: Text(
                       "${log["date"]}\nDuration: ${log["duration"]} min • Calories: ${log["calories"]} kcal",
-                      style: TextStyle(color: Colors.white70),
+                      style: const TextStyle(color: Colors.white70),
                     ),
                     trailing: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text("PR: ${log["records"]}",
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: Colors.orangeAccent, fontSize: 14)),
-                        Icon(Icons.chevron_right, color: Colors.white),
+                        const Icon(Icons.chevron_right, color: Colors.white),
                       ],
                     ),
                   ),
@@ -96,38 +97,39 @@ class ActivityScreen extends StatelessWidget {
 
           // Weekly Momentum Section
           Container(
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.green.shade700, Colors.green.shade400],
+              gradient: const LinearGradient(
+                colors: [Color(0xFF121212), Color(0xFF1E1E1E)], // dark gradient
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
-              borderRadius: BorderRadius.only(
+              borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(24), topRight: Radius.circular(24)),
               boxShadow: [
-                BoxShadow(color: Colors.black54, blurRadius: 10, offset: Offset(0, -4)),
+                const BoxShadow(color: Colors.black54, blurRadius: 10, offset: Offset(0, -4)),
               ],
+              border: Border.all(color: const Color(0xFFCCFF00), width: 1.5),
             ),
             child: Column(
               children: [
-                Text(
+                const Text(
                   "🔥 Weekly Momentum",
                   style: TextStyle(
-                      color: Colors.white,
+                      color: Color(0xFFCCFF00), // ✅ Neon lime accent
                       fontWeight: FontWeight.bold,
                       fontSize: 22),
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _progressStat("Calories Burned", 1240, Colors.orange),
-                    _progressStat("Workouts Done", 4, Colors.lightGreenAccent),
+                    _progressStat("Workouts Done", 4, const Color(0xFFCCFF00)), // ✅ Neon lime accent
                   ],
                 ),
-                SizedBox(height: 16),
-                Text(
+                const SizedBox(height: 16),
+                const Text(
                   "Keep pushing! You're unstoppable 💪",
                   style: TextStyle(color: Colors.white70, fontSize: 16),
                 ),
@@ -157,16 +159,16 @@ class ActivityScreen extends StatelessWidget {
             ),
             Text(
               "$value",
-              style: TextStyle(
+              style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 18),
             ),
           ],
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Text(label,
-            style: TextStyle(color: Colors.white70, fontSize: 14),
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
             textAlign: TextAlign.center),
       ],
     );

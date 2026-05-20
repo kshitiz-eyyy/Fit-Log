@@ -30,6 +30,10 @@ environment:
 dependencies:
   video_player: ^2.7.0
   audioplayers: ^5.2.0
+<<<<<<< HEAD
+=======
+  http: ^1.2.0
+>>>>>>> development
 
 
   flutter:
@@ -64,8 +68,11 @@ flutter:
   assets:
     - assets/
     - assets/images/
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> development
 
 
 
