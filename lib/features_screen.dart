@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'bmi_calculator_screen.dart';
+import 'bmi_calculator_screen.dart'; // <--- Added connection import here
 
 class AppColors {
   static const Color background = Color(0xFF121212);

@@ -1,10 +1,51 @@
 import 'package:fitlog/register_screen.dart';
 import 'package:flutter/material.dart';
-
 import 'forgot_password_screen.dart';
+import 'dashboard.dart'; // <--- Added the dashboard import here!
 
-class FitLogLogin extends StatelessWidget {
+// CHANGED: Converted to StatefulWidget so we can manage text entry inputs
+class FitLogLogin extends StatefulWidget {
   const FitLogLogin({super.key});
+
+  @override
+  State<FitLogLogin> createState() => _FitLogLoginState();
+}
+
+class _FitLogLoginState extends State<FitLogLogin> {
+  // Added controllers to extract text inputs
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  // Handle mock authentication validation rule
+  void _handleLogin() {
+    final String email = _emailController.text.trim();
+    final String password = _passwordController.text.trim();
+
+    // Use placeholder credentials for teammate development access
+    if (email == "admin@fitlog.com" && password == "password123") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const DashboardScreen(),
+        ),
+      );
+    } else {
+      // Prompt user with matching mock credentials rule
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Invalid Credentials! Use admin@fitlog.com / password123'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,13 +61,12 @@ class FitLogLogin extends StatelessWidget {
 
               Row(
                 children: [
-                Image.asset(
-                'assets/images/logo.png',
-                height: 50,
-                width: 50,
-                fit: BoxFit.contain,
-              ),
-
+                  Image.asset(
+                    'assets/images/logo.png',
+                    height: 50,
+                    width: 50,
+                    fit: BoxFit.contain,
+                  ),
                   const SizedBox(width: 8),
                   const Text(
                     'FITLOG',
@@ -49,59 +89,57 @@ class FitLogLogin extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              // --- INCREASED SIZE: Credentials Subtitle ---
               const Text(
                 'Enter credentials to access the training grid.',
                 style: TextStyle(color: Colors.grey, fontSize: 18),
               ),
               const SizedBox(height: 40),
 
-
               const _FieldLabel(label: 'EMAIL ADDRESS', size: 16),
               const SizedBox(height: 8),
-              const _CustomTextField(
+              _CustomTextField(
                 hint: 'NAME@SERVICE.COM',
                 icon: Icons.email_outlined,
+                controller: _emailController, // Added controller hook
               ),
 
               const SizedBox(height: 24),
 
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const _FieldLabel(label: 'PASSWORD', size: 16),
-              TextButton(
-                onPressed: () {
-                  // Navigate to ForgotPasswordScreen
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ForgotPasswordScreen(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const _FieldLabel(label: 'PASSWORD', size: 16),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ForgotPasswordScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'FORGOT PASSWORD?',
+                      style: TextStyle(color: Colors.grey, fontSize: 14),
                     ),
-                  );
-                },
-                child: const Text(
-                  'FORGOT PASSWORD?',
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
-              const _CustomTextField(
+              _CustomTextField(
                 hint: '********',
                 icon: Icons.lock_outline,
                 isPassword: true,
+                controller: _passwordController, // Added controller hook
               ),
 
               const SizedBox(height: 32),
 
-              // Login Button
+              // Login Button with connected functionality
               SizedBox(
                 width: double.infinity,
                 height: 60,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _handleLogin, // Triggers our mock navigator logic
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFCCFF00),
                     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
@@ -155,7 +193,6 @@ class FitLogLogin extends StatelessWidget {
               ),
               const SizedBox(height: 40),
 
-              // --- INCREASED SIZE: New to the Rig footer ---
               Center(
                 child: Wrap(
                   alignment: WrapAlignment.center,
@@ -164,7 +201,6 @@ class FitLogLogin extends StatelessWidget {
                         style: TextStyle(color: Colors.grey, fontSize: 16)),
                     GestureDetector(
                       onTap: () {
-                        // This command pushes the RegisterScreen on top of the LoginScreen
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => const RegisterScreen()),
@@ -192,7 +228,6 @@ class FitLogLogin extends StatelessWidget {
   }
 }
 
-// Reusable Label Widget (Updated with size parameter)
 class _FieldLabel extends StatelessWidget {
   final String label;
   final double size;
@@ -211,15 +246,17 @@ class _FieldLabel extends StatelessWidget {
   }
 }
 
-// Reusable TextField Widget
+// Updated Custom Field Widget to inherit parent controllers
 class _CustomTextField extends StatefulWidget {
   final String hint;
   final IconData icon;
   final bool isPassword;
+  final TextEditingController controller; // Track inputs
 
   const _CustomTextField({
     required this.hint,
     required this.icon,
+    required this.controller,
     this.isPassword = false,
   });
 
@@ -228,19 +265,18 @@ class _CustomTextField extends StatefulWidget {
 }
 
 class _CustomTextFieldState extends State<_CustomTextField> {
-  // Local state to track visibility
   late bool _obscureText;
 
   @override
   void initState() {
     super.initState();
-    // Start hidden if it's a password field
     _obscureText = widget.isPassword;
   }
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: widget.controller, // Connected the passed controller
       obscureText: _obscureText,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
@@ -249,8 +285,6 @@ class _CustomTextFieldState extends State<_CustomTextField> {
         hintText: widget.hint,
         hintStyle: const TextStyle(color: Colors.white24, fontSize: 16),
         prefixIcon: Icon(widget.icon, color: Colors.white54, size: 22),
-
-        // Add the toggle icon only if isPassword is true
         suffixIcon: widget.isPassword
             ? IconButton(
           icon: Icon(
@@ -265,7 +299,6 @@ class _CustomTextFieldState extends State<_CustomTextField> {
           },
         )
             : null,
-
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(4),
           borderSide: BorderSide.none,
