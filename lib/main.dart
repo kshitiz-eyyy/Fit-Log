@@ -1,21 +1,48 @@
 import 'package:flutter/material.dart';
+// Teammate's imports
+import 'package:fitlog/bmi_calculator_screen.dart';
+import 'package:fitlog/fitlog_login.dart';
+import 'package:fitlog/forgot_password_screen.dart';
+import 'package:fitlog/register_screen.dart';
+import 'package:fitlog/workout_timer_screen.dart';
+import 'library.dart';
+import 'activity_screen.dart';
+import 'favourite_exercise.dart';
+import 'change_password_screen.dart';
+import 'dashboard.dart';
+import 'features_screen.dart';
+import 'splash_screen.dart';
+
+// Your tracking imports
 import 'workout_tracking_screen.dart';
 import 'meal_tracking_screen.dart';
 import 'membership_tracking_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const FitLogApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class FitLogApp extends StatelessWidget {
+  const FitLogApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(),
-      home: const MembershipTrackingScreen(),
+      title: 'FitLog',
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: Colors.black,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.black,
+          titleTextStyle: TextStyle(
+            color: Colors.lightGreenAccent,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+
+      home: const SplashScreen(),
     );
   }
 }

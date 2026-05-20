@@ -28,6 +28,10 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  video_player: ^2.7.0
+  audioplayers: ^5.2.0
+  http: ^1.2.0
+
   flutter:
     sdk: flutter
 
@@ -58,16 +62,8 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/Benchpress.png
-    - assets/images/Pecdecfly.png
-    - assets/images/cablecrossover.png
-    - assets/images/Dumbellpress.png
-    - assets/images/machinepress.png
-    - assets/images/chestdips.png
-    - assets/images/gym.png
-    - assets/images/logo.png
-
-
+    - assets/
+    - assets/images/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
