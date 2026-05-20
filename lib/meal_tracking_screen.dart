@@ -1,5 +1,3 @@
-// meal_tracking_screen.dart
-
 import 'package:flutter/material.dart';
 
 class MealTrackingScreen extends StatelessWidget {
@@ -27,22 +25,18 @@ class MealTrackingScreen extends StatelessWidget {
             icon: Icon(Icons.home),
             label: "HOME",
           ),
-
           BottomNavigationBarItem(
             icon: Icon(Icons.featured_video_sharp),
             label: "Features",
           ),
-
           BottomNavigationBarItem(
             icon: Icon(Icons.library_add),
             label: "Library",
           ),
-
           BottomNavigationBarItem(
             icon: Icon(Icons.history),
             label: "Activity",
           ),
-
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: "PROFILE",
@@ -71,9 +65,7 @@ class MealTrackingScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   const SizedBox(width: 14),
-
                   const Text(
                     "PERFORMANCE",
                     style: TextStyle(
@@ -82,9 +74,7 @@ class MealTrackingScreen extends StatelessWidget {
                       color: Colors.white,
                     ),
                   ),
-
                   const Spacer(),
-
                   const Icon(
                     Icons.notifications_none,
                     color: Colors.white,
@@ -110,9 +100,7 @@ class MealTrackingScreen extends StatelessWidget {
                           letterSpacing: 1,
                         ),
                       ),
-
                       SizedBox(height: 10),
-
                       Text(
                         "Nutrition\nInsights",
                         style: TextStyle(
@@ -124,7 +112,6 @@ class MealTrackingScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24,
@@ -136,14 +123,8 @@ class MealTrackingScreen extends StatelessWidget {
                     ),
                     child: const Row(
                       children: [
-                        Icon(
-                          Icons.add,
-                          color: Colors.black,
-                          size: 30,
-                        ),
-
+                        Icon(Icons.add, color: Colors.black, size: 30),
                         SizedBox(width: 10),
-
                         Text(
                           "Add\nMeal",
                           style: TextStyle(
@@ -156,6 +137,30 @@ class MealTrackingScreen extends StatelessWidget {
                     ),
                   )
                 ],
+              ),
+
+              const SizedBox(height: 30),
+
+              /// ACCOUNT SETTINGS BUTTON
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: neon,
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const AccountSettingsScreen()),
+                  );
+                },
+                child: const Text(
+                  "Account Settings",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
               ),
 
               const SizedBox(height: 30),
@@ -179,9 +184,7 @@ class MealTrackingScreen extends StatelessWidget {
                         letterSpacing: 1,
                       ),
                     ),
-
                     const SizedBox(height: 12),
-
                     RichText(
                       text: const TextSpan(
                         children: [
@@ -206,345 +209,38 @@ class MealTrackingScreen extends StatelessWidget {
                   ],
                 ),
               ),
-
-              const SizedBox(height: 22),
-
-              /// HYDRATION + GOAL
-              Row(
-                children: [
-                  Expanded(
-                    child: infoCard(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.water_drop_outlined,
-                            color: Colors.cyanAccent,
-                            size: 42,
-                          ),
-
-                          const SizedBox(height: 18),
-
-                          const Text(
-                            "HYDRATION",
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-
-                          const SizedBox(height: 8),
-
-                          const Text(
-                            "2.4L",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 40,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-
-                          Text(
-                            "Goal: 3.5L",
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.7),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(width: 18),
-
-                  Expanded(
-                    child: infoCard(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            height: 110,
-                            width: 110,
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                SizedBox(
-                                  height: 90,
-                                  width: 90,
-                                  child: CircularProgressIndicator(
-                                    value: 0.75,
-                                    strokeWidth: 10,
-                                    backgroundColor: Colors.white10,
-                                    valueColor:
-                                    const AlwaysStoppedAnimation(neon),
-                                  ),
-                                ),
-
-                                const Text(
-                                  "75%",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 24,
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: 12),
-
-                          const Text(
-                            "DAILY GOAL",
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 30),
-
-              /// MACRONUTRIENTS
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF151515),
-                  borderRadius: BorderRadius.circular(35),
-                  border: Border.all(color: Colors.white10),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Macronutrients",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(height: 28),
-
-                    macroRow(
-                      "PROTEIN",
-                      "142g / 180g",
-                      0.8,
-                      neon,
-                    ),
-
-                    const SizedBox(height: 18),
-
-                    macroRow(
-                      "CARBS",
-                      "210g / 320g",
-                      0.7,
-                      Colors.cyanAccent,
-                    ),
-
-                    const SizedBox(height: 18),
-
-                    macroRow(
-                      "FATS",
-                      "52g / 75g",
-                      0.75,
-                      Colors.white70,
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 36),
-
-              /// DAILY MEALS
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
-                    "Daily Meals",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 34,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-
-                  Text(
-                    "VIEW ALL",
-                    style: TextStyle(
-                      color: neon,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 24),
-
-              mealCard(
-                time: "08:30 AM",
-                title: "Power Omelette",
-                subtitle: "420 kcal • 32g Protein",
-              ),
-
-              const SizedBox(height: 18),
-
-              mealCard(
-                time: "01:15 PM",
-                title: "Quinoa Fusion Bowl",
-                subtitle: "610 kcal • 45g Protein",
-              ),
-
-              const SizedBox(height: 18),
-
-              mealCard(
-                time: "04:00 PM",
-                title: "Whey Isolate & Nuts",
-                subtitle: "280 kcal • 24g Protein",
-              ),
-
-              const SizedBox(height: 30),
             ],
           ),
         ),
       ),
     );
   }
+}
 
-  static Widget infoCard({required Widget child}) {
-    return Container(
-      height: 200,
-      decoration: BoxDecoration(
-        color: const Color(0xFF151515),
-        borderRadius: BorderRadius.circular(35),
-        border: Border.all(color: Colors.white10),
-      ),
-      child: child,
-    );
-  }
+/// Account Settings Screen
+class AccountSettingsScreen extends StatelessWidget {
+  const AccountSettingsScreen({super.key});
 
-  static Widget macroRow(
-      String title,
-      String value,
-      double progress,
-      Color color,
-      ) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 22,
-              ),
-            ),
-
-            Text(
-              value,
-              style: const TextStyle(
-                color: Colors.white70,
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 10),
-
-        ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: LinearProgressIndicator(
-            value: progress,
-            minHeight: 14,
-            backgroundColor: Colors.white10,
-            valueColor: AlwaysStoppedAnimation(color),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Account Settings")),
+      body: ListView(
+        children: const [
+          ListTile(
+            leading: Icon(Icons.card_membership),
+            title: Text("Membership Details"),
           ),
-        ),
-      ],
-    );
-  }
-
-  static Widget mealCard({
-    required String time,
-    required String title,
-    required String subtitle,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0xFF151515),
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.white10),
-      ),
-      child: Row(
-        children: [
-          Container(
-            height: 80,
-            width: 80,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.grey.shade800,
-            ),
-            child: const Icon(
-              Icons.restaurant,
-              color: Colors.white,
-              size: 40,
-            ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.tune),
+            title: Text("Preferences"),
           ),
-
-          const SizedBox(width: 16),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  time,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(height: 6),
-
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(height: 4),
-
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 18,
-                  ),
-                ),
-              ],
-            ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.lock),
+            title: Text("Security & Privacy"),
           ),
-
-          const Icon(
-            Icons.arrow_forward_ios_rounded,
-            color: Colors.white70,
-          )
         ],
       ),
     );
