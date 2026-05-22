@@ -89,7 +89,7 @@ class _LibraryContent extends StatelessWidget {
             title: const Text(
               "Library",
               style: TextStyle(
-                color: Color(0xFFCCFF00),
+
                 fontWeight: FontWeight.bold,
                 letterSpacing: 2,
                 fontSize: 22,
