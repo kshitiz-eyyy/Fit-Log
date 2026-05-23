@@ -1,6 +1,10 @@
+import 'package:fitlog/exercise_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'exerciselistscreen.dart';
-import 'exercise_data.dart'; // <-- make sure this file exists
+import 'exercise_data.dart';
+import 'exercise_details_screen.dart';
+import 'library.dart';
+
 
 void main() {
   runApp(const FitLogApp());
@@ -25,11 +29,8 @@ class FitLogApp extends StatelessWidget {
           ),
         ),
       ),
-      // 👇 Pass a valid muscle group and its exercises
-      home: ExerciseListScreen(
-        muscleGroup: "Chest",          // Example: first screen shows Chest
-        exercises: exerciseData["Chest"]!, // Comes from exercise_data.dart
-      ),
+
+      home: LibraryScreen(),
     );
   }
 }
