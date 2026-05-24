@@ -83,7 +83,11 @@ class _HydrationPreferencesScreenState extends State<HydrationPreferencesScreen>
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Logged +${(amountLiters * 1000).toInt()}ml of water!'),
+        content: Text(
+          amountLiters >= 0 
+            ? 'Logged +${(amountLiters * 1000).toInt()}ml of water!'
+            : 'Removed ${(amountLiters.abs() * 1000).toInt()}ml of water!'
+        ),
         duration: const Duration(seconds: 2),
         backgroundColor: cardColor,
         behavior: SnackBarBehavior.floating,
@@ -342,16 +346,16 @@ class _HydrationPreferencesScreenState extends State<HydrationPreferencesScreen>
                             const SizedBox(width: 12),
                             Expanded(
                               child: InkWell(
-                                onTap: () => _logWater(0.50),
+                                onTap: () => _logWater(-0.25),
                                 child: Container(
                                   height: 60,
                                   decoration: BoxDecoration(color: cardColor, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFF222222))),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: const [
-                                      Icon(Icons.water_drop_outlined, color: accentColor, size: 20),
+                                      Icon(Icons.remove_circle_outline, color: warningColor, size: 20),
                                       SizedBox(height: 2),
-                                      Text('+500 ml (Bottle)', style: TextStyle(color: accentColor, fontSize: 12, fontWeight: FontWeight.bold)),
+                                      Text('-250 ml (Undo)', style: TextStyle(color: warningColor, fontSize: 12, fontWeight: FontWeight.bold)),
                                     ],
                                   ),
                                 ),
