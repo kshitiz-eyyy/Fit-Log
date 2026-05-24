@@ -51,7 +51,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
-// --- KINETIC ELITE STYLED CONTENT ---
 class _DashboardContent extends StatefulWidget {
   const _DashboardContent();
 
@@ -63,7 +62,7 @@ class _DashboardContentState extends State<_DashboardContent> {
   final AudioPlayer _audioPlayer = AudioPlayer();
   double energyLevel = 0.5;
   bool fatigueWarning = true;
-  double hydrationAmount = 2.4; // Controlled state for Hydration block
+  double hydrationAmount = 2.4;
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +117,7 @@ class _DashboardContentState extends State<_DashboardContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // READINESS BLOCK (Premium Kinetic Card Style)
+
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
@@ -244,7 +243,6 @@ class _DashboardContentState extends State<_DashboardContent> {
             ),
             const SizedBox(height: 12),
 
-            // GRID METRICS (Hydration & Training Mode)
             Row(
               children: [
                 Expanded(
@@ -326,7 +324,7 @@ class _DashboardContentState extends State<_DashboardContent> {
             ),
             const SizedBox(height: 16),
 
-            // ORIGINAL USER PROGRESS BARS
+
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
@@ -342,7 +340,7 @@ class _DashboardContentState extends State<_DashboardContent> {
             ),
             const SizedBox(height: 16),
 
-            // SLEEP ANALYSIS BLOCK
+
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
@@ -391,7 +389,6 @@ class _DashboardContentState extends State<_DashboardContent> {
             ),
             const SizedBox(height: 16),
 
-            // BIOLOGICAL CYCLE BLOCK
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
@@ -439,7 +436,6 @@ class _DashboardContentState extends State<_DashboardContent> {
             ),
             const SizedBox(height: 16),
 
-            // SYSTEM MANAGEMENT & UTILITIES
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
@@ -466,7 +462,6 @@ class _DashboardContentState extends State<_DashboardContent> {
             ),
             const SizedBox(height: 16),
 
-            // STREAK STATUS BANNER
             Container(
               padding: const EdgeInsets.all(16),
               color: const Color(0xFFCCFF00),
@@ -483,13 +478,12 @@ class _DashboardContentState extends State<_DashboardContent> {
               const SizedBox(height: 16),
             ],
 
-            // AUDIO CONTROLLER BUTTON
+
             _actionButton("Daily Flash Audio", Icons.play_circle_fill, const Color(0xFFCCFF00), () async {
               await _audioPlayer.play(UrlSource("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"));
             }, textColor: Colors.black),
             const SizedBox(height: 16),
 
-            // START WORKOUT TRIGGER
             ElevatedButton(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Starting workout...")));
@@ -504,7 +498,7 @@ class _DashboardContentState extends State<_DashboardContent> {
             ),
             const SizedBox(height: 32),
 
-            // TYPOGRAPHY QUOTE DESIGN
+
             const Icon(Icons.format_quote, color: Color(0xFFCCFF00), size: 32),
             const Text(
               "\"Discipline is the bridge between goals and accomplishment.\"",
@@ -524,7 +518,7 @@ class _DashboardContentState extends State<_DashboardContent> {
     );
   }
 
-  // --- REUSABLE KINETIC DESIGN UI ELEMENTS ---
+
   static Widget _badge(String label) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
