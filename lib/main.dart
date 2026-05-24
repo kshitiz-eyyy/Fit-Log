@@ -1,3 +1,4 @@
+import 'package:fitlog/dashboard.dart';
 import 'package:fitlog/exercise_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'exerciselistscreen.dart';
@@ -30,7 +31,7 @@ class FitLogApp extends StatelessWidget {
         ),
       ),
 
-      home: LibraryScreen(),
+      home: DashboardScreen(),
     );
   }
 }
