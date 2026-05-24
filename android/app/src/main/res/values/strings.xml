@@ -106,4 +106,26 @@
     <string name="metrics_info_description">Update these metrics regularly for the most accurate metabolic and recovery calculations. Forge uses these to calibrate your intensity zones.</string>
     <string name="save_changes_button">SAVE CHANGES</string>
     <string name="reset_button_content_description">Reset</string>
+
+    <!-- Fuel Log Screen Strings -->
+    <string name="daily_energy_balance">DAILY ENERGY BALANCE</string>
+    <string name="kcal">kcal</string>
+    <string name="surplus">SURPLUS</string>
+    <string name="burned">BURNED</string>
+    <string name="intake">INTAKE</string>
+    <string name="of_target">%s OF TARGET</string>
+    <string name="goal">%s GOAL</string>
+    <string name="of_limit">%s OF LIMIT</string>
+    <string name="limit">%s LIMIT</string>
+    <string name="macronutrients">MACRONUTRIENTS</string>
+    <string name="protein">PROTEIN</string>
+    <string name="carbs">CARBS</string>
+    <string name="fats">FATS</string>
+    <string name="of_grams">%s of %s</string>
+    <string name="fuel_log">FUEL LOG</string>
+    <string name="breakfast">Breakfast</string>
+    <string name="lunch">Lunch</string>
+    <string name="dinner">Dinner</string>
+    <string name="snacks">Snacks</string>
+    <string name="not_logged_yet">Not logged yet</string>
 </resources>
