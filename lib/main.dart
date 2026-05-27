@@ -1,16 +1,14 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:fitlog/bmi_calculator_screen.dart';
-import 'package:fitlog/fitlog_login.dart';
-import 'package:fitlog/forgot_password_screen.dart';
-import 'package:fitlog/register_screen.dart';
-import 'package:fitlog/workout_timer_screen.dart';
-import 'library.dart';
-import 'activity_screen.dart';
-import 'favourite_exercise.dart';
-import 'change_password_screen.dart';
-import 'dashboard.dart';
-import 'features_screen.dart';
-import 'splash_screen.dart';
+
+import 'firebase_options.dart';
+import 'view/library.dart';
+import 'view/activity_screen.dart';
+import 'view/favourite_exercise.dart';
+import 'view/change_password_screen.dart';
+import 'view/dashboard.dart';
+import 'view/features_screen.dart';
+import 'view/splash_screen.dart';
 
 void main() {
   runApp(const FitLogApp());
@@ -36,7 +34,7 @@ class FitLogApp extends StatelessWidget {
         ),
       ),
 
-      home: SplashScreen(),
+      home: FitLogApp(),
     );
   }
 }

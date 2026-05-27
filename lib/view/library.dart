@@ -30,6 +30,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       body: _screens[_selectedIndex],
     );
   }
@@ -89,7 +90,7 @@ class _LibraryContent extends StatelessWidget {
             title: const Text(
               "Library",
               style: TextStyle(
-                color: Color(0xFFCCFF00),
+
                 fontWeight: FontWeight.bold,
                 letterSpacing: 2,
                 fontSize: 22,
