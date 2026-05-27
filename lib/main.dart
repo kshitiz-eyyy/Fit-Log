@@ -1,4 +1,6 @@
 import 'package:fitlog/account_screen.dart';
+import 'package:fitlog/change_password_screen.dart';
+import 'package:fitlog/fuel_log_screen.dart';
 import 'package:fitlog/hydration_settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'personal_details_screen.dart';
@@ -19,7 +21,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         brightness: Brightness.dark,
       ),
-      home: const HydrationPreferencesScreen(),
+      home: const FuelLogScreen(),
     );
   }
 }
