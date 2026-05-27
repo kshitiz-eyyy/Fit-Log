@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 
 class FuelLogScreen extends StatelessWidget {
   const FuelLogScreen({super.key});
 
+  static const Color backgroundColor = Color(0xFF0C0C0C);
+  static const Color accentColor = Color(0xFFD4FF00);
+  static const Color cardColor = Color(0xFF141414);
+  static const Color textColor = Colors.white;
+  static const Color secondaryTextColor = Color(0xFF8E8E8E);
+  static const Color orangeColor = Color(0xFFFF5A1F);
+  static const Color cyanColor = Color(0xFF00E5FF);
+
   @override
   Widget build(BuildContext context) {
-    const backgroundColor = Color(0xFF0C0C0C);
-    const accentColor = Color(0xFFD4FF00);
-    const cardColor = Color(0xFF141414);
-    const textColor = Colors.white;
-    const secondaryTextColor = Color(0xFF8E8E8E);
-    const orangeColor = Color(0xFFFF5A1F);
-    const cyanColor = Color(0xFF00E5FF);
-
     return Scaffold(
       backgroundColor: backgroundColor,
       body: SafeArea(
@@ -169,7 +168,6 @@ class FuelLogScreen extends StatelessWidget {
                             target: '200g',
                             percent: 80,
                             color: accentColor,
-                            cardColor: cardColor,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -180,7 +178,6 @@ class FuelLogScreen extends StatelessWidget {
                             target: '400g',
                             percent: 55,
                             color: textColor,
-                            cardColor: cardColor,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -191,7 +188,6 @@ class FuelLogScreen extends StatelessWidget {
                             target: '180g',
                             percent: 30,
                             color: cyanColor,
-                            cardColor: cardColor,
                           ),
                         ),
                       ],
@@ -223,16 +219,12 @@ class FuelLogScreen extends StatelessWidget {
                       title: 'Breakfast',
                       subtitle: 'Protein Oats & Berries',
                       calories: '450',
-                      cardColor: cardColor,
-                      accentColor: accentColor,
                     ),
                     const SizedBox(height: 12),
                     _buildFuelItem(
                       title: 'Lunch',
                       subtitle: 'Grilled Chicken & Quinoa',
                       calories: '720',
-                      cardColor: cardColor,
-                      accentColor: accentColor,
                     ),
                     const SizedBox(height: 12),
                     // Dinner (Empty State)
@@ -241,7 +233,7 @@ class FuelLogScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: cardColor,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: accentColor.withOpacity(0.5)),
+                        border: Border.all(color: const Color(0x80D4FF00)),
                       ),
                       child: Row(
                         children: [
@@ -296,8 +288,6 @@ class FuelLogScreen extends StatelessWidget {
                       title: 'Snacks',
                       subtitle: 'Whey Isolate & Almonds',
                       calories: '320',
-                      cardColor: cardColor,
-                      accentColor: accentColor,
                     ),
                     const SizedBox(height: 100),
                   ],
@@ -310,7 +300,7 @@ class FuelLogScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         backgroundColor: accentColor,
-        shape: const CircleShape(),
+        shape: const CircleBorder(),
         child: const Icon(Icons.shopping_cart_outlined, color: Colors.black),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -356,7 +346,7 @@ class FuelLogScreen extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 10, fontWeight: FontWeight.bold),
+          style: const TextStyle(color: secondaryTextColor, fontSize: 10, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 4),
         Text(
@@ -390,8 +380,8 @@ class FuelLogScreen extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(subLeft, style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 8, fontWeight: FontWeight.bold)),
-            Text(subRight, style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 8, fontWeight: FontWeight.bold)),
+            Text(subLeft, style: const TextStyle(color: secondaryTextColor, fontSize: 8, fontWeight: FontWeight.bold)),
+            Text(subRight, style: const TextStyle(color: secondaryTextColor, fontSize: 8, fontWeight: FontWeight.bold)),
           ],
         ),
       ],
@@ -404,7 +394,6 @@ class FuelLogScreen extends StatelessWidget {
     required String target,
     required int percent,
     required Color color,
-    required Color cardColor,
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
@@ -419,14 +408,14 @@ class FuelLogScreen extends StatelessWidget {
             height: 50,
             child: Stack(
               children: [
-                Center(
+                const Center(
                   child: SizedBox(
                     width: 50,
                     height: 50,
                     child: CircularProgressIndicator(
                       value: 1,
                       strokeWidth: 4,
-                      color: const Color(0xFF2C2C2C),
+                      color: Color(0xFF2C2C2C),
                     ),
                   ),
                 ),
@@ -454,7 +443,7 @@ class FuelLogScreen extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             label,
-            style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 9, fontWeight: FontWeight.bold),
+            style: const TextStyle(color: secondaryTextColor, fontSize: 9, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
           Text(
@@ -463,7 +452,7 @@ class FuelLogScreen extends StatelessWidget {
           ),
           Text(
             'of $target',
-            style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 9, fontWeight: FontWeight.bold),
+            style: const TextStyle(color: secondaryTextColor, fontSize: 9, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -474,8 +463,6 @@ class FuelLogScreen extends StatelessWidget {
     required String title,
     required String subtitle,
     required String calories,
-    required Color cardColor,
-    required Color accentColor,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -491,11 +478,6 @@ class FuelLogScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xFF2C2C2C),
               borderRadius: BorderRadius.circular(12),
-              image: const DecorationImage(
-                image: NetworkImage('https://placeholder.com/48'), // Placeholder
-                fit: BoxFit.cover,
-                opacity: 0.5,
-              ),
             ),
             child: const Icon(Icons.restaurant, color: Colors.grey, size: 24),
           ),
@@ -510,7 +492,7 @@ class FuelLogScreen extends StatelessWidget {
                 ),
                 Text(
                   subtitle,
-                  style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 12),
+                  style: const TextStyle(color: secondaryTextColor, fontSize: 12),
                 ),
               ],
             ),
@@ -520,11 +502,11 @@ class FuelLogScreen extends StatelessWidget {
             children: [
               Text(
                 calories,
-                style: TextStyle(color: accentColor, fontSize: 16, fontWeight: FontWeight.bold),
+                style: const TextStyle(color: accentColor, fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const Text(
                 'KCAL',
-                style: TextStyle(color: Color(0xFF8E8E93), fontSize: 8, fontWeight: FontWeight.bold),
+                style: TextStyle(color: secondaryTextColor, fontSize: 8, fontWeight: FontWeight.bold),
               ),
             ],
           ),
