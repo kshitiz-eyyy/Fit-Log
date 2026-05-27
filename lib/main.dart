@@ -1,22 +1,11 @@
+import 'package:fitlog/dashboard.dart';
+import 'package:fitlog/exercise_details_screen.dart';
 import 'package:flutter/material.dart';
-// Teammate's imports
-import 'package:fitlog/bmi_calculator_screen.dart';
-import 'package:fitlog/fitlog_login.dart';
-import 'package:fitlog/forgot_password_screen.dart';
-import 'package:fitlog/register_screen.dart';
-import 'package:fitlog/workout_timer_screen.dart';
+import 'exerciselistscreen.dart';
+import 'exercise_data.dart';
+import 'exercise_details_screen.dart';
 import 'library.dart';
-import 'activity_screen.dart';
-import 'favourite_exercise.dart';
-import 'change_password_screen.dart';
-import 'dashboard.dart';
-import 'features_screen.dart';
-import 'splash_screen.dart';
 
-// Your tracking imports
-import 'workout_tracking_screen.dart';
-import 'meal_tracking_screen.dart';
-import 'membership_tracking_screen.dart';
 
 void main() {
   runApp(const FitLogApp());
@@ -42,7 +31,7 @@ class FitLogApp extends StatelessWidget {
         ),
       ),
 
-      home: const SplashScreen(),
+      home: DashboardScreen(),
     );
   }
 }
