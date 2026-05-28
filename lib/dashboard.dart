@@ -6,7 +6,7 @@ import 'features_screen.dart';
 import 'chatbot.dart';
 import 'meal_tracking_screen.dart';
 import 'bmi_calculator_screen.dart';
-import 'workout_timer_screen.dart'; // 👈 Added your new workout timer screen import
+import 'workout_timer_screen.dart';
 import 'dart:math';
 
 class DashboardScreen extends StatefulWidget {
@@ -67,8 +67,6 @@ class _DashboardContent extends StatefulWidget {
 
 class _DashboardContentState extends State<_DashboardContent> {
   final AudioPlayer _audioPlayer = AudioPlayer();
-  double energyLevel = 0.5;
-  bool fatigueWarning = true;
   double hydrationAmount = 2.4;
 
   final List<String> _quotes = [
@@ -175,9 +173,10 @@ class _DashboardContentState extends State<_DashboardContent> {
               ),
             ),
 
-            // READINESS CARD
+            // CALORIE TARGET CARD
             Container(
               padding: const EdgeInsets.all(24),
+              margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
                 color: const Color(0xFF161616),
                 borderRadius: BorderRadius.circular(4),
@@ -204,35 +203,15 @@ class _DashboardContentState extends State<_DashboardContent> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: const [
                             Text("88", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 36, height: 1)),
-                            Text("READINESS", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 10, letterSpacing: 1)),
+                            Text("Calories", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 10, letterSpacing: 1)),
                           ],
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  const Text("Optimal Performance State", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 12),
-                  const Text(
-                    "Your recovery is peaking. Central Nervous System fatigue is low, and your HRV indicates a high capacity for intense metabolic stress today.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey, fontSize: 13, height: 1.4),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _badge("CNS: FRESH"),
-                      const SizedBox(width: 8),
-                      _badge("HRV: 84MS"),
-                      const SizedBox(width: 8),
-                      _badge("SLEEP: 92%"),
-                    ],
-                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
 
             // GRID METRICS (BMI & Daily Calories)
             Row(
@@ -390,103 +369,99 @@ class _DashboardContentState extends State<_DashboardContent> {
             ),
             const SizedBox(height: 16),
 
-            // PROGRESS PROGRESSION BARS
+            // MEAL LOGGING INTERACTION BLOCK
             Container(
               padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
-              child: Column(
-                children: [
-                  _progressBar("Steps Goal", 0.75, Colors.greenAccent),
-                  const SizedBox(height: 12),
-                  _progressBar("Workout Time", 0.45, Colors.blueAccent),
-                  const SizedBox(height: 12),
-                  _progressBar("Calories Burned", 0.65, Colors.orangeAccent),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // SLEEP CARDS
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: const [
-                      Icon(Icons.bedtime, color: Color(0xFFCCFF00), size: 18),
-                      SizedBox(width: 8),
-                      Text("Sleep Analysis", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                    ],
+              child: _actionButton("Log Meal", Icons.restaurant, Colors.orangeAccent, () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MealTrackingScreen(),
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text("DEEP SLEEP", style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
-                          SizedBox(height: 4),
-                          Text("2h 15m", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text("CONSISTENCY", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 20, fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      _chartBar(20), _chartBar(35), _chartBar(75, isActive: true), _chartBar(30), _chartBar(40), _chartBar(85, isActive: true), _chartBar(25),
-                    ],
-                  )
-                ],
-              ),
+                );
+              }),
             ),
-            const SizedBox(height: 16),
 
-            // DYNAMIC MEAL LOGGING INTERACTION ENGINE
+            // FANCY MEMBERSHIP STATUS CARD WITH MANAGE SUBSCRIPTION BUTTON
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF161616),
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: const Color(0xFFCCFF00).withOpacity(0.2), width: 1),
+              ),
               child: Column(
                 children: [
-                  _actionButton("Log Meal", Icons.restaurant, Colors.orangeAccent, () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const MealTrackingScreen(),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFCCFF00).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Icon(Icons.workspace_premium, color: Color(0xFFCCFF00), size: 24),
                       ),
-                    );
-                  }),
-                  const SizedBox(height: 14),
-                  Slider(
-                    value: energyLevel,
-                    divisions: 2,
-                    activeColor: const Color(0xFFCCFF00),
-                    inactiveColor: Colors.grey.shade900,
-                    label: energyLevel < 0.5 ? "Low Energy" : "High Energy",
-                    onChanged: (val) => setState(() => energyLevel = val),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              "ACCOUNT PLAN",
+                              style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              "FitLog Pro Access",
+                              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(
+                        Icons.stars_rounded,
+                        color: Color(0xFFCCFF00),
+                        size: 28,
+                      ),
+                    ],
                   ),
-                  Text(
-                    energyLevel < 0.5 ? "Recommended: Gentle Yoga / Stretching" : "Recommended: Intense Cardio / HIIT",
-                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: Divider(color: Color(0xFF262626), height: 1),
+                  ),
+                  InkWell(
+                    onTap: () {},
+                    borderRadius: BorderRadius.circular(4),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color(0xFFCCFF00).withOpacity(0.4), width: 1),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.settings_suggest_outlined, color: Color(0xFFCCFF00), size: 16),
+                          SizedBox(width: 8),
+                          Text(
+                            "MANAGE SUBSCRIPTION",
+                            style: TextStyle(color: Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1),
+                          ),
+                          Spacer(),
+                          Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFFCCFF00), size: 12),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
 
             // START WORKOUT BUTTON
-            // 🚀 Updated: Triggers a navigation push to the workout timer screen
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -507,47 +482,6 @@ class _DashboardContentState extends State<_DashboardContent> {
             const SizedBox(height: 24),
           ],
         ),
-      ),
-    );
-  }
-
-  static Widget _badge(String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFCCFF00), width: 1),
-        borderRadius: BorderRadius.circular(2),
-      ),
-      child: Text(label, style: const TextStyle(color: Color(0xFFCCFF00), fontSize: 10, fontWeight: FontWeight.bold)),
-    );
-  }
-
-  static Widget _chartBar(double height, {bool isActive = false}) {
-    return Container(
-      height: height,
-      width: 20,
-      decoration: BoxDecoration(
-        color: isActive ? const Color(0xFFCCFF00) : Colors.grey.shade900,
-        borderRadius: BorderRadius.circular(1),
-      ),
-    );
-  }
-
-  static Widget _progressBar(String label, double progress, Color color) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 13)),
-          const SizedBox(height: 6),
-          LinearProgressIndicator(
-            value: progress,
-            backgroundColor: Colors.grey.shade900,
-            color: color,
-            minHeight: 6,
-          ),
-        ],
       ),
     );
   }
