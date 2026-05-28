@@ -1,8 +1,9 @@
 
-import 'package:fitlog/library.dart';
+
+import 'package:fitlog/view/library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fitlog/exercise_details_screen.dart';
+
 
 void main() {
   testWidgets('ExerciseDetailsScreen displays content correctly',
