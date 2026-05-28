@@ -1,11 +1,8 @@
-import 'package:fitlog/dashboard.dart';
-import 'package:fitlog/exercise_details_screen.dart';
 import 'package:flutter/material.dart';
-import 'exerciselistscreen.dart';
-import 'exercise_data.dart';
-import 'exercise_details_screen.dart';
-import 'library.dart';
-import 'workout_tracking_screen.dart';
+
+// --- Imports matched exactly to your Development Branch architecture ---
+import 'view/dashboard.dart';
+import 'view/exercise_details_screen.dart';
 
 void main() {
   runApp(const FitLogApp());
@@ -20,18 +17,19 @@ class FitLogApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'FitLog',
       theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: Colors.black,
+        scaffoldBackgroundColor: const Color(0xFF0F0F0F), // Premium dark theme background
         appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.black,
+          backgroundColor: Color(0xFF0F0F0F),
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.white),
           titleTextStyle: TextStyle(
-            color: Colors.lightGreenAccent,
+            color: Color(0xFFCCFF00), // Kinetic Elite signature neon green/yellow
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
-
-      home: DashboardScreen(),
+      home: const DashboardScreen(),
     );
   }
 }
