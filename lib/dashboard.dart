@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'activity_screen.dart';
-import 'library.dart';
-import 'features_screen.dart';
-import 'chatbot.dart';
-import 'meal_tracking_screen.dart';
-import 'bmi_calculator_screen.dart';
-import 'workout_timer_screen.dart';
 import 'dart:math';
+import 'package:fitlog/view/activity_screen.dart';
+import 'package:fitlog/view/library.dart';
+import 'package:fitlog/view/features_screen.dart';
+import 'package:fitlog/view/activity_screen.dart';
+import 'package:fitlog/view/library.dart';
+import 'package:fitlog/view/features_screen.dart';
+import 'package:fitlog/view/bmi_calculator_screen.dart';
+import 'package:fitlog/view/workout_timer_screen.dart';
+import 'package:fitlog/meal_tracking_screen.dart';
+import 'package:fitlog/view/bmi_calculator_screen.dart';
+import 'package:fitlog/view/workout_timer_screen.dart';
+import 'package:fitlog/chatbot.dart';
+
+
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -21,10 +28,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   List<Widget> get _screens => [
     _DashboardContent(onNavigateToActivity: () => _onItemTapped(3)),
-    FeaturesScreen(),
-    LibraryScreen(),
-    const ActivityScreen(),
-    const Center(
+     FeaturesScreen(),
+     LibraryScreen(),
+     ActivityScreen(),
+     Center(
       child: Text("PROFILE", style: TextStyle(color: Colors.white)),
     ),
   ];
@@ -66,7 +73,7 @@ class _DashboardContent extends StatefulWidget {
 }
 
 class _DashboardContentState extends State<_DashboardContent> {
-  final AudioPlayer _audioPlayer = AudioPlayer();
+  // Removed unused _audioPlayer to resolve the compiler warning
   double hydrationAmount = 2.4;
 
   final List<String> _quotes = [
@@ -145,12 +152,12 @@ class _DashboardContentState extends State<_DashboardContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-
             Container(
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
-                color: const Color(0xFFCCFF00).withOpacity(0.1),
+                // FIXED: Changed .withOpacity() to .withValues()
+                color: const Color(0xFFCCFF00).withValues(alpha: 0.1),
                 border: Border.all(color: const Color(0xFFCCFF00), width: 1),
                 borderRadius: BorderRadius.circular(4),
               ),
@@ -172,7 +179,6 @@ class _DashboardContentState extends State<_DashboardContent> {
                 ],
               ),
             ),
-
 
             Container(
               padding: const EdgeInsets.all(24),
@@ -199,9 +205,9 @@ class _DashboardContentState extends State<_DashboardContent> {
                             valueColor: const AlwaysStoppedAnimation(Color(0xFFCCFF00)),
                           ),
                         ),
-                        Column(
+                        const Column( // Added const here to fix nested text warnings
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
+                          children: [
                             Text("88", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 36, height: 1)),
                             Text("Calories", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 10, letterSpacing: 1)),
                           ],
@@ -212,7 +218,6 @@ class _DashboardContentState extends State<_DashboardContent> {
                 ],
               ),
             ),
-
 
             Row(
               children: [
@@ -289,7 +294,6 @@ class _DashboardContentState extends State<_DashboardContent> {
 
             Row(
               children: [
-
                 Expanded(
                   child: Container(
                     height: 140,
@@ -328,7 +332,6 @@ class _DashboardContentState extends State<_DashboardContent> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                // TRAINING BLOCK
                 Expanded(
                   child: Container(
                     height: 140,
@@ -369,7 +372,6 @@ class _DashboardContentState extends State<_DashboardContent> {
             ),
             const SizedBox(height: 16),
 
-
             Container(
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.only(bottom: 16),
@@ -384,14 +386,14 @@ class _DashboardContentState extends State<_DashboardContent> {
               }),
             ),
 
-
             Container(
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
                 color: const Color(0xFF161616),
                 borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: const Color(0xFFCCFF00).withOpacity(0.2), width: 1),
+                // FIXED: Changed .withOpacity() to .withValues()
+                border: Border.all(color: const Color(0xFFCCFF00).withValues(alpha: 0.2), width: 1),
               ),
               child: Column(
                 children: [
@@ -400,7 +402,8 @@ class _DashboardContentState extends State<_DashboardContent> {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFCCFF00).withOpacity(0.1),
+                          // FIXED: Changed .withOpacity() to .withValues()
+                          color: const Color(0xFFCCFF00).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: const Icon(Icons.workspace_premium, color: Color(0xFFCCFF00), size: 24),
@@ -439,7 +442,8 @@ class _DashboardContentState extends State<_DashboardContent> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                       decoration: BoxDecoration(
-                        border: Border.all(color: const Color(0xFFCCFF00).withOpacity(0.4), width: 1),
+                        // FIXED: Changed .withOpacity() to .withValues()
+                        border: Border.all(color: const Color(0xFFCCFF00).withValues(alpha: 0.4), width: 1),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Row(
@@ -460,7 +464,6 @@ class _DashboardContentState extends State<_DashboardContent> {
                 ],
               ),
             ),
-
 
             ElevatedButton(
               onPressed: () {
