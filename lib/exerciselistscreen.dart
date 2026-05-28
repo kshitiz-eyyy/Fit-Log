@@ -19,17 +19,23 @@ class ExerciseListScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFCCFF00), // ✅ Neon lime accent
+        backgroundColor: Colors.black, // ✅ Black top bar
         elevation: 8,
+        centerTitle: true,
         title: Text(
           muscleGroup.toUpperCase(),
           style: const TextStyle(
-            color: Colors.black, // better contrast on neon lime
+            color: Color(0xFFCCFF00), // ✅ Neon lime text
             fontWeight: FontWeight.bold,
             letterSpacing: 2,
+            shadows: [
+              Shadow(
+                color: Color(0xFFCCFF00),
+                blurRadius: 12, // ✅ Neon glow effect
+              ),
+            ],
           ),
         ),
-        centerTitle: true,
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
