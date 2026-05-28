@@ -1,12 +1,9 @@
 plugins {
     id("com.android.application")
-    // START: FlutterFire Configuration
-    id("com.google.gms.google-services")
-    // END: FlutterFire Configuration
     id("kotlin-android")
     id("org.jetbrains.kotlin.plugin.compose")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
-    id("dev.flutter.flutter-gradle-plugin")
+    id("com.google.gms.google-services") // This brings in the Firebase config
+    id("dev.flutter.flutter-gradle-plugin") // MUST remain at the bottom of the block
 }
 
 android {
