@@ -1,9 +1,10 @@
-import 'package:fitlog/register_screen.dart';
+
+import 'package:fitlog/view/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'forgot_password_screen.dart';
-import 'dashboard.dart'; // <--- Added the dashboard import here!
+import 'dashboard.dart';
 
-// CHANGED: Converted to StatefulWidget so we can manage text entry inputs
+
 class FitLogLogin extends StatefulWidget {
   const FitLogLogin({super.key});
 
@@ -12,7 +13,7 @@ class FitLogLogin extends StatefulWidget {
 }
 
 class _FitLogLoginState extends State<FitLogLogin> {
-  // Added controllers to extract text inputs
+
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -23,12 +24,12 @@ class _FitLogLoginState extends State<FitLogLogin> {
     super.dispose();
   }
 
-  // Handle mock authentication validation rule
+
   void _handleLogin() {
     final String email = _emailController.text.trim();
     final String password = _passwordController.text.trim();
 
-    // Use placeholder credentials for teammate development access
+
     if (email == "admin@fitlog.com" && password == "password123") {
       Navigator.pushReplacement(
         context,
@@ -37,7 +38,7 @@ class _FitLogLoginState extends State<FitLogLogin> {
         ),
       );
     } else {
-      // Prompt user with matching mock credentials rule
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Invalid Credentials! Use admin@fitlog.com / password123'),
@@ -100,7 +101,7 @@ class _FitLogLoginState extends State<FitLogLogin> {
               _CustomTextField(
                 hint: 'NAME@SERVICE.COM',
                 icon: Icons.email_outlined,
-                controller: _emailController, // Added controller hook
+                controller: _emailController,
               ),
 
               const SizedBox(height: 24),
@@ -129,17 +130,17 @@ class _FitLogLoginState extends State<FitLogLogin> {
                 hint: '********',
                 icon: Icons.lock_outline,
                 isPassword: true,
-                controller: _passwordController, // Added controller hook
+                controller: _passwordController,
               ),
 
               const SizedBox(height: 32),
 
-              // Login Button with connected functionality
+
               SizedBox(
                 width: double.infinity,
                 height: 60,
                 child: ElevatedButton(
-                  onPressed: _handleLogin, // Triggers our mock navigator logic
+                  onPressed: _handleLogin,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFCCFF00),
                     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
@@ -246,12 +247,12 @@ class _FieldLabel extends StatelessWidget {
   }
 }
 
-// Updated Custom Field Widget to inherit parent controllers
+
 class _CustomTextField extends StatefulWidget {
   final String hint;
   final IconData icon;
   final bool isPassword;
-  final TextEditingController controller; // Track inputs
+  final TextEditingController controller;
 
   const _CustomTextField({
     required this.hint,
@@ -276,7 +277,7 @@ class _CustomTextFieldState extends State<_CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: widget.controller, // Connected the passed controller
+      controller: widget.controller,
       obscureText: _obscureText,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
