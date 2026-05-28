@@ -461,49 +461,6 @@ class _DashboardContentState extends State<_DashboardContent> {
               ),
             ),
 
-            // NEW: DYNAMIC TRAINING SUGGESTION ENGINE (Placed right above Start Workout)
-            Container(
-              padding: const EdgeInsets.all(16),
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF161616),
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: const Color(0xFFCCFF00).withOpacity(0.15), width: 0.5),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.bolt, color: Color(0xFFCCFF00), size: 18),
-                      const SizedBox(width: 8),
-                      const Text(
-                        "TRAINING RECOMMENDATION",
-                        style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _workoutSuggestionBadge("CARDIO HIIT", true),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _workoutSuggestionBadge("LOWER BODY HIIT", false),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
             // START WORKOUT BUTTON
             ElevatedButton(
               onPressed: () {
@@ -524,32 +481,6 @@ class _DashboardContentState extends State<_DashboardContent> {
             ),
             const SizedBox(height: 24),
           ],
-        ),
-      ),
-    );
-  }
-
-  // Workout option item design block builder
-  static Widget _workoutSuggestionBadge(String label, bool isPrimary) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        color: isPrimary ? const Color(0xFFCCFF00).withOpacity(0.08) : Colors.transparent,
-        border: Border.all(
-            color: isPrimary ? const Color(0xFFCCFF00) : Colors.grey.shade800,
-            width: 1
-        ),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Center(
-        child: Text(
-          label,
-          style: TextStyle(
-              color: isPrimary ? const Color(0xFFCCFF00) : Colors.grey,
-              fontSize: 11,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.5
-          ),
         ),
       ),
     );
