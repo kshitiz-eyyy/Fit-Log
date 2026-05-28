@@ -5,7 +5,7 @@ import 'exerciselistscreen.dart';
 import 'exercise_data.dart';
 import 'exercise_details_screen.dart';
 import 'library.dart';
-
+import 'workout_tracking_screen.dart';
 
 void main() {
   runApp(const FitLogApp());
