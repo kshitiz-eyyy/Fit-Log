@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+
 // Teammate's imports
 import 'package:fitlog/bmi_calculator_screen.dart';
 import 'package:fitlog/fitlog_login.dart';
 import 'package:fitlog/forgot_password_screen.dart';
 import 'package:fitlog/register_screen.dart';
 import 'package:fitlog/workout_timer_screen.dart';
+
 import 'library.dart';
 import 'activity_screen.dart';
 import 'favourite_exercise.dart';
@@ -30,8 +32,10 @@ class FitLogApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'FitLog',
+
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: Colors.black,
+
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.black,
           titleTextStyle: TextStyle(
