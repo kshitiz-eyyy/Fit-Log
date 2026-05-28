@@ -484,6 +484,7 @@ class _DashboardContentState extends State<_DashboardContent> {
         ),
       ),
     );
+
   }
 
   static Widget _actionButton(String text, IconData icon, Color color, Function onTap, {Color textColor = Colors.white}) {
