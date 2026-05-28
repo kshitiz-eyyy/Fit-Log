@@ -145,7 +145,7 @@ class _DashboardContentState extends State<_DashboardContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // MOTIVATIONAL QUOTE BANNER
+
             Container(
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.only(bottom: 16),
@@ -173,7 +173,7 @@ class _DashboardContentState extends State<_DashboardContent> {
               ),
             ),
 
-            // CALORIE TARGET CARD
+
             Container(
               padding: const EdgeInsets.all(24),
               margin: const EdgeInsets.only(bottom: 16),
@@ -213,7 +213,7 @@ class _DashboardContentState extends State<_DashboardContent> {
               ),
             ),
 
-            // GRID METRICS (BMI & Daily Calories)
+
             Row(
               children: [
                 Expanded(
@@ -289,7 +289,7 @@ class _DashboardContentState extends State<_DashboardContent> {
 
             Row(
               children: [
-                // HYDRATION ACTION BLOCK
+
                 Expanded(
                   child: Container(
                     height: 140,
@@ -369,7 +369,7 @@ class _DashboardContentState extends State<_DashboardContent> {
             ),
             const SizedBox(height: 16),
 
-            // MEAL LOGGING INTERACTION BLOCK
+
             Container(
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.only(bottom: 16),
@@ -384,7 +384,7 @@ class _DashboardContentState extends State<_DashboardContent> {
               }),
             ),
 
-            // FANCY MEMBERSHIP STATUS CARD WITH MANAGE SUBSCRIPTION BUTTON
+
             Container(
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.only(bottom: 16),
@@ -461,7 +461,7 @@ class _DashboardContentState extends State<_DashboardContent> {
               ),
             ),
 
-            // START WORKOUT BUTTON
+
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
