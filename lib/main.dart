@@ -2,15 +2,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'firebase_options.dart';
-import 'view/library.dart';
-import 'view/activity_screen.dart';
-import 'view/favourite_exercise.dart';
-import 'view/change_password_screen.dart';
 import 'view/dashboard.dart';
-import 'view/features_screen.dart';
-import 'view/splash_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const FitLogApp());
 }
 
@@ -23,18 +21,18 @@ class FitLogApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'FitLog',
       theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: Colors.black,
+        scaffoldBackgroundColor: const Color(0xFF0F0F0F),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.black,
+          backgroundColor: Color(0xFF0F0F0F),
+          elevation: 0,
           titleTextStyle: TextStyle(
-            color: Colors.lightGreenAccent,
+            color: Color(0xFFCCFF00),
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
-
-      home: SplashScreen(),
+      home: const DashboardScreen(),
     );
   }
 }
