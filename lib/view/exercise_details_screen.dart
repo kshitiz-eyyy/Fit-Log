@@ -22,12 +22,12 @@ class ExerciseDetailsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFCCFF00), // ✅ Neon lime accent
+        backgroundColor: const Color(0xFF0E0E0E),
         elevation: 12,
         title: Text(
           exerciseName,
           style: const TextStyle(
-            color: Colors.black, // better contrast on neon lime
+            color: const Color(0xFFCCFF00),
             fontWeight: FontWeight.bold,
             letterSpacing: 2,
           ),
@@ -37,7 +37,7 @@ class ExerciseDetailsScreen extends StatelessWidget {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.black, Color(0xFF003300)], // black → deep green
+            colors: [Colors.black, Color(0xFF003300)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -53,7 +53,7 @@ class ExerciseDetailsScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFCCFF00).withOpacity(0.6), // ✅ Neon lime glow
+                        color: const Color(0xFFCCFF00).withOpacity(0.6),
                         blurRadius: 25,
                         offset: const Offset(0, 10),
                       ),
@@ -74,16 +74,16 @@ class ExerciseDetailsScreen extends StatelessWidget {
 
               const SizedBox(height: 28),
 
-              // 📝 Rich Description Card
+
               Container(
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.75),
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: const Color(0xFFCCFF00), width: 2), // ✅ Neon lime border
+                  border: Border.all(color: const Color(0xFFCCFF00), width: 2),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFCCFF00).withOpacity(0.4), // ✅ Neon lime glow
+                      color: const Color(0xFFCCFF00).withOpacity(0.4),
                       blurRadius: 15,
                       offset: const Offset(0, 8),
                     ),
