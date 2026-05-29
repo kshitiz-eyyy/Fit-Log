@@ -7,6 +7,7 @@ import 'chatbot.dart';
 import 'meal_tracking_screen.dart';
 import 'bmi_calculator_screen.dart';
 import 'workout_timer_screen.dart';
+import 'membership_tracking_screen.dart';
 import 'dart:math';
 
 class DashboardScreen extends StatefulWidget {
@@ -145,7 +146,7 @@ class _DashboardContentState extends State<_DashboardContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // MOTIVATIONAL QUOTE BANNER
+
             Container(
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.only(bottom: 16),
@@ -173,7 +174,7 @@ class _DashboardContentState extends State<_DashboardContent> {
               ),
             ),
 
-            // CALORIE TARGET CARD
+
             Container(
               padding: const EdgeInsets.all(24),
               margin: const EdgeInsets.only(bottom: 16),
@@ -213,7 +214,7 @@ class _DashboardContentState extends State<_DashboardContent> {
               ),
             ),
 
-            // GRID METRICS (BMI & Daily Calories)
+
             Row(
               children: [
                 Expanded(
@@ -289,7 +290,7 @@ class _DashboardContentState extends State<_DashboardContent> {
 
             Row(
               children: [
-                // HYDRATION ACTION BLOCK
+
                 Expanded(
                   child: Container(
                     height: 140,
@@ -328,7 +329,7 @@ class _DashboardContentState extends State<_DashboardContent> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                // TRAINING BLOCK
+
                 Expanded(
                   child: Container(
                     height: 140,
@@ -369,7 +370,7 @@ class _DashboardContentState extends State<_DashboardContent> {
             ),
             const SizedBox(height: 16),
 
-            // MEAL LOGGING INTERACTION BLOCK
+
             Container(
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.only(bottom: 16),
@@ -384,7 +385,7 @@ class _DashboardContentState extends State<_DashboardContent> {
               }),
             ),
 
-            // FANCY MEMBERSHIP STATUS CARD WITH MANAGE SUBSCRIPTION BUTTON
+
             Container(
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.only(bottom: 16),
@@ -434,7 +435,14 @@ class _DashboardContentState extends State<_DashboardContent> {
                     child: Divider(color: Color(0xFF262626), height: 1),
                   ),
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MembershipTrackingScreen(),
+                        ),
+                      );
+                    },
                     borderRadius: BorderRadius.circular(4),
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
@@ -448,7 +456,7 @@ class _DashboardContentState extends State<_DashboardContent> {
                           Icon(Icons.settings_suggest_outlined, color: Color(0xFFCCFF00), size: 16),
                           SizedBox(width: 8),
                           Text(
-                            "MANAGE SUBSCRIPTION",
+                            "MANAGE MEMBERSHIP",
                             style: TextStyle(color: Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1),
                           ),
                           Spacer(),
@@ -461,7 +469,7 @@ class _DashboardContentState extends State<_DashboardContent> {
               ),
             ),
 
-            // START WORKOUT BUTTON
+
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
