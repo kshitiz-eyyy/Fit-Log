@@ -17,11 +17,11 @@ class _FuelLogScreenState extends State<FuelLogScreen> {
   static const Color cyanColor = Color(0xFF00E5FF);
 
   // Data starts at 0 for all meals
-  Map<String, Map<String, double>> meals = {
-    'Breakfast': {'protein': 0, 'carbs': 0, 'fats': 0},
-    'Lunch': {'protein': 0, 'carbs': 0, 'fats': 0},
-    'Dinner': {'protein': 0, 'carbs': 0, 'fats': 0},
-    'Snacks': {'protein': 0, 'carbs': 0, 'fats': 0},
+  Map<String, double> meals = {
+    'Breakfast': 0,
+    'Lunch': 0,
+    'Dinner': 0,
+    'Snacks': 0,
   };
 
   DateTime _lastResetDate = DateTime.now();
@@ -41,30 +41,20 @@ class _FuelLogScreenState extends State<FuelLogScreen> {
         now.year != _lastResetDate.year) {
       setState(() {
         meals = {
-          'Breakfast': {'protein': 0, 'carbs': 0, 'fats': 0},
-          'Lunch': {'protein': 0, 'carbs': 0, 'fats': 0},
-          'Dinner': {'protein': 0, 'carbs': 0, 'fats': 0},
-          'Snacks': {'protein': 0, 'carbs': 0, 'fats': 0},
+          'Breakfast': 0,
+          'Lunch': 0,
+          'Dinner': 0,
+          'Snacks': 0,
         };
         _lastResetDate = now;
       });
     }
   }
 
-  double get totalProtein => meals.values.fold(0, (sum, meal) => sum + meal['protein']!);
-  double get totalCarbs => meals.values.fold(0, (sum, meal) => sum + meal['carbs']!);
-  double get totalFats => meals.values.fold(0, (sum, meal) => sum + meal['fats']!);
+  double get totalIntakeKcal => meals.values.fold(0, (sum, cal) => sum + cal);
 
-  double calculateKcal(Map<String, double> meal) {
-    return (meal['protein']! * 4) + (meal['carbs']! * 4) + (meal['fats']! * 9);
-  }
-
-  double get totalIntakeKcal => meals.values.fold(0, (sum, meal) => sum + calculateKcal(meal));
-
-  void _showMacroInput(String mealTitle) {
-    final proteinController = TextEditingController(text: meals[mealTitle]!['protein'] == 0 ? "" : meals[mealTitle]!['protein']!.toInt().toString());
-    final carbsController = TextEditingController(text: meals[mealTitle]!['carbs'] == 0 ? "" : meals[mealTitle]!['carbs']!.toInt().toString());
-    final fatsController = TextEditingController(text: meals[mealTitle]!['fats'] == 0 ? "" : meals[mealTitle]!['fats']!.toInt().toString());
+  void _showCalorieInput(String mealTitle) {
+    final calorieController = TextEditingController(text: meals[mealTitle] == 0 ? "" : meals[mealTitle]!.toInt().toString());
 
     showModalBottomSheet(
       context: context,
@@ -89,11 +79,7 @@ class _FuelLogScreenState extends State<FuelLogScreen> {
               style: const TextStyle(color: textColor, fontSize: 20, fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 24),
-            _buildInputField('Protein (g)', proteinController, accentColor),
-            const SizedBox(height: 16),
-            _buildInputField('Carbs (g)', carbsController, textColor),
-            const SizedBox(height: 16),
-            _buildInputField('Fats (g)', fatsController, cyanColor),
+            _buildInputField('Calories (kcal)', calorieController, accentColor),
             const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
@@ -101,11 +87,7 @@ class _FuelLogScreenState extends State<FuelLogScreen> {
               child: ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    meals[mealTitle] = {
-                      'protein': double.tryParse(proteinController.text) ?? 0,
-                      'carbs': double.tryParse(carbsController.text) ?? 0,
-                      'fats': double.tryParse(fatsController.text) ?? 0,
-                    };
+                    meals[mealTitle] = double.tryParse(calorieController.text) ?? 0;
                   });
                   Navigator.pop(context);
                 },
@@ -265,49 +247,6 @@ class _FuelLogScreenState extends State<FuelLogScreen> {
                       subRight: '${targetIntake.toInt()} kcal LIMIT',
                     ),
                     const SizedBox(height: 40),
-                    const Text(
-                      'MACRONUTRIENTS',
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildMacroCard(
-                            label: 'PROTEIN',
-                            amount: '${totalProtein.toInt()}g',
-                            target: '200g',
-                            percent: (totalProtein / 200 * 100).toInt(),
-                            color: accentColor,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildMacroCard(
-                            label: 'CARBS',
-                            amount: '${totalCarbs.toInt()}g',
-                            target: '400g',
-                            percent: (totalCarbs / 400 * 100).toInt(),
-                            color: textColor,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildMacroCard(
-                            label: 'FATS',
-                            amount: '${totalFats.toInt()}g',
-                            target: '180g',
-                            percent: (totalFats / 180 * 100).toInt(),
-                            color: cyanColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 40),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -332,25 +271,25 @@ class _FuelLogScreenState extends State<FuelLogScreen> {
                     const SizedBox(height: 16),
                     _buildFuelItem(
                       title: 'Breakfast',
-                      subtitle: meals['Breakfast']!.values.any((v) => v > 0) ? 'P: ${meals['Breakfast']!['protein']!.toInt()}g, C: ${meals['Breakfast']!['carbs']!.toInt()}g, F: ${meals['Breakfast']!['fats']!.toInt()}g' : 'Tap to log morning meal',
-                      calories: calculateKcal(meals['Breakfast']!).toInt().toString(),
-                      onTap: () => _showMacroInput('Breakfast'),
+                      subtitle: meals['Breakfast']! > 0 ? 'Fuel for the morning' : 'Tap to log morning meal',
+                      calories: meals['Breakfast']!.toInt().toString(),
+                      onTap: () => _showCalorieInput('Breakfast'),
                     ),
                     const SizedBox(height: 12),
                     _buildFuelItem(
                       title: 'Lunch',
-                      subtitle: meals['Lunch']!.values.any((v) => v > 0) ? 'P: ${meals['Lunch']!['protein']!.toInt()}g, C: ${meals['Lunch']!['carbs']!.toInt()}g, F: ${meals['Lunch']!['fats']!.toInt()}g' : 'Tap to log lunch',
-                      calories: calculateKcal(meals['Lunch']!).toInt().toString(),
-                      onTap: () => _showMacroInput('Lunch'),
+                      subtitle: meals['Lunch']! > 0 ? 'Fuel for the afternoon' : 'Tap to log lunch',
+                      calories: meals['Lunch']!.toInt().toString(),
+                      onTap: () => _showCalorieInput('Lunch'),
                     ),
                     const SizedBox(height: 12),
                     _buildDinnerItem(),
                     const SizedBox(height: 12),
                     _buildFuelItem(
                       title: 'Snacks',
-                      subtitle: meals['Snacks']!.values.any((v) => v > 0) ? 'P: ${meals['Snacks']!['protein']!.toInt()}g, C: ${meals['Snacks']!['carbs']!.toInt()}g, F: ${meals['Snacks']!['fats']!.toInt()}g' : 'Tap to log snacks',
-                      calories: calculateKcal(meals['Snacks']!).toInt().toString(),
-                      onTap: () => _showMacroInput('Snacks'),
+                      subtitle: meals['Snacks']! > 0 ? 'Additional fuel' : 'Tap to log snacks',
+                      calories: meals['Snacks']!.toInt().toString(),
+                      onTap: () => _showCalorieInput('Snacks'),
                     ),
                     const SizedBox(height: 100),
                   ],
@@ -402,19 +341,19 @@ class _FuelLogScreenState extends State<FuelLogScreen> {
   }
 
   Widget _buildDinnerItem() {
-    bool hasData = meals['Dinner']!.values.any((v) => v > 0);
+    bool hasData = meals['Dinner']! > 0;
     
     if (hasData) {
       return _buildFuelItem(
         title: 'Dinner',
-        subtitle: 'P: ${meals['Dinner']!['protein']!.toInt()}g, C: ${meals['Dinner']!['carbs']! .toInt()}g, F: ${meals['Dinner']!['fats']!.toInt()}g',
-        calories: calculateKcal(meals['Dinner']!).toInt().toString(),
-        onTap: () => _showMacroInput('Dinner'),
+        subtitle: 'Fuel for the evening',
+        calories: meals['Dinner']!.toInt().toString(),
+        onTap: () => _showCalorieInput('Dinner'),
       );
     }
 
     return GestureDetector(
-      onTap: () => _showMacroInput('Dinner'),
+      onTap: () => _showCalorieInput('Dinner'),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -525,77 +464,6 @@ class _FuelLogScreenState extends State<FuelLogScreen> {
           ],
         ),
       ],
-    );
-  }
-
-  Widget _buildMacroCard({
-    required String label,
-    required String amount,
-    required String target,
-    required int percent,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        children: [
-          SizedBox(
-            width: 50,
-            height: 50,
-            child: Stack(
-              children: [
-                const Center(
-                  child: SizedBox(
-                    width: 50,
-                    height: 50,
-                    child: CircularProgressIndicator(
-                      value: 1,
-                      strokeWidth: 4,
-                      color: Color(0xFF2C2C2C),
-                    ),
-                  ),
-                ),
-                Center(
-                  child: SizedBox(
-                    width: 50,
-                    height: 50,
-                    child: CircularProgressIndicator(
-                      value: percent / 100,
-                      strokeWidth: 4,
-                      color: color,
-                      strokeCap: StrokeCap.round,
-                    ),
-                  ),
-                ),
-                Center(
-                  child: Text(
-                    '${percent.clamp(0, 100)}%',
-                    style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            label,
-            style: const TextStyle(color: secondaryTextColor, fontSize: 9, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            amount,
-            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900),
-          ),
-          Text(
-            'of $target',
-            style: const TextStyle(color: secondaryTextColor, fontSize: 9, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
     );
   }
 
