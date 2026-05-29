@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'bmi_calculator_screen.dart'; // <--- Added connection import here
+import 'bmi_calculator_screen.dart';
+import 'favourite_exercise.dart';
 
 class AppColors {
-  static const Color background = Color(0xFF121212);
-  static const Color surfaceCard = Color(0xFF1E1E1E);
-  static const Color neonAccent = Color(0xFFD4FF00);
+  static const Color background = Colors.black; //
+  static const Color surfaceCard = Color(0xFF0E0E0E);
+  static const Color neonAccent = Color(0xFFCCFF00);
   static const Color textPrimary = Colors.white;
-  static const Color textSecondary = Color(0xFF8A8A8A);
+  static const Color textSecondary = Colors.white70;
 }
 
 class FeatureItem {
@@ -25,6 +26,11 @@ class FeaturesScreen extends StatelessWidget {
   FeaturesScreen({super.key});
 
   final List<FeatureItem> features = [
+    FeatureItem(
+      title: 'Favourite Exercises',
+      description: 'Quickly access and manage your curated workout moves.',
+      icon: Icons.favorite,
+    ),
     FeatureItem(
       title: 'Contact Trainer',
       description: 'Get professional guidance and 1-on-1 coaching.',
@@ -150,17 +156,30 @@ class FeaturesScreen extends StatelessWidget {
         color: AppColors.surfaceCard,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.05),
-          width: 1,
+          color: AppColors.neonAccent.withValues(alpha: 0.3),
+          width: 1.2,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.neonAccent.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
           onTap: () {
-            // <--- CONNECTED NAVIGATION TRACKING HERE
-            if (item.title == 'BMI Calculator') {
+            if (item.title == 'Favourite Exercises') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const FavouriteExerciseScreen(),
+                ),
+              );
+            } else if (item.title == 'BMI Calculator') {
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -185,7 +204,7 @@ class FeaturesScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.background,
+                    color: Colors.black,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
