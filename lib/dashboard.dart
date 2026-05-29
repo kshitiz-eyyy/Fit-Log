@@ -1,5 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+<<<<<<< HEAD
+=======
+import 'activity_screen.dart';
+import 'library.dart';
+import 'features_screen.dart';
+import 'chatbot.dart';
+import 'meal_tracking_screen.dart';
+import 'bmi_calculator_screen.dart';
+import 'workout_timer_screen.dart';
+>>>>>>> development
 import 'dart:math';
 
 // Explicit view sub-directory imports
@@ -153,7 +163,7 @@ class _DashboardContentState extends State<_DashboardContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // MOTIVATIONAL QUOTE BANNER
+
             Container(
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.only(bottom: 16),
@@ -181,7 +191,11 @@ class _DashboardContentState extends State<_DashboardContent> {
               ),
             ),
 
+<<<<<<< HEAD
             // CALORIE TARGET CARD
+=======
+
+>>>>>>> development
             Container(
               padding: const EdgeInsets.all(24),
               margin: const EdgeInsets.only(bottom: 16),
@@ -221,7 +235,7 @@ class _DashboardContentState extends State<_DashboardContent> {
               ),
             ),
 
-            // GRID METRICS (BMI & Daily Calories)
+
             Row(
               children: [
                 Expanded(
@@ -297,7 +311,7 @@ class _DashboardContentState extends State<_DashboardContent> {
 
             Row(
               children: [
-                // HYDRATION ACTION BLOCK
+
                 Expanded(
                   child: Container(
                     height: 140,
@@ -377,12 +391,108 @@ class _DashboardContentState extends State<_DashboardContent> {
             ),
             const SizedBox(height: 16),
 
+<<<<<<< HEAD
             // MEAL LOGGING INTERACTION BLOCK
+=======
+
+>>>>>>> development
             Container(
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
               child: _actionButton("Log Meal", Icons.restaurant, Colors.orangeAccent, () {
+<<<<<<< HEAD
+=======
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MealTrackingScreen(),
+                  ),
+                );
+              }),
+            ),
+
+
+            Container(
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF161616),
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: const Color(0xFFCCFF00).withOpacity(0.2), width: 1),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFCCFF00).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Icon(Icons.workspace_premium, color: Color(0xFFCCFF00), size: 24),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              "ACCOUNT PLAN",
+                              style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              "FitLog Pro Access",
+                              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(
+                        Icons.stars_rounded,
+                        color: Color(0xFFCCFF00),
+                        size: 28,
+                      ),
+                    ],
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: Divider(color: Color(0xFF262626), height: 1),
+                  ),
+                  InkWell(
+                    onTap: () {},
+                    borderRadius: BorderRadius.circular(4),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: const Color(0xFFCCFF00).withOpacity(0.4), width: 1),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.settings_suggest_outlined, color: Color(0xFFCCFF00), size: 16),
+                          SizedBox(width: 8),
+                          Text(
+                            "MANAGE SUBSCRIPTION",
+                            style: TextStyle(color: Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1),
+                          ),
+                          Spacer(),
+                          Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFFCCFF00), size: 12),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+
+            ElevatedButton(
+              onPressed: () {
+>>>>>>> development
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -520,8 +630,8 @@ class _DashboardContentState extends State<_DashboardContent> {
         ),
       ),
     );
-  }
 
+<<<<<<< HEAD
   // Workout option item design block builder
   Widget _workoutSuggestionBadge(String label, bool isPrimary) {
     return Container(
@@ -545,6 +655,11 @@ class _DashboardContentState extends State<_DashboardContent> {
   }
 
   Widget _actionButton(String text, IconData icon, Color color, Function onTap, {Color textColor = Colors.white}) {
+=======
+  }
+
+  static Widget _actionButton(String text, IconData icon, Color color, Function onTap, {Color textColor = Colors.white}) {
+>>>>>>> development
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
