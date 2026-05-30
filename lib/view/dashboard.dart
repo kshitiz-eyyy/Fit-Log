@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'activity_screen.dart';
 import 'library.dart';
 import 'features_screen.dart';
@@ -25,9 +26,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     FeaturesScreen(),
     LibraryScreen(),
     const ActivityScreen(),
-    const Center(
-      child: Text("PROFILE", style: TextStyle(color: Colors.white)),
-    ),
+    const Center(child: Text("PROFILE", style: TextStyle(color: Colors.white))),
   ];
 
   void _onItemTapped(int index) {
@@ -59,7 +58,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
 class _DashboardContent extends StatefulWidget {
   final VoidCallback onNavigateToActivity;
-
   const _DashboardContent({required this.onNavigateToActivity});
 
   @override
@@ -70,61 +68,79 @@ class _DashboardContentState extends State<_DashboardContent> {
   final AudioPlayer _audioPlayer = AudioPlayer();
   double hydrationAmount = 2.4;
 
+  int internalCaloriesEaten = 0;
+  int currentTargetCalories = 2500;
+  double displayBmiValue = 24.2;
+  String bmiStatusText = "Athletic Range";
+
   final List<String> _quotes = [
     "The only bad workout is the one that didn't happen.",
     "Success isn't always about greatness. It's about consistency.",
     "Your body can stand almost anything. It's your mind that you have to convince.",
-    "What hurts today makes you stronger tomorrow.",
-    "Don't limit your challenges. Challenge your limits.",
-    "Discipline is choosing between what you want now and what you want most.",
   ];
-
   late String _currentQuote;
 
   @override
   void initState() {
     super.initState();
     _currentQuote = _quotes[Random().nextInt(_quotes.length)];
+    _loadDashboardData();
+  }
+
+  Future<void> _loadDashboardData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      internalCaloriesEaten = prefs.getInt('total_calories_eaten') ?? 0;
+
+      // Pull dynamic BMI scores
+      double weight = prefs.getDouble('user_weight') ?? 70.0;
+      double height = prefs.getDouble('user_height') ?? 175.0;
+      int age = prefs.getInt('user_age') ?? 25;
+
+      double heightInMeters = height / 100;
+      if (heightInMeters > 0) {
+        displayBmiValue = double.parse((weight / (heightInMeters * heightInMeters)).toStringAsFixed(1));
+      }
+
+      if (displayBmiValue < 18.5) {
+        bmiStatusText = "Underweight";
+      } else if (displayBmiValue < 25) {
+        bmiStatusText = "Normal Range";
+      } else if (displayBmiValue < 30) {
+        bmiStatusText = "Overweight";
+      } else {
+        bmiStatusText = "Obese Range";
+      }
+
+      // Handle calorie targets based on setup states
+      if (prefs.containsKey('target_calories')) {
+        currentTargetCalories = prefs.getInt('target_calories') ?? 2500;
+      } else {
+        // Fallback calculations matching user constraints instantly
+        double bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
+        currentTargetCalories = (bmr * 1.375).round();
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final DateTime membershipStart = DateTime.now();
-    final DateTime membershipEnd = membershipStart.add(const Duration(days: 30));
-    final int remainingDays = membershipEnd.difference(DateTime.now()).inDays;
+    final int remainingDays = 30;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F0F),
       appBar: AppBar(
         backgroundColor: const Color(0xFF0F0F0F),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.white),
-          onPressed: () {},
-        ),
-        title: const Text(
-          "Fit Log",
-          style: TextStyle(
-            color: Color(0xFFCCFF00),
-            fontSize: 22,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1.5,
-          ),
-        ),
+        leading: IconButton(icon: const Icon(Icons.menu, color: Colors.white), onPressed: () {}),
+        title: const Text("Fit Log", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.white),
-            onPressed: widget.onNavigateToActivity,
-          ),
+          IconButton(icon: const Icon(Icons.notifications_none, color: Colors.white), onPressed: widget.onNavigateToActivity),
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: GestureDetector(
               onTap: widget.onNavigateToActivity,
-              child: const CircleAvatar(
-                radius: 16,
-                backgroundColor: Colors.grey,
-                child: Icon(Icons.person, size: 20, color: Colors.black),
-              ),
+              child: const CircleAvatar(radius: 16, backgroundColor: Colors.grey, child: Icon(Icons.person, size: 20, color: Colors.black)),
             ),
           )
         ],
@@ -133,12 +149,7 @@ class _DashboardContentState extends State<_DashboardContent> {
         backgroundColor: const Color(0xFFCCFF00),
         child: const Icon(Icons.chat, color: Colors.black),
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const FitnessCoachChatScreen(),
-            ),
-          );
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const FitnessCoachChatScreen()));
         },
       ),
       body: SingleChildScrollView(
@@ -146,42 +157,22 @@ class _DashboardContentState extends State<_DashboardContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-
             Container(
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: const Color(0xFFCCFF00).withOpacity(0.1),
-                border: Border.all(color: const Color(0xFFCCFF00), width: 1),
-                borderRadius: BorderRadius.circular(4),
-              ),
+              decoration: BoxDecoration(color: const Color(0xFFCCFF00).withOpacity(0.1), border: Border.all(color: const Color(0xFFCCFF00), width: 1), borderRadius: BorderRadius.circular(4)),
               child: Row(
                 children: [
                   const Icon(Icons.format_quote, color: Color(0xFFCCFF00), size: 28),
                   const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      _currentQuote,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontStyle: FontStyle.italic,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
+                  Expanded(child: Text(_currentQuote, style: const TextStyle(color: Colors.white, fontSize: 14, fontStyle: FontStyle.italic))),
                 ],
               ),
             ),
-
-
             Container(
               padding: const EdgeInsets.all(24),
               margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF161616),
-                borderRadius: BorderRadius.circular(4),
-              ),
+              decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
               child: Column(
                 children: [
                   SizedBox(
@@ -194,7 +185,7 @@ class _DashboardContentState extends State<_DashboardContent> {
                           height: 130,
                           width: 130,
                           child: CircularProgressIndicator(
-                            value: 0.88,
+                            value: currentTargetCalories > 0 ? (internalCaloriesEaten / currentTargetCalories).clamp(0.0, 1.0) : 0,
                             strokeWidth: 6,
                             backgroundColor: Colors.grey.shade900,
                             valueColor: const AlwaysStoppedAnimation(Color(0xFFCCFF00)),
@@ -202,9 +193,9 @@ class _DashboardContentState extends State<_DashboardContent> {
                         ),
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Text("88", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 36, height: 1)),
-                            Text("Calories", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 10, letterSpacing: 1)),
+                          children: [
+                            Text("$internalCaloriesEaten", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 30, height: 1)),
+                            const Text("Calories", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 10)),
                           ],
                         ),
                       ],
@@ -213,19 +204,13 @@ class _DashboardContentState extends State<_DashboardContent> {
                 ],
               ),
             ),
-
-
             Row(
               children: [
                 Expanded(
                   child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const BMICalculatorScreen(),
-                        ),
-                      );
+                    onTap: () async {
+                      await Navigator.push(context, MaterialPageRoute(builder: (context) => const BMICalculatorScreen()));
+                      _loadDashboardData();
                     },
                     child: Container(
                       height: 140,
@@ -235,15 +220,15 @@ class _DashboardContentState extends State<_DashboardContent> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: const [
+                          const Row(
+                            children: [
                               Icon(Icons.scale, color: Color(0xFFCCFF00), size: 16),
                               SizedBox(width: 6),
                               Text("BODY MASS INDEX", style: TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold)),
                             ],
                           ),
-                          const Text("24.2", style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900)),
-                          const Text("Athletic Range", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 12, fontWeight: FontWeight.bold)),
+                          Text("$displayBmiValue", style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900)),
+                          Text(bmiStatusText, style: const TextStyle(color: Color(0xFFCCFF00), fontSize: 12, fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ),
@@ -259,23 +244,23 @@ class _DashboardContentState extends State<_DashboardContent> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: const [
+                        const Row(
+                          children: [
                             Icon(Icons.local_fire_department, color: Color(0xFFCCFF00), size: 16),
                             SizedBox(width: 6),
                             Text("DAILY CALORIES", style: TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold)),
                           ],
                         ),
                         RichText(
-                          text: const TextSpan(
+                          text: TextSpan(
                             children: [
-                              TextSpan(text: "1,840", style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900)),
-                              TextSpan(text: " / 2,600\nkcal", style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
+                              TextSpan(text: "$internalCaloriesEaten", style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900)),
+                              TextSpan(text: " / $currentTargetCalories\nkcal", style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ),
                         LinearProgressIndicator(
-                          value: 1840 / 2600,
+                          value: currentTargetCalories > 0 ? (internalCaloriesEaten / currentTargetCalories).clamp(0.0, 1.0) : 0,
                           backgroundColor: Colors.grey.shade900,
                           color: const Color(0xFFCCFF00),
                           minHeight: 4,
@@ -287,10 +272,8 @@ class _DashboardContentState extends State<_DashboardContent> {
               ],
             ),
             const SizedBox(height: 12),
-
             Row(
               children: [
-
                 Expanded(
                   child: Container(
                     height: 140,
@@ -300,8 +283,8 @@ class _DashboardContentState extends State<_DashboardContent> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: const [
+                        const Row(
+                          children: [
                             Icon(Icons.water_drop, color: Color(0xFFCCFF00), size: 16),
                             SizedBox(width: 6),
                             Text("HYDRATION", style: TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold)),
@@ -329,16 +312,11 @@ class _DashboardContentState extends State<_DashboardContent> {
                   ),
                 ),
                 const SizedBox(width: 12),
-
                 Expanded(
                   child: Container(
                     height: 140,
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF161616),
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: Colors.grey.shade800, width: 0.5),
-                    ),
+                    decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4), border: Border.all(color: Colors.grey.shade800, width: 0.5)),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -346,8 +324,8 @@ class _DashboardContentState extends State<_DashboardContent> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: const [
+                            const Row(
+                              children: [
                                 Icon(Icons.fitness_center, color: Color(0xFFCCFF00), size: 16),
                                 SizedBox(width: 6),
                                 Text("TRAINING", style: TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold)),
@@ -369,96 +347,57 @@ class _DashboardContentState extends State<_DashboardContent> {
               ],
             ),
             const SizedBox(height: 16),
-
-
             Container(
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
-              child: _actionButton("Log Meal", Icons.restaurant, Colors.orangeAccent, () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MealTrackingScreen(),
-                  ),
-                );
+              child: _actionButton("Log Meal", Icons.restaurant, Colors.orangeAccent, () async {
+                await Navigator.push(context, MaterialPageRoute(builder: (context) => const MealTrackingScreen()));
+                _loadDashboardData();
               }),
             ),
-
-
             Container(
               padding: const EdgeInsets.all(16),
               margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF161616),
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: const Color(0xFFCCFF00).withOpacity(0.2), width: 1),
-              ),
+              decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4), border: Border.all(color: const Color(0xFFCCFF00).withOpacity(0.2), width: 1)),
               child: Column(
                 children: [
                   Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFCCFF00).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
+                        decoration: BoxDecoration(color: const Color(0xFFCCFF00).withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
                         child: const Icon(Icons.workspace_premium, color: Color(0xFFCCFF00), size: 24),
                       ),
                       const SizedBox(width: 16),
-                      Expanded(
+                      const Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              "ACCOUNT PLAN",
-                              style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
-                            ),
+                          children: [
+                            Text("ACCOUNT PLAN", style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
                             SizedBox(height: 2),
-                            Text(
-                              "FitLog Pro Access",
-                              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
+                            Text("FitLog Pro Access", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                           ],
                         ),
                       ),
-                      const Icon(
-                        Icons.stars_rounded,
-                        color: Color(0xFFCCFF00),
-                        size: 28,
-                      ),
+                      const Icon(Icons.stars_rounded, color: Color(0xFFCCFF00), size: 28),
                     ],
                   ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    child: Divider(color: Color(0xFF262626), height: 1),
-                  ),
+                  const Padding(padding: EdgeInsets.symmetric(vertical: 12), child: Divider(color: Color(0xFF262626), height: 1)),
                   InkWell(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const MembershipTrackingScreen(),
-                        ),
-                      );
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const MembershipTrackingScreen()));
                     },
                     borderRadius: BorderRadius.circular(4),
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: const Color(0xFFCCFF00).withOpacity(0.4), width: 1),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Row(
+                      decoration: BoxDecoration(border: Border.all(color: const Color(0xFFCCFF00).withOpacity(0.4), width: 1), borderRadius: BorderRadius.circular(4)),
+                      child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           Icon(Icons.settings_suggest_outlined, color: Color(0xFFCCFF00), size: 16),
                           SizedBox(width: 8),
-                          Text(
-                            "MANAGE MEMBERSHIP",
-                            style: TextStyle(color: Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1),
-                          ),
+                          Text("MANAGE MEMBERSHIP", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.w900)),
                           Spacer(),
                           Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFFCCFF00), size: 12),
                         ],
@@ -468,23 +407,11 @@ class _DashboardContentState extends State<_DashboardContent> {
                 ],
               ),
             ),
-
-
             ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const WorkoutTimerScreen(),
-                  ),
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const WorkoutTimerScreen()));
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                foregroundColor: const Color(0xFFCCFF00),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: const RoundedRectangleBorder(side: BorderSide(color: Color(0xFFCCFF00), width: 1.5)),
-              ),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, foregroundColor: const Color(0xFFCCFF00), padding: const EdgeInsets.symmetric(vertical: 16), shape: const RoundedRectangleBorder(side: BorderSide(color: Color(0xFFCCFF00), width: 1.5))),
               child: const Text("START WORKOUT", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1)),
             ),
             const SizedBox(height: 24),
@@ -501,11 +428,7 @@ class _DashboardContentState extends State<_DashboardContent> {
         onPressed: () => onTap(),
         icon: Icon(icon, color: textColor),
         label: Text(text, style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-        ),
+        style: ElevatedButton.styleFrom(backgroundColor: color, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
       ),
     );
   }
