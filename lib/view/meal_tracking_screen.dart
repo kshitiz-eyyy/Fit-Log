@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MealTrackingScreen extends StatefulWidget {
   const MealTrackingScreen({super.key});
@@ -8,8 +9,29 @@ class MealTrackingScreen extends StatefulWidget {
 }
 
 class _MealTrackingScreenState extends State<MealTrackingScreen> {
-  // --- STATE VARIABLES ---
-  // Tracks what the user has actually logged
+  Color color = Color(0xFFCCFF00);
+
+  // --- LOCAL BMI RETRIEVED VARIABLES ---
+  double savedWeight = 70.0; // Default fallback if BMI screen hasn't run yet
+  double savedHeight = 175.0; // Default fallback
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBMIData(); // Automatically pull data when screen opens
+  }
+
+  // Pure connection method: Pulls weight & height saved by your BMI section
+  Future<void> _loadBMIData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      // Looks for keys "user_weight" and "user_height" saved by your BMI logic
+      savedWeight = prefs.getDouble('user_weight') ?? 70.0;
+      savedHeight = prefs.getDouble('user_height') ?? 175.0;
+    });
+  }
+
+  // --- STATE VARIABLES FOR LOGGED MEALS ---
   Map<String, LoggedMeal> loggedMeals = {
     "Breakfast": LoggedMeal(name: "", calories: 0, protein: 0, carbs: 0, fats: 0),
     "Lunch": LoggedMeal(name: "", calories: 0, protein: 0, carbs: 0, fats: 0),
@@ -17,7 +39,6 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
     "Snacks": LoggedMeal(name: "", calories: 0, protein: 0, carbs: 0, fats: 0),
   };
 
-  // Tracks what the AI recommends (Defaults to empty/pending)
   Map<String, String> aiRecommendations = {
     "Breakfast": "Pending setup...",
     "Lunch": "Pending setup...",
@@ -25,11 +46,10 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
     "Snacks": "Pending setup...",
   };
 
-  // Target Limits (Can be updated dynamically by AI setup later)
-  int targetCalories = 2800;
-  int targetProtein = 180;
-  int targetCarbs = 300;
-  int targetFats = 80;
+  int targetCalories = 2500;
+  int targetProtein = 150;
+  int targetCarbs = 250;
+  int targetFats = 70;
 
   // --- GETTERS FOR TOTALS ---
   int get totalCaloriesEaten => loggedMeals.values.fold(0, (sum, item) => sum + item.calories);
@@ -38,6 +58,183 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
   int get totalFatsEaten => loggedMeals.values.fold(0, (sum, item) => sum + item.fats);
 
   int get caloriesRemaining => targetCalories - totalCaloriesEaten;
+
+  // --- DIALOG ENGINE: CONVERTS PROFILE DATA TO REAL DIET CHARTS ---
+  void _openAIDietSetupDialog() {
+    String selectedGoal = 'Weight Loss';
+    String selectedActivity = 'Moderately Active';
+    final TextEditingController ageController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF151515),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
+            side: const BorderSide(color: Colors.white10),
+          ),
+          title: const Row(
+            children: [
+              Icon(Icons.auto_awesome, color: Color(0xFFCCFF00)),
+              SizedBox(width: 10),
+              Text("AI Diet Setup", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Visual Confirmation indicating connection is active
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(12)),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.link, color: Color(0xFFCCFF00), size: 16),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          "Connected to BMI: ${savedWeight.toStringAsFixed(1)}kg, ${savedHeight.toStringAsFixed(0)}cm",
+                          style: const TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                const Text("ENTER YOUR AGE", style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: ageController,
+                  keyboardType: TextInputType.number,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: "e.g. 24",
+                    hintStyle: const TextStyle(color: Colors.white24),
+                    filled: true,
+                    fillColor: Colors.black,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                const Text("SELECT FITNESS GOAL", style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                DropdownButtonFormField<String>(
+                  value: selectedGoal,
+                  dropdownColor: const Color(0xFF151515),
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.black,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  ),
+                  items: ['Weight Loss', 'Muscle Gain', 'Maintenance'].map((String value) {
+                    return DropdownMenuItem<String>(value: value, child: Text(value));
+                  }).toList(),
+                  onChanged: (newValue) => selectedGoal = newValue!,
+                ),
+                const SizedBox(height: 20),
+
+                const Text("ACTIVITY LEVEL", style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                DropdownButtonFormField<String>(
+                  value: selectedActivity,
+                  dropdownColor: const Color(0xFF151515),
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.black,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  ),
+                  items: ['Sedentary', 'Lightly Active', 'Moderately Active', 'Very Active'].map((String value) {
+                    return DropdownMenuItem<String>(value: value, child: Text(value));
+                  }).toList(),
+                  onChanged: (newValue) => selectedActivity = newValue!,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel", style: TextStyle(color: Colors.white70)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFCCFF00),
+                foregroundColor: Colors.black,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: () {
+                int parsedAge = int.tryParse(ageController.text) ?? 25;
+
+                // 1. MIFFLIN-ST JEOR FORMULA (Calculates real algorithmic baseline metabolic outputs)
+                double bmr = (10 * savedWeight) + (6.25 * savedHeight) - (5 * parsedAge) + 5;
+
+                // 2. APPLY ACTIVITY MULTIPLIERS
+                double activityMultiplier = 1.2;
+                if (selectedActivity == 'Lightly Active') activityMultiplier = 1.375;
+                if (selectedActivity == 'Moderately Active') activityMultiplier = 1.55;
+                if (selectedActivity == 'Very Active') activityMultiplier = 1.725;
+                double tdee = bmr * activityMultiplier;
+
+                // 3. GENERATE CUSTOM DIET CHART MATRIX VALUES BASED ON USER GOAL
+                setState(() {
+                  if (selectedGoal == 'Weight Loss') {
+                    targetCalories = (tdee - 500).round();
+                    targetProtein = (savedWeight * 2.0).round(); // High protein for fat loss preservation
+                    targetFats = ((targetCalories * 0.25) / 9).round();
+                    targetCarbs = ((targetCalories - (targetProtein * 4) - (targetFats * 9)) / 4).round();
+
+                    aiRecommendations["Breakfast"] = "🍳 3 Egg Whites Scramble + 40g Oats (${(targetCalories * 0.25).round()} kcal)";
+                    aiRecommendations["Lunch"] = "🥗 150g Grilled Chicken Breast + Broccoli (${(targetCalories * 0.35).round()} kcal)";
+                    aiRecommendations["Dinner"] = "🐟 150g Baked Salmon + Asparagus Spears (${(targetCalories * 0.30).round()} kcal)";
+                    aiRecommendations["Snacks"] = "🥛 1 Scoop Whey Protein + 1 Apple (${(targetCalories * 0.10).round()} kcal)";
+
+                  } else if (selectedGoal == 'Muscle Gain') {
+                    targetCalories = (tdee + 400).round();
+                    targetProtein = (savedWeight * 2.2).round(); // Surplus scaling macros
+                    targetFats = ((targetCalories * 0.25) / 9).round();
+                    targetCarbs = ((targetCalories - (targetProtein * 4) - (targetFats * 9)) / 4).round();
+
+                    aiRecommendations["Breakfast"] = "🥞 4 Whole Eggs + 100g Oats + 1 Banana (${(targetCalories * 0.25).round()} kcal)";
+                    aiRecommendations["Lunch"] = "🥩 200g Lean Ground Beef + 1.5 Cups White Rice (${(targetCalories * 0.35).round()} kcal)";
+                    aiRecommendations["Dinner"] = "🍗 200g Chicken Thighs + Large Sweet Potato (${(targetCalories * 0.30).round()} kcal)";
+                    aiRecommendations["Snacks"] = "🥜 Mass Gainer Shake + 2 Tbsp Peanut Butter (${(targetCalories * 0.10).round()} kcal)";
+
+                  } else {
+                    targetCalories = tdee.round();
+                    targetProtein = (savedWeight * 1.8).round();
+                    targetFats = ((targetCalories * 0.25) / 9).round();
+                    targetCarbs = ((targetCalories - (targetProtein * 4) - (targetFats * 9)) / 4).round();
+
+                    aiRecommendations["Breakfast"] = "🥪 3 Scrambled Eggs + 2 Slices Whole Wheat Toast (${(targetCalories * 0.25).round()} kcal)";
+                    aiRecommendations["Lunch"] = "🌯 Large Turkey & Avocado Wrap + Mixed Greens (${(targetCalories * 0.35).round()} kcal)";
+                    aiRecommendations["Dinner"] = "🐠 180g White Fish Fillet + Quinoa Bowl (${(targetCalories * 0.30).round()} kcal)";
+                    aiRecommendations["Snacks"] = "🍯 200g Greek Yogurt + Handful of Almonds (${(targetCalories * 0.10).round()} kcal)";
+                  }
+                });
+
+                Navigator.pop(context);
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("✨ Generated full macro diet chart for $selectedGoal!"),
+                    backgroundColor: const Color(0xFF111111),
+                  ),
+                );
+              },
+              child: const Text("Generate", style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   // --- FUNCTION: LOG A MEAL MANUAL FLOW ---
   void _openLogMealBottomSheet(String mealType) {
@@ -48,9 +245,7 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: const Color(0xFF151515),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
       builder: (context) {
         return Padding(
           padding: EdgeInsets.only(
@@ -61,15 +256,12 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "Log $mealType",
-                style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
-              ),
+              Text("Log $mealType", style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
               const SizedBox(height: 6),
               if (aiRecommendations[mealType] != "Pending setup...")
                 Text(
                   "💡 AI Suggestion: ${aiRecommendations[mealType]}",
-                  style: const TextStyle(color: Color(0xFFD4FF00), fontSize: 13, fontWeight: FontWeight.w500),
+                  style: const TextStyle(color: Color(0xFFCCFF00), fontSize: 13, fontWeight: FontWeight.w500),
                 ),
               const SizedBox(height: 20),
               const Text("WHAT DID YOU EAT?", style: TextStyle(color: Colors.white60, fontSize: 11, fontWeight: FontWeight.bold)),
@@ -107,7 +299,7 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD4FF00),
+                    backgroundColor: Color(0xFFCCFF00),
                     foregroundColor: Colors.black,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -115,17 +307,16 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
                   onPressed: () {
                     if (nameController.text.trim().isEmpty) return;
 
-                    // Parse multiplier factor based on selection
                     double factor = 1.0;
                     if (selectedPortion == "0.5 Serving") factor = 0.5;
                     if (selectedPortion == "1.5 Servings") factor = 1.5;
                     if (selectedPortion == "2 Servings") factor = 2.0;
 
-                    // Mathematical Matrix Generation Rule (Simulating nutrition computation values per serving)
-                    int baseCals = mealType == "Breakfast" ? 450 : mealType == "Lunch" ? 650 : mealType == "Dinner" ? 700 : 300;
-                    int basePro = mealType == "Breakfast" ? 30 : mealType == "Lunch" ? 45 : mealType == "Dinner" ? 40 : 15;
-                    int baseCarb = mealType == "Breakfast" ? 50 : mealType == "Lunch" ? 60 : mealType == "Dinner" ? 55 : 30;
-                    int baseFat = mealType == "Breakfast" ? 12 : mealType == "Lunch" ? 15 : mealType == "Dinner" ? 18 : 8;
+                    // Calculates target distributions safely based on your dynamically created targets
+                    int baseCals = (targetCalories * (mealType == "Breakfast" ? 0.25 : mealType == "Lunch" ? 0.35 : mealType == "Dinner" ? 0.30 : 0.10)).round();
+                    int basePro = (targetProtein * (mealType == "Breakfast" ? 0.25 : mealType == "Lunch" ? 0.35 : mealType == "Dinner" ? 0.30 : 0.10)).round();
+                    int baseCarb = (targetCarbs * (mealType == "Breakfast" ? 0.25 : mealType == "Lunch" ? 0.35 : mealType == "Dinner" ? 0.30 : 0.10)).round();
+                    int baseFat = (targetFats * (mealType == "Breakfast" ? 0.25 : mealType == "Lunch" ? 0.35 : mealType == "Dinner" ? 0.30 : 0.10)).round();
 
                     setState(() {
                       loggedMeals[mealType] = LoggedMeal(
@@ -149,34 +340,8 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
     );
   }
 
-  // --- FUNCTION: AI GENERATION INJECTION ---
-  void _generateAIDietPlan() {
-    // In a future production build, connect this to your network layer parsing response body blocks
-    setState(() {
-      aiRecommendations["Breakfast"] = "3 Egg Whites + 50g Oats with Berries";
-      aiRecommendations["Lunch"] = "150g Grilled Breast Chicken + 1 Cup Basmati Rice";
-      aiRecommendations["Dinner"] = "200g Salmon Fillet + Grilled Asparagus & Sweet Potato";
-      aiRecommendations["Snacks"] = "1 Scoop Whey Protein + 1 Medium Apple";
-
-      // Customize target bounds conditionally based on selection criteria rules
-      targetCalories = 2200;
-      targetProtein = 160;
-      targetCarbs = 230;
-      targetFats = 70;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("✨ AI Diet Chart successfully loaded into recommendations!"),
-        backgroundColor: Color(0xFF111111),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    const neon = Color(0xFFD4FF00);
-
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -185,21 +350,30 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// TOP TITLE BAR
-              const Row(
+              /// TOP BAR
+              Row(
                 children: [
-                  Text(
-                    "NUTRITION LOG",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 1.5),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+                    onPressed: () => Navigator.pop(context),
                   ),
-                  Spacer(),
-                  Icon(Icons.calendar_today_outlined, color: Colors.white70, size: 22),
+                  const Expanded(
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 48.0),
+                        child: Text(
+                          "NUTRITION LOG",
+                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFFCCFF00), letterSpacing: 1.5),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
 
               const SizedBox(height: 24),
 
-              /// PERFORMANCE CALORIE & MACRO TRACKER CARD
+              /// CALORIE & MACRO CARD
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
@@ -232,7 +406,7 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
                       children: [
                         _buildMacroIndicator("PROTEIN", "$totalProteinEaten\u200bg / ${targetProtein}g", totalProteinEaten / targetProtein, Colors.orangeAccent),
                         _buildMacroIndicator("CARBS", "$totalCarbsEaten\u200bg / ${targetCarbs}g", totalCarbsEaten / targetCarbs, Colors.cyanAccent),
-                        _buildMacroIndicator("FATS", "$totalFatsEaten\u200bg / ${targetFats}g", totalFatsEaten / targetFats, neon),
+                        _buildMacroIndicator("FATS", "$totalFatsEaten\u200bg / ${targetFats}g", totalFatsEaten / targetFats, Color(0xFFCCFF00)),
                       ],
                     )
                   ],
@@ -243,14 +417,14 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
 
               /// AI DIET GENERATOR CARD
               InkWell(
-                onTap: _generateAIDietPlan,
+                onTap: _openAIDietSetupDialog,
                 borderRadius: BorderRadius.circular(30),
                 child: Container(
                   padding: const EdgeInsets.all(22),
                   decoration: BoxDecoration(
                     color: const Color(0xFF111111),
                     borderRadius: BorderRadius.circular(30),
-                    border: Border.all(color: neon.withOpacity(0.3), width: 1.5),
+                    border: Border.all(color: Color(0xFFCCFF00).withOpacity(0.3), width: 1.5),
                   ),
                   child: const Row(
                     children: [
@@ -260,7 +434,7 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
                           children: [
                             Text(
                               "🪄 AI Smart Meal Planner",
-                              style: TextStyle(color: neon, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1),
+                              style: TextStyle(color: Color(0xFFCCFF00), fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1),
                             ),
                             SizedBox(height: 8),
                             Text(
@@ -275,7 +449,7 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
                           ],
                         ),
                       ),
-                      Icon(Icons.auto_awesome, color: neon, size: 22),
+                      Icon(Icons.auto_awesome, color: Color(0xFFCCFF00), size: 22),
                     ],
                   ),
                 ),
@@ -301,7 +475,6 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
     );
   }
 
-  /// Interactive Builder for Component Selection Nodes
   Widget _buildInteractiveMealCard(String mealType, IconData icon) {
     final meal = loggedMeals[mealType];
     final aiRec = aiRecommendations[mealType];
@@ -313,15 +486,12 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFF151515),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: hasLogged ? const Color(0xFFD4FF00).withOpacity(0.2) : Colors.white10),
+        border: Border.all(color: hasLogged ? Color(0xFFCCFF00).withOpacity(0.2) : Colors.white10),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: Icon(icon, color: hasLogged ? const Color(0xFFD4FF00) : Colors.white24, size: 26),
-        title: Text(
-          mealType,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-        ),
+        leading: Icon(icon, color: hasLogged ? Color(0xFFCCFF00) : Colors.white24, size: 26),
+        title: Text(mealType, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 4.0),
           child: Column(
@@ -334,7 +504,7 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
               const SizedBox(height: 4),
               Text(
                 hasAiPlan ? "📋 AI Target: $aiRec" : "💡 Tap AI setup above for suggestions",
-                style: TextStyle(color: hasAiPlan ? const Color(0xFFD4FF00).withOpacity(0.7) : Colors.white24, fontSize: 12),
+                style: TextStyle(color: hasAiPlan ? Color(0xFFCCFF00).withOpacity(0.7) : Colors.white24, fontSize: 12),
               ),
             ],
           ),
@@ -348,7 +518,7 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
               style: TextStyle(color: hasLogged ? Colors.white : Colors.white24, fontWeight: FontWeight.bold, fontSize: 14),
             ),
             const SizedBox(height: 4),
-            Icon(Icons.add_circle_outline, color: hasLogged ? const Color(0xFFD4FF00) : Colors.white30, size: 18),
+            Icon(Icons.add_circle_outline, color: hasLogged ? Color(0xFFCCFF00) : Colors.white30, size: 18),
           ],
         ),
         onTap: () => _openLogMealBottomSheet(mealType),
@@ -356,7 +526,6 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
     );
   }
 
-  /// Reusable Progress Bar Metrics Formatter
   Widget _buildMacroIndicator(String title, String values, double progress, Color color) {
     double checkedProgress = progress.isNaN || progress.isInfinite ? 0.0 : progress;
     if (checkedProgress > 1.0) checkedProgress = 1.0;
@@ -383,7 +552,6 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
   }
 }
 
-// --- CORE DATA ARTIFACT CONTAINER ---
 class LoggedMeal {
   final String name;
   final int calories;
