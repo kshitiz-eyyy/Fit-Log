@@ -6,29 +6,26 @@ class UserModel {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': this.id,
-      'name': this.name,
-      'contact': this.contact,
-      'email': this.email,
+      'id': id,
+      'name': name,
+      'contact': contact,
+      'email': email,
     };
   }
 
-
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
-      id: map['id'] as String,
-      name: map['name'] as String,
-      contact: map['contact'] as String,
-      email: map['email'] as String,
+      id: map['id'] ?? '',
+      name: map['name'] ?? '',
+      contact: map['contact'],
+      email: map['email'] ?? '',
     );
   }
 
   const UserModel({
     required this.id,
     required this.name,
-    required this.contact,
+    this.contact,
     required this.email,
   });
 }
-
-

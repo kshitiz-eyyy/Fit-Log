@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-// Make sure this path matches your project structure
-import 'change_password_screen.dart';
+import 'package:fitlog/view/change_password_screen.dart';
 
 class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});

@@ -1,26 +1,13 @@
-<<<<<<< HEAD
-import 'package:fitlog/account_screen.dart';
-import 'package:fitlog/change_password_screen.dart';
-import 'package:fitlog/fuel_log_screen.dart';
-import 'package:fitlog/hydration_settings_screen.dart';
-import 'package:flutter/material.dart';
-import 'personal_details_screen.dart';
-import 'hydration_settings_screen.dart';
-=======
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'firebase_options.dart';
-import 'view/library.dart';
-import 'view/activity_screen.dart';
-import 'view/favourite_exercise.dart';
-import 'view/change_password_screen.dart';
-import 'view/dashboard.dart';
-import 'view/features_screen.dart';
-import 'view/splash_screen.dart';
-import 'view/membership_tracking_screen.dart';
+import 'view/fuel_log_screen.dart';
 
->>>>>>> fa5419a6feadf0df5a9bb965f23933aa3b521a44
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const FitLogApp());
 }
 
@@ -31,33 +18,21 @@ class FitLogApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-<<<<<<< HEAD
+      title: 'FitLog',
       theme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.dark,
-      ),
-      home: const FuelLogScreen(),
-    );
-  }
-}
-=======
-      title: 'FitLog',
-
-      theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: Colors.black,
-
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.black,
           titleTextStyle: TextStyle(
-            color: Colors.lightGreenAccent,
+            color: Color(0xFFD4FF00),
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
-
-      home: const MembershipTrackingScreen(),
+      home: const FuelLogScreen(),
     );
   }
 }
->>>>>>> fa5419a6feadf0df5a9bb965f23933aa3b521a44
