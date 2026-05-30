@@ -85,7 +85,7 @@ class _LibraryContent extends StatelessWidget {
         Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            backgroundColor: const Color(0xFF121212),
+            backgroundColor: const Color(0xFF0E0707),
             elevation: 10,
             title: const Text(
               "Library",
@@ -248,7 +248,7 @@ class SplitScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF121212),
+        backgroundColor: const Color(0xFF0E0707),
         title: Text(splitName,
             style: const TextStyle(color: Color(0xFFCCFF00), fontWeight: FontWeight.bold)),
         centerTitle: true,

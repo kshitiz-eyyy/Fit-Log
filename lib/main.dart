@@ -36,7 +36,7 @@ class FitLogApp extends StatelessWidget {
         ),
       ),
 
-      home: const MembershipTrackingScreen(),
+      home: const DashboardScreen(),
     );
   }
 }
