@@ -1,45 +1,22 @@
 import 'package:flutter/material.dart';
 import 'exercise_data.dart';
 import 'exerciselistscreen.dart';
-import 'activity_screen.dart';
 
-class LibraryScreen extends StatefulWidget {
+class LibraryScreen extends StatelessWidget {
   const LibraryScreen({super.key});
 
   @override
-  State<LibraryScreen> createState() => _LibraryScreenState();
-}
-
-class _LibraryScreenState extends State<LibraryScreen> {
-  int _selectedIndex = 2;
-
-  final List<Widget> _screens = [
-    Center(child: Text("HOME", style: TextStyle(color: Colors.white))),
-    Center(child: Text("FEATURES", style: TextStyle(color: Colors.white))),
-    _LibraryContent(),
-    ActivityScreen(),
-    Center(child: Text("PROFILE", style: TextStyle(color: Colors.white))),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-
-      body: _screens[_selectedIndex],
-    );
+    return _LibraryContent();
   }
 }
 
 class _LibraryContent extends StatelessWidget {
-  final muscleGroups = exerciseData.keys.toList();
+  _LibraryContent();
 
-  final Map<String, String> muscleGroupImages = {
+  final Map<String, List<Map<String, String>>> exerciseDataLocal = exerciseData;
+
+  final Map<String, String> muscleGroupImages = const {
     "Chest": "assets/images/chestdash.png",
     "Back": "assets/images/backdash.png",
     "Legs": "assets/images/legsdash.png",
@@ -49,190 +26,195 @@ class _LibraryContent extends StatelessWidget {
     "Abs": "assets/images/absdash.png",
   };
 
-  // Training splits definition
-  final Map<String, Map<String, List<Map<String, String>>>> trainingSplits = {
-    "Push/Pull/Legs": {
-      "Push": exerciseData["Chest"]! + exerciseData["Shoulders"]! + exerciseData["Triceps"]!,
-      "Pull": exerciseData["Back"]! + exerciseData["Biceps"]!,
-      "Legs": exerciseData["Legs"]!,
-    },
-    "Bro Split": {
-      "Chest Day": exerciseData["Chest"]!,
-      "Back Day": exerciseData["Back"]!,
-      "Shoulder Day": exerciseData["Shoulders"]!,
-      "Arm Day": exerciseData["Biceps"]! + exerciseData["Triceps"]!,
-      "Leg Day": exerciseData["Legs"]!,
-      "Abs Day": exerciseData["Abs"]!,
-    },
-  };
-
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/images/gym.png"),
-              fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                const Color(0xFF121212).withOpacity(0.7),
-                BlendMode.darken,
-              ),
-            ),
+    final muscleGroups = exerciseDataLocal.keys.toList();
+
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF121212),
+        elevation: 10,
+        automaticallyImplyLeading: false,
+        title: const Text(
+          "EXERCISE LIBRARY",
+          style: TextStyle(
+            color: Color(0xFFCCFF00),
+            fontWeight: FontWeight.bold,
+            letterSpacing: 2,
+            fontSize: 22,
           ),
         ),
-        Scaffold(
-          backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            backgroundColor: const Color(0xFF121212),
-            elevation: 10,
-            title: const Text(
-              "Library",
-              style: TextStyle(
-
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2,
-                fontSize: 22,
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            flex: 3,
+            child: GridView.builder(
+              padding: const EdgeInsets.all(16),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 14,
+                mainAxisSpacing: 14,
+                childAspectRatio: 0.9,
               ),
-            ),
-            centerTitle: true,
-          ),
-          body: Column(
-            children: [
-              // Muscle Group Grid (full screen focus)
-              Expanded(
-                flex: 3,
-                child: GridView.builder(
-                  padding: const EdgeInsets.all(16),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 14,
-                    mainAxisSpacing: 14,
-                    childAspectRatio: 0.9,
-                  ),
-                  itemCount: muscleGroups.length,
-                  itemBuilder: (context, index) {
-                    final group = muscleGroups[index];
-                    final imagePath = muscleGroupImages[group] ?? "assets/images/default.png";
+              itemCount: muscleGroups.length,
+              itemBuilder: (context, index) {
+                final group = muscleGroups[index];
+                final imagePath = muscleGroupImages[group] ?? "assets/images/default.png";
 
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ExerciseListScreen(
-                              muscleGroup: group,
-                              exercises: exerciseData[group]!,
-                            ),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFFCCFF00).withOpacity(0.4),
-                              blurRadius: 12,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: Stack(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Image.asset(
-                                imagePath,
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: double.infinity,
-                              ),
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.black.withOpacity(0.7),
-                                    Colors.transparent,
-                                    const Color(0xFFCCFF00).withOpacity(0.3),
-                                  ],
-                                  begin: Alignment.bottomCenter,
-                                  end: Alignment.topCenter,
-                                ),
-                              ),
-                            ),
-                            Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.fitness_center,
-                                      color: const Color(0xFFCCFF00), size: 42),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    group.toUpperCase(),
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      letterSpacing: 1.5,
-                                      shadows: [
-                                        Shadow(
-                                          color: Colors.black,
-                                          blurRadius: 6,
-                                          offset: Offset(2, 2),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ExerciseListScreen(
+                          muscleGroup: group,
+                          exercises: exerciseDataLocal[group]!,
                         ),
                       ),
                     );
                   },
-                ),
-              ),
-
-              // Splits Section at bottom
-              Expanded(
-                flex: 1,
-                child: ListView(
-                  children: trainingSplits.keys.map((splitName) {
-                    return Card(
-                      color: const Color(0xFF1E1E1E),
-                      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                      child: ListTile(
-                        title: Text(splitName,
-                            style: const TextStyle(
-                                color: Color(0xFFCCFF00),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18)),
-                        trailing: const Icon(Icons.chevron_right, color: Colors.white),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => SplitScreen(
-                                splitName: splitName,
-                                splitData: trainingSplits[splitName]!,
-                              ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFFCCFF00).withOpacity(0.4),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.asset(
+                            imagePath,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                            errorBuilder: (context, error, stackTrace) => Container(
+                              color: Colors.grey.shade900,
+                              child: const Icon(Icons.fitness_center, color: Colors.white24, size: 50),
                             ),
-                          );
-                        },
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ],
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.black.withOpacity(0.7),
+                                Colors.transparent,
+                                const Color(0xFFCCFF00).withOpacity(0.3),
+                              ],
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                            ),
+                          ),
+                        ),
+                        Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.fitness_center,
+                                  color: Color(0xFFCCFF00), size: 42),
+                              const SizedBox(height: 10),
+                              Text(
+                                group.toUpperCase(),
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  letterSpacing: 1.5,
+                                  shadows: [
+                                    Shadow(
+                                      color: Colors.black,
+                                      blurRadius: 6,
+                                      offset: Offset(2, 2),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
-        ),
-      ],
+          const SizedBox(height: 16),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "TRAINING SPLITS",
+                style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: ListView(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              children: [
+                _buildSplitTile(context, "Push/Pull/Legs"),
+                _buildSplitTile(context, "Bro Split"),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSplitTile(BuildContext context, String splitName) {
+    return Card(
+      color: const Color(0xFF1E1E1E),
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+      child: ListTile(
+        title: Text(splitName,
+            style: const TextStyle(
+                color: Color(0xFFCCFF00),
+                fontWeight: FontWeight.bold,
+                fontSize: 16)),
+        trailing: const Icon(Icons.chevron_right, color: Colors.white, size: 20),
+        onTap: () {
+          // Training splits definition
+          final Map<String, Map<String, List<Map<String, String>>>> trainingSplits = {
+            "Push/Pull/Legs": {
+              "Push": exerciseData["Chest"]! + exerciseData["Shoulders"]! + exerciseData["Triceps"]!,
+              "Pull": exerciseData["Back"]! + exerciseData["Biceps"]!,
+              "Legs": exerciseData["Legs"]!,
+            },
+            "Bro Split": {
+              "Chest Day": exerciseData["Chest"]!,
+              "Back Day": exerciseData["Back"]!,
+              "Shoulder Day": exerciseData["Shoulders"]!,
+              "Arm Day": exerciseData["Biceps"]! + exerciseData["Triceps"]!,
+              "Leg Day": exerciseData["Legs"]!,
+              "Abs Day": exerciseData["Abs"]!,
+            },
+          };
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => SplitScreen(
+                splitName: splitName,
+                splitData: trainingSplits[splitName]!,
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }

@@ -1,4 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:fitlog/view/account_screen.dart';
+import 'package:fitlog/view/cycle_tracking_screen.dart';
+import 'package:fitlog/view/dashboard.dart';
+import 'package:fitlog/view/hydration_settings_screen.dart';
+import 'package:fitlog/view/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'firebase_options.dart';
 import 'view/fuel_log_screen.dart';

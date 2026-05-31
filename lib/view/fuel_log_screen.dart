@@ -14,7 +14,6 @@ class _FuelLogScreenState extends State<FuelLogScreen> {
   static const Color textColor = Colors.white;
   static const Color secondaryTextColor = Color(0xFF8E8E8E);
   static const Color orangeColor = Color(0xFFFF5A1F);
-  static const Color cyanColor = Color(0xFF00E5FF);
 
   // Data starts at 0 for all meals
   Map<String, double> meals = {
@@ -39,15 +38,13 @@ class _FuelLogScreenState extends State<FuelLogScreen> {
     if (now.day != _lastResetDate.day || 
         now.month != _lastResetDate.month || 
         now.year != _lastResetDate.year) {
-      setState(() {
-        meals = {
-          'Breakfast': 0,
-          'Lunch': 0,
-          'Dinner': 0,
-          'Snacks': 0,
-        };
-        _lastResetDate = now;
-      });
+      meals = {
+        'Breakfast': 0,
+        'Lunch': 0,
+        'Dinner': 0,
+        'Snacks': 0,
+      };
+      _lastResetDate = now;
     }
   }
 
@@ -119,7 +116,7 @@ class _FuelLogScreenState extends State<FuelLogScreen> {
           style: const TextStyle(color: textColor, fontSize: 18),
           decoration: InputDecoration(
             hintText: "0",
-            hintStyle: TextStyle(color: secondaryTextColor.withOpacity(0.3)),
+            hintStyle: TextStyle(color: secondaryTextColor.withValues(alpha: 0.3)),
             enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF333333))),
             focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: accentColor)),
           ),
@@ -237,7 +234,6 @@ class _FuelLogScreenState extends State<FuelLogScreen> {
                       ],
                     ),
                     const SizedBox(height: 32),
-                    // Intake Progress (Burned section removed)
                     _buildIntakeProgress(
                       label: 'DAILY GOAL PROGRESS',
                       value: intake.toInt().toString(),
@@ -299,38 +295,6 @@ class _FuelLogScreenState extends State<FuelLogScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: accentColor,
-        shape: const CircleBorder(),
-        child: const Icon(Icons.shopping_cart_outlined, color: Colors.black),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.black,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: accentColor,
-        unselectedItemColor: Colors.white,
-        selectedFontSize: 10,
-        unselectedFontSize: 10,
-        currentIndex: 2,
-        items: [
-          const BottomNavigationBarItem(icon: Icon(Icons.dashboard_outlined), label: 'Dash'),
-          const BottomNavigationBarItem(icon: Icon(Icons.fitness_center), label: 'Train'),
-          BottomNavigationBarItem(
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: accentColor,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.restaurant_menu, color: Colors.black),
-            ),
-            label: 'Fuel',
-          ),
-          const BottomNavigationBarItem(icon: Icon(Icons.analytics_outlined), label: 'Goals'),
-          const BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Admin'),
-        ],
-      ),
     );
   }
 
@@ -373,10 +337,10 @@ class _FuelLogScreenState extends State<FuelLogScreen> {
               child: const Icon(Icons.restaurant, color: Colors.grey, size: 24),
             ),
             const SizedBox(width: 16),
-            Expanded(
+            const Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     'Dinner',
                     style: TextStyle(color: textColor, fontSize: 16, fontWeight: FontWeight.bold),

@@ -5,6 +5,7 @@ import 'library.dart';
 import 'activity_screen.dart';
 import 'features_screen.dart';
 import 'account_screen.dart';
+import 'fuel_log_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -18,8 +19,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   final List<Widget> _screens = [
     const DashboardContent(),
-    FeaturesScreen(),
     const LibraryScreen(),
+    const FuelLogScreen(),
     const ActivityScreen(),
     const AccountScreen(),
   ];
@@ -32,36 +33,50 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    const accentColor = Color(0xFFD4FF00);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF121212),
-      body: _screens[_selectedIndex],
+      backgroundColor: const Color(0xFF0C0C0C),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _screens,
+      ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color(0xFF121212),
-        selectedItemColor: const Color(0xFFCCFF00),
-        unselectedItemColor: Colors.grey,
+        backgroundColor: Colors.black,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: accentColor,
+        unselectedItemColor: Colors.white,
+        selectedFontSize: 10,
+        unselectedFontSize: 10,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: "Home",
+        items: [
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard_outlined),
+            label: 'Dash',
+          ),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.fitness_center),
+            label: 'Train',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.featured_video_outlined),
-            label: "Features",
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(
+                color: accentColor,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.restaurant_menu, color: Colors.black),
+            ),
+            label: 'Fuel',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.library_add),
-            label: "Library",
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.analytics_outlined),
+            label: 'Goals',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: "Activity",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: "Profile",
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: 'Admin',
           ),
         ],
       ),
@@ -107,21 +122,40 @@ class _DashboardContentState extends State<DashboardContent> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 40),
-            const Text(
-              "WELCOME BACK, COMMANDER",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              "A step ahead than yesterday",
-              style: TextStyle(
-                color: Color(0xFFCCFF00),
-                fontSize: 16,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "WELCOME BACK, COMMANDER",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      "A step ahead than yesterday",
+                      style: TextStyle(
+                        color: Color(0xFFCCFF00),
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+                IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => FeaturesScreen()),
+                    );
+                  },
+                  icon: const Icon(Icons.grid_view_rounded, color: Color(0xFFCCFF00)),
+                ),
+              ],
             ),
             const SizedBox(height: 30),
             Center(

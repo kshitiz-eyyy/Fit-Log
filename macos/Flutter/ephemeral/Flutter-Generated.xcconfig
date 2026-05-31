@@ -1,13 +1,7 @@
 // This is a generated file; do not edit or check into version control.
-<<<<<<< HEAD
 FLUTTER_ROOT=/Users/dada/Documents/flutter
 FLUTTER_APPLICATION_PATH=/Users/dada/Documents/Fit-Log
 FLUTTER_FRAMEWORK_SWIFT_PACKAGE_PATH=/Users/dada/Documents/Fit-Log/macos/Flutter/ephemeral/Packages/.packages/FlutterFramework
-=======
-FLUTTER_ROOT=C:\flutter
-FLUTTER_APPLICATION_PATH=E:\FitLog Project\Fitlog
-FLUTTER_FRAMEWORK_SWIFT_PACKAGE_PATH=E:\FitLog Project\Fitlog\macos\Flutter\ephemeral\Packages\.packages\FlutterFramework
->>>>>>> fa5419a6feadf0df5a9bb965f23933aa3b521a44
 COCOAPODS_PARALLEL_CODE_SIGN=true
 FLUTTER_BUILD_DIR=build
 FLUTTER_BUILD_NAME=1.0.0
