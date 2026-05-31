@@ -9,6 +9,7 @@ import 'view/change_password_screen.dart';
 import 'view/dashboard.dart';
 import 'view/features_screen.dart';
 import 'view/splash_screen.dart';
+import 'view/workout_tracking_screen.dart';
 
 void main() {
   runApp(const FitLogApp());

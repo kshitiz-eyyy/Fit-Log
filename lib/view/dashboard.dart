@@ -92,7 +92,6 @@ class _DashboardContentState extends State<_DashboardContent> {
     setState(() {
       internalCaloriesEaten = prefs.getInt('total_calories_eaten') ?? 0;
 
-      // Pull dynamic BMI scores
       double weight = prefs.getDouble('user_weight') ?? 70.0;
       double height = prefs.getDouble('user_height') ?? 175.0;
       int age = prefs.getInt('user_age') ?? 25;
@@ -112,11 +111,9 @@ class _DashboardContentState extends State<_DashboardContent> {
         bmiStatusText = "Obese Range";
       }
 
-      // Handle calorie targets based on setup states
       if (prefs.containsKey('target_calories')) {
         currentTargetCalories = prefs.getInt('target_calories') ?? 2500;
       } else {
-        // Fallback calculations matching user constraints instantly
         double bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
         currentTargetCalories = (bmr * 1.375).round();
       }
@@ -132,8 +129,17 @@ class _DashboardContentState extends State<_DashboardContent> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF0F0F0F),
         elevation: 0,
+        centerTitle: true,
         leading: IconButton(icon: const Icon(Icons.menu, color: Colors.white), onPressed: () {}),
-        title: const Text("Fit Log", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+        title: const Text(
+          "FIT LOG",
+          style: TextStyle(
+            color: Color(0xFFCCFF00),
+            fontSize: 22,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.5,
+          ),
+        ),
         actions: [
           IconButton(icon: const Icon(Icons.notifications_none, color: Colors.white), onPressed: widget.onNavigateToActivity),
           Padding(
@@ -354,7 +360,7 @@ class _DashboardContentState extends State<_DashboardContent> {
               child: _actionButton("Log Meal", Icons.restaurant, Colors.orangeAccent, () async {
                 await Navigator.push(context, MaterialPageRoute(builder: (context) => const MealTrackingScreen()));
                 _loadDashboardData();
-              }),
+              }, textColor: Colors.black),
             ),
             Container(
               padding: const EdgeInsets.all(16),
