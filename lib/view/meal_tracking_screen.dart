@@ -51,29 +51,28 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
   Future<void> _loadStateAndData() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Load BMI specifications
     savedWeight = prefs.getDouble('user_weight') ?? 70.0;
     savedHeight = prefs.getDouble('user_height') ?? 175.0;
     savedAge = prefs.getInt('user_age') ?? 25;
 
-    // Read existing targets or auto-calculate based on BMI fallback
     if (prefs.containsKey('target_calories')) {
       targetCalories = prefs.getInt('target_calories') ?? 2500;
       targetProtein = prefs.getInt('target_protein') ?? 150;
       targetCarbs = prefs.getInt('target_carbs') ?? 250;
       targetFats = prefs.getInt('target_fats') ?? 70;
     } else {
-      // Automatic Baseline Calculation from raw BMI metrics
       double bmr = (10 * savedWeight) + (6.25 * savedHeight) - (5 * savedAge) + 5;
-      double tdee = bmr * 1.375; // Baseline Light Activity multiplier
+      double tdee = bmr * 1.375;
       targetCalories = tdee.round();
       targetProtein = (savedWeight * 1.8).round();
       targetFats = ((targetCalories * 0.25) / 9).round();
       targetCarbs = ((targetCalories - (targetProtein * 4) - (targetFats * 9)) / 4).round();
     }
 
-    // Load any logged meal items stored in JSON formats
-    String? mealsJson = prefs.getString('logged_meals_data');
+    DateTime now = DateTime.now();
+    String dateKey = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+    String? mealsJson = prefs.getString('meals_$dateKey') ?? prefs.getString('logged_meals_data');
+
     if (mealsJson != null) {
       Map<String, dynamic> decoded = jsonDecode(mealsJson);
       decoded.forEach((key, value) {
@@ -89,7 +88,6 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
       });
     }
 
-    // Load custom AI targets
     String? aiJson = prefs.getString('ai_recommendations_data');
     if (aiJson != null) {
       Map<String, dynamic> decodedAi = jsonDecode(aiJson);
@@ -104,7 +102,9 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
   Future<void> _saveMealState() async {
     final prefs = await SharedPreferences.getInstance();
 
-    // Map objects to serializable maps
+    DateTime now = DateTime.now();
+    String dateKey = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+
     Map<String, dynamic> mealsMap = {};
     loggedMeals.forEach((key, value) {
       mealsMap[key] = {
@@ -115,6 +115,9 @@ class _MealTrackingScreenState extends State<MealTrackingScreen> {
         'fats': value.fats,
       };
     });
+
+    await prefs.setString('meals_$dateKey', jsonEncode(mealsMap));
+    await prefs.setInt('calories_$dateKey', totalCaloriesEaten);
 
     await prefs.setString('logged_meals_data', jsonEncode(mealsMap));
     await prefs.setString('ai_recommendations_data', jsonEncode(aiRecommendations));
