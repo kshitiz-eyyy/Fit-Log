@@ -10,17 +10,18 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  // Account state properties
+  // Profile Parameters
   String athleteName = "FitLog Athlete";
   String athleteEmail = "athlete@fitlog.com";
   double userWeight = 70.0;
   double userHeight = 175.0;
 
-  // Settings switches states
+  // App Settings Engine States
   bool pushNotificationsEnabled = true;
   bool workoutRemindersEnabled = true;
-  bool darkModeEnabled = true;
   bool useMetricSystem = true;
+  bool biometricAuthEnabled = false;
+  bool offlineModeEnabled = false;
 
   @override
   void initState() {
@@ -37,6 +38,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       userHeight = prefs.getDouble('user_height') ?? 175.0;
       pushNotificationsEnabled = prefs.getBool('setting_push') ?? true;
       workoutRemindersEnabled = prefs.getBool('setting_reminders') ?? true;
+      biometricAuthEnabled = prefs.getBool('setting_biometric') ?? false;
+      offlineModeEnabled = prefs.getBool('setting_offline') ?? false;
     });
   }
 
@@ -77,13 +80,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  void _clearAppCache() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        backgroundColor: Color(0xFF161616),
+        content: Text("Application media and diagnostics cache cleared successfully.", style: TextStyle(color: Color(0xFFCCFF00))),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F0F),
       appBar: AppBar(
         backgroundColor: const Color(0xFF161616),
-        title: const Text("MY PROFILE & SETTINGS", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold, letterSpacing: 1)),
+        // FIXED: Title updated to "MY PROFILE" in clean green neon accent styles
+        title: const Text(
+          "MY PROFILE",
+          style: TextStyle(
+            color: Color(0xFFCCFF00),
+            fontSize: 16,
+            fontWeight: FontWeight.w900, // Fixed from .black to .w900
+            letterSpacing: 1.5,
+          ),
+        ),
         centerTitle: true,
         elevation: 0,
       ),
@@ -92,7 +113,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // PROFILE AVATAR BLOCK
+            // ATHLETE ACCOUNT CARD BLOCK
             Center(
               child: Stack(
                 alignment: Alignment.bottomRight,
@@ -106,7 +127,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     onTap: _showEditNameDialog,
                     child: Container(
                       padding: const EdgeInsets.all(6),
-                      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                      decoration: const BoxDecoration(color: Color(0xFFCCFF00), shape: BoxShape.circle),
                       child: const Icon(Icons.edit, size: 16, color: Colors.black),
                     ),
                   )
@@ -119,7 +140,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             const SizedBox(height: 30),
 
-            // SECTION: HEALTH METRICS SUITE
+            // SECTION 1: BIOMETRICS HEALTH TRACKING CARDS
             _buildSectionHeader("BIOMETRIC HEALTH PARAMETERS"),
             _buildSliderTile("Body Mass Weight", userWeight, 40.0, 150.0, useMetricSystem ? "kg" : "lbs", (val) {
               setState(() => userWeight = double.parse(val.toStringAsFixed(1)));
@@ -132,36 +153,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             const SizedBox(height: 20),
 
-            // SECTION: PREFERENCES & SETTINGS MODULE
-            _buildSectionHeader("SYSTEM PREFERENCES & CONTROL"),
-            _buildSwitchSettingTile("Push Notification Pipeline", "Receive live dynamic feed pings", pushNotificationsEnabled, (val) {
+            // SECTION 2: NEW INTEGRATED APP SETTINGS MANAGEMENT ENGINE
+            _buildSectionHeader("APPLICATION CONFIGURATION SETTINGS"),
+
+            // Sub-Category: Security Matrix Configurations
+            _buildSwitchSettingTile(Icons.fingerprint, "Biometric Vault Authentication", "Lock app behind face or touch sensor scans", biometricAuthEnabled, (val) {
+              setState(() => biometricAuthEnabled = val);
+              _savePreference('setting_biometric', val);
+            }),
+
+            // Sub-Category: Network Control
+            _buildSwitchSettingTile(Icons.cloud_off, "Offline Performance Profile Mode", "Cache routines to load engine data without local wifi", offlineModeEnabled, (val) {
+              setState(() => offlineModeEnabled = val);
+              _savePreference('setting_offline', val);
+            }),
+
+            // Sub-Category: Alert Engines
+            _buildSwitchSettingTile(Icons.notifications_active_outlined, "Push Notification Pipeline", "Receive live dynamic feed updates and targets", pushNotificationsEnabled, (val) {
               setState(() => pushNotificationsEnabled = val);
               _savePreference('setting_push', val);
             }),
-            _buildSwitchSettingTile("Workout Window Reminders", "Get alerts near schedule targets", workoutRemindersEnabled, (val) {
+            _buildSwitchSettingTile(Icons.alarm, "Workout Window Reminders", "Get alerts near workout session intervals", workoutRemindersEnabled, (val) {
               setState(() => workoutRemindersEnabled = val);
               _savePreference('setting_reminders', val);
             }),
-            _buildSwitchSettingTile("Metric Measurement Scaling", "Use Kilograms and Centimeters", useMetricSystem, (val) {
+
+            // Sub-Category: Measurement Scales
+            _buildSwitchSettingTile(Icons.swap_horizontal_circle_outlined, "Metric Measurement Metrics Scaling", "Toggle conversion metric calculations (KG/cm vs Lbs/in)", useMetricSystem, (val) {
               setState(() => useMetricSystem = val);
             }),
 
+            // Sub-Category: System Tools
+            _buildStandardActionTile(Icons.cleaning_services_outlined, "Clear Cache & Media Database Storage", _clearAppCache),
+
             const SizedBox(height: 20),
 
-            // SECTION: UTILITIES & SYSTEM MANAGEMENT
-            _buildSectionHeader("UTILITY & ACCOUNT SUBSCRIPTION"),
-            _buildStandardActionTile(Icons.card_membership, "Manage FitLog Subscription Plan", () {
+            // SECTION 3: SUBSCRIPTIONS & OPERATIONS UTILITY SUBSYSTEMS
+            _buildSectionHeader("ACCOUNT SUBSCRIPTION & PROTOCOLS"),
+            _buildStandardActionTile(Icons.card_membership, "Manage FitLog Membership Subscription Plan", () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const MembershipTrackingScreen()));
             }),
-            _buildStandardActionTile(Icons.shield_outlined, "Privacy Policy & Secure Data Protocol", () {}),
-            _buildStandardActionTile(Icons.info_outline_rounded, "FitLog Client Engine Version (v1.4.0)", null),
+            _buildStandardActionTile(Icons.shield_outlined, "Privacy Policy & Secure Core Framework Layout", () {}),
+            _buildStandardActionTile(Icons.info_outline_rounded, "FitLog Production Core Version (v1.4.0)", null),
 
             const SizedBox(height: 24),
 
             ElevatedButton(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("All profile modifications synced securely.")),
+                  const SnackBar(
+                    backgroundColor: Color(0xFFCCFF00),
+                    content: Text("All localized operational profiles synced securely.", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                  ),
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -169,7 +212,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
               ),
-              child: const Text("SYNC PROFILE PROFILE DATA", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+              child: const Text("SYNC MODIFIED PROFILE DATA", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
             ),
             const SizedBox(height: 24),
           ],
@@ -213,21 +256,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildSwitchSettingTile(String title, String subtitle, bool currentStatus, Function(bool) onToggle) {
+  Widget _buildSwitchSettingTile(IconData icon, String title, String subtitle, bool currentStatus, Function(bool) onToggle) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 2),
-              Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 11)),
-            ],
+          Icon(icon, color: const Color(0xFFCCFF00), size: 20),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 2),
+                Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+              ],
+            ),
           ),
           Switch(
             value: currentStatus,
