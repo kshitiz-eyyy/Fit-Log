@@ -22,11 +22,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
 
   List<Widget> get _screens => [
-    _DashboardContent(onNavigateToActivity: () => _onItemTapped(3)),
+    _DashboardContent(
+      onNavigateToActivity: () => _onItemTapped(3),
+      onNavigateToProfile: () => _onItemTapped(4),
+    ),
     FeaturesScreen(),
     LibraryScreen(),
     const ActivityScreen(),
-    const Center(child: Text("PROFILE", style: TextStyle(color: Colors.white))),
+    const ProfileContent(), // Full Profile Screen Architecture Integrated
   ];
 
   void _onItemTapped(int index) {
@@ -35,7 +38,91 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
     return Scaffold(
+      key: scaffoldKey,
+      // Left Navigation Drawer Menu (Triggered by the top-left 3 lines)
+      drawer: Drawer(
+        backgroundColor: const Color(0xFF121212),
+        child: Column(
+          children: [
+            DrawerHeader(
+              decoration: const BoxDecoration(color: Color(0xFF161616)),
+              child: Row(
+                children: [
+                  const CircleAvatar(
+                    radius: 30,
+                    backgroundColor: Color(0xFFCCFF00),
+                    child: Icon(Icons.person, color: Colors.black, size: 35),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text("FitLog Athlete", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text("Pro Premium Member", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 12)),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.dashboard, color: Colors.white),
+              title: const Text("Dashboard Home", style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                _onItemTapped(0);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person, color: Colors.white),
+              title: const Text("My Profile", style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                _onItemTapped(4);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.calculate, color: Colors.white),
+              title: const Text("BMI Engine Analyzer", style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const BMICalculatorScreen()));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.timer, color: Colors.white),
+              title: const Text("Workout Session Timer", style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const WorkoutTimerScreen()));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.card_membership, color: Colors.white),
+              title: const Text("Membership Operations", style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const MembershipTrackingScreen()));
+              },
+            ),
+            const Divider(color: Color(0xFF262626)),
+            const Spacer(),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.redAccent),
+              title: const Text("Sign Out Session", style: TextStyle(color: Colors.redAccent)),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF0F0F0F),
@@ -58,7 +145,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
 class _DashboardContent extends StatefulWidget {
   final VoidCallback onNavigateToActivity;
-  const _DashboardContent({required this.onNavigateToActivity});
+  final VoidCallback onNavigateToProfile;
+
+  const _DashboardContent({
+    required this.onNavigateToActivity,
+    required this.onNavigateToProfile,
+  });
 
   @override
   State<_DashboardContent> createState() => _DashboardContentState();
@@ -94,7 +186,6 @@ class _DashboardContentState extends State<_DashboardContent> {
 
       double weight = prefs.getDouble('user_weight') ?? 70.0;
       double height = prefs.getDouble('user_height') ?? 175.0;
-      int age = prefs.getInt('user_age') ?? 25;
 
       double heightInMeters = height / 100;
       if (heightInMeters > 0) {
@@ -117,7 +208,11 @@ class _DashboardContentState extends State<_DashboardContent> {
         backgroundColor: const Color(0xFF0F0F0F),
         elevation: 0,
         centerTitle: true,
-        leading: IconButton(icon: const Icon(Icons.menu, color: Colors.white), onPressed: () {}),
+        // Left Icon triggers Scaffold context's Drawer panel layout
+        leading: IconButton(
+          icon: const Icon(Icons.menu, color: Colors.white),
+          onPressed: () => Scaffold.of(context).openDrawer(),
+        ),
         title: const Text(
           "FIT LOG",
           style: TextStyle(
@@ -128,12 +223,19 @@ class _DashboardContentState extends State<_DashboardContent> {
           ),
         ),
         actions: [
-          IconButton(icon: const Icon(Icons.notifications_none, color: Colors.white), onPressed: widget.onNavigateToActivity),
+          IconButton(
+            icon: const Icon(Icons.notifications_none, color: Colors.white),
+            onPressed: widget.onNavigateToActivity, // Strictly bound to internal button tap
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: GestureDetector(
-              onTap: widget.onNavigateToActivity,
-              child: const CircleAvatar(radius: 16, backgroundColor: Colors.grey, child: Icon(Icons.person, size: 20, color: Colors.black)),
+              onTap: widget.onNavigateToProfile, // FIXED: Corrected mapping path to point to full Profile view
+              child: const CircleAvatar(
+                radius: 16,
+                backgroundColor: Colors.grey,
+                child: Icon(Icons.person, size: 20, color: Colors.black),
+              ),
             ),
           )
         ],
@@ -423,6 +525,78 @@ class _DashboardContentState extends State<_DashboardContent> {
         icon: Icon(icon, color: textColor),
         label: Text(text, style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
         style: ElevatedButton.styleFrom(backgroundColor: color, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
+      ),
+    );
+  }
+}
+
+// Complete, High-Quality Profile Interface View Model Configuration
+class ProfileContent extends StatelessWidget {
+  const ProfileContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0F0F0F),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF161616),
+        title: const Text("MY PROFILE", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1)),
+        centerTitle: true,
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            const SizedBox(height: 10),
+            const CircleAvatar(
+              radius: 50,
+              backgroundColor: Color(0xFFCCFF00),
+              child: Icon(Icons.person, size: 60, color: Colors.black),
+            ),
+            const SizedBox(height: 16),
+            const Text("FitLog Athlete", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+            const Text("athlete@fitlog.com", style: TextStyle(color: Colors.grey, fontSize: 14)),
+            const SizedBox(height: 24),
+            _profileStatTile(Icons.fitness_center, "Active Tier", "Premium Pro Access"),
+            _profileStatTile(Icons.monitor_weight_outlined, "Target Framework", "Hypertrophy Recomp"),
+            _profileStatTile(Icons.calendar_month, "Join Date", "June 2026"),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const MembershipTrackingScreen()));
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFCCFF00),
+                minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+              ),
+              child: const Text("EDIT MEMBERSHIP PROFILE", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _profileStatTile(IconData icon, String title, String subtitle) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
+      child: Row(
+        children: [
+          Icon(icon, color: const Color(0xFFCCFF00)),
+          const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+              const SizedBox(height: 2),
+              Text(subtitle, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+            ],
+          )
+        ],
       ),
     );
   }
