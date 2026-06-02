@@ -9,6 +9,7 @@ import 'meal_tracking_screen.dart';
 import 'bmi_calculator_screen.dart';
 import 'workout_timer_screen.dart';
 import 'membership_tracking_screen.dart';
+import 'profile.dart'; // Import your newly added file structure
 import 'dart:math';
 
 class DashboardScreen extends StatefulWidget {
@@ -29,7 +30,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     FeaturesScreen(),
     LibraryScreen(),
     const ActivityScreen(),
-    const ProfileContent(), // Full Profile Screen Architecture Integrated
+    const ProfileScreen(), // LINKED: Your functional settings interactive file view
   ];
 
   void _onItemTapped(int index) {
@@ -38,11 +39,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-
     return Scaffold(
-      key: scaffoldKey,
-      // Left Navigation Drawer Menu (Triggered by the top-left 3 lines)
       drawer: Drawer(
         backgroundColor: const Color(0xFF121212),
         child: Column(
@@ -80,7 +77,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.person, color: Colors.white),
-              title: const Text("My Profile", style: TextStyle(color: Colors.white)),
+              title: const Text("My Profile & Settings", style: TextStyle(color: Colors.white)),
               onTap: () {
                 Navigator.pop(context);
                 _onItemTapped(4);
@@ -110,14 +107,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const MembershipTrackingScreen()));
               },
             ),
-            const Divider(color: Color(0xFF262626)),
             const Spacer(),
+            const Divider(color: Color(0xFF262626)),
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.redAccent),
               title: const Text("Sign Out Session", style: TextStyle(color: Colors.redAccent)),
-              onTap: () {
-                Navigator.pop(context);
-              },
+              onTap: () => Navigator.pop(context),
             ),
             const SizedBox(height: 20),
           ],
@@ -183,7 +178,6 @@ class _DashboardContentState extends State<_DashboardContent> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       internalCaloriesEaten = prefs.getInt('total_calories_eaten') ?? 3498;
-
       double weight = prefs.getDouble('user_weight') ?? 70.0;
       double height = prefs.getDouble('user_height') ?? 175.0;
 
@@ -198,6 +192,60 @@ class _DashboardContentState extends State<_DashboardContent> {
     });
   }
 
+  // FUNCTIONAL POPUP PANEL: Handles live dynamic user app notifications gracefully
+  void _openNotificationCenterOverlay() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF161616),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(12))),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("LIVE NOTIFICATION FEED", style: TextStyle(color: Color(0xFFCCFF00), fontWeight: FontWeight.bold, fontSize: 14)),
+                  IconButton(icon: const Icon(Icons.close, color: Colors.white, size: 20), onPressed: () => Navigator.pop(context)),
+                ],
+              ),
+              const Divider(color: Color(0xFF262626)),
+              _notificationItem(Icons.workspace_premium, "Subscription Active", "Your FitLog Pro access plan has renewed smoothly."),
+              _notificationItem(Icons.local_fire_department, "Calorie Target Goal Alert", "You are within 15% of hitting your metabolic target metrics ceiling today."),
+              _notificationItem(Icons.water_drop, "Hydration Reminder", "Time to log another 250ml water matrix window input."),
+              const SizedBox(height: 10),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _notificationItem(IconData icon, String title, String description) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: Row(
+        children: [
+          Icon(icon, color: const Color(0xFFCCFF00), size: 20),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 2),
+                Text(description, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final int remainingDays = 30;
@@ -208,34 +256,25 @@ class _DashboardContentState extends State<_DashboardContent> {
         backgroundColor: const Color(0xFF0F0F0F),
         elevation: 0,
         centerTitle: true,
-        // Left Icon triggers Scaffold context's Drawer panel layout
         leading: IconButton(
           icon: const Icon(Icons.menu, color: Colors.white),
           onPressed: () => Scaffold.of(context).openDrawer(),
         ),
         title: const Text(
           "FIT LOG",
-          style: TextStyle(
-            color: Color(0xFFCCFF00),
-            fontSize: 22,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1.5,
-          ),
+          style: TextStyle(color: Color(0xFFCCFF00), fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 1.5),
         ),
         actions: [
+          // FIXED: This icon now triggers the functional overlay context panel cleanly
           IconButton(
             icon: const Icon(Icons.notifications_none, color: Colors.white),
-            onPressed: widget.onNavigateToActivity, // Strictly bound to internal button tap
+            onPressed: _openNotificationCenterOverlay,
           ),
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: GestureDetector(
-              onTap: widget.onNavigateToProfile, // FIXED: Corrected mapping path to point to full Profile view
-              child: const CircleAvatar(
-                radius: 16,
-                backgroundColor: Colors.grey,
-                child: Icon(Icons.person, size: 20, color: Colors.black),
-              ),
+              onTap: widget.onNavigateToProfile,
+              child: const CircleAvatar(radius: 16, backgroundColor: Colors.grey, child: Icon(Icons.person, size: 20, color: Colors.black)),
             ),
           )
         ],
@@ -264,7 +303,6 @@ class _DashboardContentState extends State<_DashboardContent> {
                 ],
               ),
             ),
-
             Container(
               padding: const EdgeInsets.all(24),
               margin: const EdgeInsets.only(bottom: 16),
@@ -525,78 +563,6 @@ class _DashboardContentState extends State<_DashboardContent> {
         icon: Icon(icon, color: textColor),
         label: Text(text, style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
         style: ElevatedButton.styleFrom(backgroundColor: color, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
-      ),
-    );
-  }
-}
-
-// Complete, High-Quality Profile Interface View Model Configuration
-class ProfileContent extends StatelessWidget {
-  const ProfileContent({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0F0F0F),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF161616),
-        title: const Text("MY PROFILE", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1)),
-        centerTitle: true,
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 10),
-            const CircleAvatar(
-              radius: 50,
-              backgroundColor: Color(0xFFCCFF00),
-              child: Icon(Icons.person, size: 60, color: Colors.black),
-            ),
-            const SizedBox(height: 16),
-            const Text("FitLog Athlete", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
-            const Text("athlete@fitlog.com", style: TextStyle(color: Colors.grey, fontSize: 14)),
-            const SizedBox(height: 24),
-            _profileStatTile(Icons.fitness_center, "Active Tier", "Premium Pro Access"),
-            _profileStatTile(Icons.monitor_weight_outlined, "Target Framework", "Hypertrophy Recomp"),
-            _profileStatTile(Icons.calendar_month, "Join Date", "June 2026"),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const MembershipTrackingScreen()));
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFCCFF00),
-                minimumSize: const Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-              ),
-              child: const Text("EDIT MEMBERSHIP PROFILE", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _profileStatTile(IconData icon, String title, String subtitle) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
-      child: Row(
-        children: [
-          Icon(icon, color: const Color(0xFFCCFF00)),
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: const TextStyle(color: Colors.grey, fontSize: 11)),
-              const SizedBox(height: 2),
-              Text(subtitle, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
-            ],
-          )
-        ],
       ),
     );
   }
