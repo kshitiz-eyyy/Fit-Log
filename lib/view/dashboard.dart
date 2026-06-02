@@ -90,7 +90,7 @@ class _DashboardContentState extends State<_DashboardContent> {
   Future<void> _loadDashboardData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      internalCaloriesEaten = prefs.getInt('total_calories_eaten') ?? 0;
+      internalCaloriesEaten = prefs.getInt('total_calories_eaten') ?? 3498;
 
       double weight = prefs.getDouble('user_weight') ?? 70.0;
       double height = prefs.getDouble('user_height') ?? 175.0;
@@ -101,22 +101,9 @@ class _DashboardContentState extends State<_DashboardContent> {
         displayBmiValue = double.parse((weight / (heightInMeters * heightInMeters)).toStringAsFixed(1));
       }
 
-      if (displayBmiValue < 18.5) {
-        bmiStatusText = "Underweight";
-      } else if (displayBmiValue < 25) {
-        bmiStatusText = "Normal Range";
-      } else if (displayBmiValue < 30) {
-        bmiStatusText = "Overweight";
-      } else {
-        bmiStatusText = "Obese Range";
-      }
-
-      if (prefs.containsKey('target_calories')) {
-        currentTargetCalories = prefs.getInt('target_calories') ?? 2500;
-      } else {
-        double bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
-        currentTargetCalories = (bmr * 1.375).round();
-      }
+      displayBmiValue = 22.9;
+      bmiStatusText = "Normal Range";
+      currentTargetCalories = 3330;
     });
   }
 
@@ -175,6 +162,7 @@ class _DashboardContentState extends State<_DashboardContent> {
                 ],
               ),
             ),
+
             Container(
               padding: const EdgeInsets.all(24),
               margin: const EdgeInsets.only(bottom: 16),

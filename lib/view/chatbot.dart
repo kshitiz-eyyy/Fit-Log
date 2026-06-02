@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 
 class FitnessCoachChatScreen extends StatefulWidget {
   const FitnessCoachChatScreen({super.key});
@@ -20,8 +21,30 @@ class _FitnessCoachChatScreenState extends State<FitnessCoachChatScreen> {
   ];
   bool _isTyping = false;
   String _activeIntent = "";
+  GenerativeModel? _model;
 
-  void _sendMessage() {
+  final String _apiKey = "AQ.Ab8RN6Lb3kj46LrTKifeKnOKpIdtRGkX1M-3B7__f-otGFha5Q";
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeGemini();
+  }
+
+  void _initializeGemini() {
+    _model = GenerativeModel(
+      model: 'gemini-1.5-flash',
+      apiKey: _apiKey,
+      systemInstruction: Content.system(
+          "You are an elite, highly professional AI personal trainer and fitness coach integrated within the FitLog ecosystem. "
+              "Analyze user queries, provide motivating fitness or nutrition advice, and keep instructions actionable. "
+              "Keep your responses concise (2-4 sentences maximum). If the user mentions chest, back, diet, or water, "
+              "give a great contextual reply and tell them you can guide them to that specific dashboard section."
+      ),
+    );
+  }
+
+  void _sendMessage() async {
     final String text = _messageController.text.trim();
     if (text.isEmpty) return;
 
@@ -32,17 +55,43 @@ class _FitnessCoachChatScreenState extends State<FitnessCoachChatScreen> {
     });
     _scrollToBottom();
 
-    Future.delayed(const Duration(seconds: 1, milliseconds: 200), () {
+    _setIntentByKeywords(text);
+
+    try {
+      if (_model == null) throw Exception("Model uninitialized");
+
+      final content = [Content.text(text)];
+      final response = await _model!.generateContent(content);
+      final aiReply = response.text?.trim() ?? "Understood. Let's adjust your metrics for today.";
+
       if (!mounted) return;
       setState(() {
         _isTyping = false;
-        _messages.add({"text": _getAIResponse(text), "isUser": false, "time": _getCurrentTime()});
+        _messages.add({"text": aiReply, "isUser": false, "time": _getCurrentTime()});
       });
+    } catch (e) {
+      await Future.delayed(const Duration(seconds: 1));
+      if (!mounted) return;
+      setState(() {
+        _isTyping = false;
+        _messages.add({"text": _getFallbackAIResponse(text), "isUser": false, "time": _getCurrentTime()});
+      });
+    } finalPath() {
       _scrollToBottom();
-    });
+    }
+    finalPath();
   }
 
-  String _getAIResponse(String query) {
+  void _setIntentByKeywords(String query) {
+    final lower = query.toLowerCase();
+    if (lower.contains("chest") || lower.contains("bench") || lower.contains("push day")) { _activeIntent = "chest"; }
+    else if (lower.contains("back") || lower.contains("pull up") || lower.contains("row")) { _activeIntent = "back"; }
+    else if (lower.contains("diet") || lower.contains("meal") || lower.contains("eat") || lower.contains("calori")) { _activeIntent = "diet"; }
+    else if (lower.contains("water") || lower.contains("hydrat")) { _activeIntent = "water"; }
+    else if (lower.contains("quote") || lower.contains("motivat") || lower.contains("tired")) { _activeIntent = "motivation"; }
+  }
+
+  String _getFallbackAIResponse(String query) {
     final lower = query.toLowerCase();
 
     if (lower.contains("yes") || lower.contains("sure") || lower.contains("ok") || lower.contains("guide") || lower.contains("check")) {
@@ -53,11 +102,11 @@ class _FitnessCoachChatScreenState extends State<FitnessCoachChatScreen> {
       if (_activeIntent == "motivation") { _activeIntent = ""; return "Go to Motivation screen! Open your personal milestones under your profile to track your consecutive active streaks."; }
     }
 
-    if (lower.contains("chest") || lower.contains("bench") || lower.contains("push day")) { _activeIntent = "chest"; return "Since your central nervous system fatigue is tracking exceptionally low today, it's a great opportunity for high-intensity chest tracking. Would you like me to guide you to the Chest Exercise section?"; }
-    if (lower.contains("back") || lower.contains("pull up") || lower.contains("row")) { _activeIntent = "back"; return "Your posterior chain recovery looks optimal today. Would you like me to guide you directly to your customized Back Exercise section?"; }
-    if (lower.contains("diet") || lower.contains("meal") || lower.contains("eat") || lower.contains("calori")) { _activeIntent = "diet"; return "Current Metric Status: You've consumed 1,840 out of your 2,600 kcal ceiling. Would you like me to point you to the Meal Log section to manage your dynamic target macros?"; }
-    if (lower.contains("water") || lower.contains("hydrat")) { _activeIntent = "water"; return "Your current system records sit at 2.4 Liters logged. Do you want me to show you how to update your daily inputs on the Hydration section?"; }
-    if (lower.contains("quote") || lower.contains("motivat") || lower.contains("tired")) { _activeIntent = "motivation"; return "⚡️ Protocol Check: 'Discipline is the bridge between goals and accomplishment.' Do you want me to guide you straight to the Motivation screen to see your active streaks?"; }
+    if (_activeIntent == "chest") return "Since your central nervous system fatigue is tracking exceptionally low today, it's a great opportunity for high-intensity chest tracking. Would you like me to guide you to the Chest Exercise section?";
+    if (_activeIntent == "back") return "Your posterior chain recovery looks optimal today. Would you like me to guide you directly to your customized Back Exercise section?";
+    if (_activeIntent == "diet") return "Current Metric Status: You've consumed 1,840 out of your 2,600 kcal ceiling. Would you like me to point you to the Meal Log section to manage your dynamic target macros?";
+    if (_activeIntent == "water") return "Your current system records sit at 2.4 Liters logged. Do you want me to show you how to update your daily inputs on the Hydration section?";
+    if (_activeIntent == "motivation") return "⚡️ Protocol Check: 'Discipline is the bridge between goals and accomplishment.' Do you want me to guide you straight to the Motivation screen to see your active streaks?";
 
     _activeIntent = "";
     return "Understood. Tell me explicitly: are we reviewing your target chest movements, checking back workouts, logging meal data, tracking water baselines, or pulling up motivation windows?";
@@ -106,7 +155,7 @@ class _FitnessCoachChatScreenState extends State<FitnessCoachChatScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
                 Text("AI Coach", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
-                Text("Online • Kinetic Protocol", style: TextStyle(color: Colors.grey, fontSize: 11)),
+                Text("Online • Kinetic Cloud Protocol", style: TextStyle(color: Colors.grey, fontSize: 11)),
               ],
             ),
           ],
