@@ -144,4 +144,25 @@
     <string name="snack">Snack</string>
     <string name="kcal_uppercase">KCAL</string>
 
+    <!-- Water Tracker Strings -->
+    <string name="water_tracker_title">Water Tracker</string>
+    <string name="liters_label">LITERS</string>
+    <string name="water_goal_format">GOAL: %s LITERS</string>
+    <string name="plus_1_cup">+ 1 Cup</string>
+    <string name="plus_500ml">+ 500ml</string>
+    <string name="minus_250ml">- 250ml</string>
+    <string name="reminder_settings_label">REMINDER SETTINGS</string>
+    <string name="frequency_label">Frequency</string>
+    <string name="hydration_log_label">HYDRATION LOG</string>
+    <string name="add_water_btn">+ Add Water</string>
+    <string name="bottled_water_label">Bottled Water</string>
+    <string name="glass_of_water_label">Glass of Water</string>
+    <string name="protein_shake_label">Protein Shake</string>
+    <string name="time_8_45_am">08:45 AM</string>
+    <string name="time_10_15_am">10:15 AM</string>
+    <string name="time_12_30_pm">12:30 PM</string>
+    <string name="vol_500ml">500ml</string>
+    <string name="vol_250ml">250ml</string>
+    <string name="vol_400ml">400ml</string>
+
 </resources>
