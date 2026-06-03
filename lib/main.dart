@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fitlog/binesh/create_profile_screen.dart';
+import 'package:fitlog/binesh/edit_profile_screen.dart';
 import 'package:fitlog/binesh/sleep_screen.dart';
 import 'package:fitlog/binesh/calorie_tracker_screen.dart';
 import 'package:fitlog/view/meal_tracking_screen.dart';
@@ -44,7 +45,7 @@ class FitLogApp extends StatelessWidget {
         ),
       ),
 
-      home: const WaterTrackerScreen(),
+      home: const EditProfileScreen(),
     );
   }
 }

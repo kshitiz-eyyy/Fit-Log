@@ -110,6 +110,11 @@
     <string name="back_button_content_description">Back</string>
 
     <!-- Personal Details Strings -->
+    <string name="settings_title">SETTINGS</string>
+    <string name="edit_profile_title">Edit Profile</string>
+    <string name="discard_changes">DISCARD CHANGES</string>
+    <string name="primary_fitness_goal_label">PRIMARY FITNESS GOAL</string>
+    <string name="weight_loss_conditioning">Weight Loss &amp; Conditioning</string>
     <string name="personal_details_subtitle">Manage your biometric data and identifiers.</string>
     <string name="cm_unit">cm</string>
     <string name="kg_unit">kg</string>

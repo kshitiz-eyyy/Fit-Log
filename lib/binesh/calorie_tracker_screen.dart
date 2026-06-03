@@ -236,20 +236,6 @@ class _CalorieTrackerScreenState extends State<CalorieTrackerScreen> {
         backgroundColor: accentColor,
         child: const Icon(Icons.add, color: Colors.black),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: backgroundColor,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: const Color(0xFF48484A),
-        currentIndex: 0,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.bolt), label: 'Features'),
-          BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: 'Library'),
-          BottomNavigationBarItem(icon: Icon(Icons.directions_run), label: 'Activity'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
-        ],
-      ),
     );
   }
 

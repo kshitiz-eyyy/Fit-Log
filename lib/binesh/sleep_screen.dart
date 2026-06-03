@@ -65,7 +65,6 @@ class _SleepScreenState extends State<SleepScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 
@@ -285,27 +284,6 @@ class _SleepScreenState extends State<SleepScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNavigationBar() {
-    return Theme(
-      data: ThemeData(
-        canvasColor: Colors.black,
-      ),
-      child: BottomNavigationBar(
-        currentIndex: 0,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.bolt), label: 'Features'),
-          BottomNavigationBarItem(icon: Icon(Icons.format_list_bulleted), label: 'Library'),
-          BottomNavigationBarItem(icon: Icon(Icons.directions_run), label: 'Activity'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
-        ],
       ),
     );
   }
