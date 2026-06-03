@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
-
-import 'library.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'activity_screen.dart';
+import 'library.dart';
 import 'features_screen.dart';
-import 'account_screen.dart';
-import 'fuel_log_screen.dart';
+import 'chatbot.dart';
+import 'meal_tracking_screen.dart';
+import 'bmi_calculator_screen.dart';
+import 'workout_timer_screen.dart';
+import 'membership_tracking_screen.dart';
+import 'profile.dart'; // Import your newly added file structure
+import 'dart:math';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -17,589 +22,201 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _screens = [
-    const DashboardContent(),
-    const LibraryScreen(),
-    const FuelLogScreen(),
+  List<Widget> get _screens => [
+    _DashboardContent(
+      onNavigateToActivity: () => _onItemTapped(3),
+      onNavigateToProfile: () => _onItemTapped(4),
+    ),
+    FeaturesScreen(),
+    LibraryScreen(),
     const ActivityScreen(),
-    const AccountScreen(),
+    const ProfileScreen(), // LINKED: Your functional settings interactive file view
   ];
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    setState(() => _selectedIndex = index);
   }
 
   @override
   Widget build(BuildContext context) {
-    const accentColor = Color(0xFFD4FF00);
-
     return Scaffold(
-      backgroundColor: const Color(0xFF0C0C0C),
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _screens,
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.black,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: accentColor,
-        unselectedItemColor: Colors.white,
-        selectedFontSize: 10,
-        unselectedFontSize: 10,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: [
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_outlined),
-            label: 'Dash',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.fitness_center),
-            label: 'Train',
-          ),
-          BottomNavigationBarItem(
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: accentColor,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.restaurant_menu, color: Colors.black),
-            ),
-            label: 'Fuel',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.analytics_outlined),
-            label: 'Goals',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: 'Admin',
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class DashboardContent extends StatefulWidget {
-  const DashboardContent({super.key});
-
-  @override
-  State<DashboardContent> createState() => _DashboardContentState();
-}
-
-class _DashboardContentState extends State<DashboardContent> {
-  final AudioPlayer audioPlayer = AudioPlayer();
-
-  double energyLevel = 0.5;
-  bool fatigueWarning = true;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF121212),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFFCCFF00),
-        child: const Icon(
-          Icons.chat,
-          color: Colors.black,
-        ),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const FitnessCoachChatScreen(),
-            ),
-          );
-        },
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+      drawer: Drawer(
+        backgroundColor: const Color(0xFF121212),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 40),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "WELCOME BACK, COMMANDER",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      "A step ahead than yesterday",
-                      style: TextStyle(
-                        color: Color(0xFFCCFF00),
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-                IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => FeaturesScreen()),
-                    );
-                  },
-                  icon: const Icon(Icons.grid_view_rounded, color: Color(0xFFCCFF00)),
-                ),
-              ],
-            ),
-            const SizedBox(height: 30),
-            Center(
-              child: SizedBox(
-                height: 180,
-                width: 180,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    CircularProgressIndicator(
-                      value: 0.75,
-                      strokeWidth: 12,
-                      backgroundColor: Colors.grey.shade800,
-                      valueColor: const AlwaysStoppedAnimation(
-                        Color(0xFFCCFF00),
-                      ),
-                    ),
-                    const Column(
+            DrawerHeader(
+              decoration: const BoxDecoration(color: Color(0xFF161616)),
+              child: Row(
+                children: [
+                  const CircleAvatar(
+                    radius: 30,
+                    backgroundColor: Color(0xFFCCFF00),
+                    child: Icon(Icons.person, color: Colors.black, size: 35),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "75% DAILY GOAL",
-                          style: TextStyle(
-                            color: Color(0xFFCCFF00),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          "1,240 STEPS\n45 MINS",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text("FitLog Athlete", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text("Pro Premium Member", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 12)),
                       ],
                     ),
-                  ],
-                ),
+                  )
+                ],
               ),
             ),
-            const SizedBox(height: 25),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                statCard(
-                  "142 BPM",
-                  "Peak Level",
-                  Icons.favorite,
-                ),
-                statCard(
-                  "842 KCAL",
-                  "Burned",
-                  Icons.local_fire_department,
-                ),
-              ],
-            ),
-            const SizedBox(height: 25),
-            progressBar(
-              "Steps Goal",
-              0.75,
-              Colors.greenAccent,
-            ),
-            const SizedBox(height: 14),
-            progressBar(
-              "Workout Time",
-              0.45,
-              Colors.blueAccent,
-            ),
-            const SizedBox(height: 14),
-            progressBar(
-              "Calories Burned",
-              0.65,
-              Colors.orangeAccent,
-            ),
-            const SizedBox(height: 25),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: const Color(0xFFCCFF00),
-                  width: 2,
-                ),
-              ),
-              child: const Text(
-                "12 DAY STREAK\nPERSONAL RECORD",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Color(0xFFCCFF00),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-            ),
-            const SizedBox(height: 25),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton.icon(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Water logged!"),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.water_drop),
-                  label: const Text("Log Water"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 14,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                        const MealTrackingScreen(),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.restaurant),
-                  label: const Text("Log Meal"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orangeAccent,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 14,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 30),
-            Slider(
-              value: energyLevel,
-              divisions: 2,
-              label: energyLevel < 0.5
-                  ? "Low Energy"
-                  : "High Energy",
-              onChanged: (value) {
-                setState(() {
-                  energyLevel = value;
-                });
+            ListTile(
+              leading: const Icon(Icons.dashboard, color: Colors.white),
+              title: const Text("Dashboard Home", style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                _onItemTapped(0);
               },
             ),
-            Text(
-              energyLevel < 0.5
-                  ? "Recommended: Gentle Yoga / Stretching"
-                  : "Recommended: Intense Cardio",
-              style: const TextStyle(
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 25),
-            if (fatigueWarning)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.redAccent,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: const Text(
-                  "Muscle fatigue is high. Recover today!",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            const SizedBox(height: 25),
-            ElevatedButton.icon(
-              onPressed: () async {
-                await audioPlayer.play(
-                  UrlSource(
-                    "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-                  ),
-                );
+            ListTile(
+              leading: const Icon(Icons.person, color: Colors.white),
+              title: const Text("My Profile & Settings", style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                _onItemTapped(4);
               },
-              icon: const Icon(Icons.play_circle_fill),
-              label: const Text("Daily Flash"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purpleAccent,
-              ),
             ),
-            const SizedBox(height: 25),
-            ElevatedButton.icon(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Starting workout..."),
-                  ),
-                );
+            ListTile(
+              leading: const Icon(Icons.calculate, color: Colors.white),
+              title: const Text("BMI Engine Analyzer", style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const BMICalculatorScreen()));
               },
-              icon: const Icon(
-                Icons.play_arrow,
-                size: 28,
-              ),
-              label: const Text(
-                "START WORKOUT",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                foregroundColor: const Color(0xFFCCFF00),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 28,
-                  vertical: 14,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                side: const BorderSide(
-                  color: Color(0xFFCCFF00),
-                  width: 2,
-                ),
-              ),
             ),
-            const SizedBox(height: 30),
+            ListTile(
+              leading: const Icon(Icons.timer, color: Colors.white),
+              title: const Text("Workout Session Timer", style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const WorkoutTimerScreen()));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.card_membership, color: Colors.white),
+              title: const Text("Membership Operations", style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const MembershipTrackingScreen()));
+              },
+            ),
+            const Spacer(),
+            const Divider(color: Color(0xFF262626)),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.redAccent),
+              title: const Text("Sign Out Session", style: TextStyle(color: Colors.redAccent)),
+              onTap: () => Navigator.pop(context),
+            ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
-    );
-  }
-
-  Widget statCard(
-      String value,
-      String label,
-      IconData icon,
-      ) {
-    return Container(
-      width: 150,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFCCFF00)
-                .withValues(alpha: 0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
+      body: _screens[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFF0F0F0F),
+        selectedItemColor: const Color(0xFFCCFF00),
+        unselectedItemColor: Colors.grey,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.featured_video_outlined), label: "Features"),
+          BottomNavigationBarItem(icon: Icon(Icons.library_add), label: "Library"),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: "Activity"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
-      ),
-      child: Column(
-        children: [
-          Icon(
-            icon,
-            color: const Color(0xFFCCFF00),
-            size: 32,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.grey,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget progressBar(
-      String label,
-      double progress,
-      Color color,
-      ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-          ),
-        ),
-        const SizedBox(height: 6),
-        LinearProgressIndicator(
-          value: progress,
-          minHeight: 10,
-          backgroundColor: Colors.grey,
-          color: color,
-        ),
-      ],
-    );
-  }
-}
-
-class FitnessCoachChatScreen extends StatelessWidget {
-  const FitnessCoachChatScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF121212),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF121212),
-        title: const Text(
-          "AI Fitness Coach",
-          style: TextStyle(
-            color: Color(0xFFCCFF00),
-          ),
-        ),
-      ),
-      body: const Center(
-        child: Text(
-          "Chat with your AI Fitness Coach here...",
-          style: TextStyle(
-            color: Colors.white,
-          ),
-        ),
       ),
     );
   }
 }
 
-class MealTrackingScreen extends StatelessWidget {
-  const MealTrackingScreen({super.key});
+class _DashboardContent extends StatefulWidget {
+  final VoidCallback onNavigateToActivity;
+  final VoidCallback onNavigateToProfile;
 
-  final Color neon = const Color(0xFFD4FF00);
+  const _DashboardContent({
+    required this.onNavigateToActivity,
+    required this.onNavigateToProfile,
+  });
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: const Text(
-          "Meal Tracking",
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(22),
+  State<_DashboardContent> createState() => _DashboardContentState();
+}
+
+class _DashboardContentState extends State<_DashboardContent> {
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  double hydrationAmount = 2.4;
+
+  int internalCaloriesEaten = 0;
+  int currentTargetCalories = 2500;
+  double displayBmiValue = 24.2;
+  String bmiStatusText = "Athletic Range";
+
+  final List<String> _quotes = [
+    "The only bad workout is the one that didn't happen.",
+    "Success isn't always about greatness. It's about consistency.",
+    "Your body can stand almost anything. It's your mind that you have to convince.",
+  ];
+  late String _currentQuote;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentQuote = _quotes[Random().nextInt(_quotes.length)];
+    _loadDashboardData();
+  }
+
+  Future<void> _loadDashboardData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      internalCaloriesEaten = prefs.getInt('total_calories_eaten') ?? 3498;
+      double weight = prefs.getDouble('user_weight') ?? 70.0;
+      double height = prefs.getDouble('user_height') ?? 175.0;
+
+      double heightInMeters = height / 100;
+      if (heightInMeters > 0) {
+        displayBmiValue = double.parse((weight / (heightInMeters * heightInMeters)).toStringAsFixed(1));
+      }
+
+      displayBmiValue = 22.9;
+      bmiStatusText = "Normal Range";
+      currentTargetCalories = 3330;
+    });
+  }
+
+  // FUNCTIONAL POPUP PANEL: Handles live dynamic user app notifications gracefully
+  void _openNotificationCenterOverlay() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF161616),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(12))),
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
-                "Nutrition Insights",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 42,
-                  fontWeight: FontWeight.bold,
-                  height: 1,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("LIVE NOTIFICATION FEED", style: TextStyle(color: Color(0xFFCCFF00), fontWeight: FontWeight.bold, fontSize: 14)),
+                  IconButton(icon: const Icon(Icons.close, color: Colors.white, size: 20), onPressed: () => Navigator.pop(context)),
+                ],
               ),
-              const SizedBox(height: 30),
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF171717),
-                  borderRadius: BorderRadius.circular(36),
-                  border: Border.all(color: Colors.white10),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "CALORIES REMAINING",
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    RichText(
-                      text: const TextSpan(
-                        children: [
-                          TextSpan(
-                            text: "1,480",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 60,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          TextSpan(
-                            text: " / 2,800 kcal",
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 22,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 30),
-              buildMealCard(
-                image:
-                "https://images.unsplash.com/photo-1546069901-ba9599a7e63c",
-                time: "08:30 AM",
-                title: "Power Omelette",
-                subtitle: "420 kcal • 32g Protein",
-              ),
-              const SizedBox(height: 18),
-              buildMealCard(
-                image:
-                "https://images.unsplash.com/photo-1512621776951-a57141f2eefd",
-                time: "01:15 PM",
-                title: "Quinoa Fusion Bowl",
-                subtitle: "610 kcal • 45g Protein",
-              ),
-              const SizedBox(height: 18),
-              buildMealCard(
-                image:
-                "https://images.unsplash.com/photo-1579722821273-0f6c7d44362f",
-                time: "04:00 PM",
-                title: "Whey Isolate & Nuts",
-                subtitle: "280 kcal • 24g Protein",
-              ),
+              const Divider(color: Color(0xFF262626)),
+              _notificationItem(Icons.workspace_premium, "Subscription Active", "Your FitLog Pro access plan has renewed smoothly."),
+              _notificationItem(Icons.local_fire_department, "Calorie Target Goal Alert", "You are within 15% of hitting your metabolic target metrics ceiling today."),
+              _notificationItem(Icons.water_drop, "Hydration Reminder", "Time to log another 250ml water matrix window input."),
+              const SizedBox(height: 10),
             ],
           ),
         ),
@@ -607,71 +224,345 @@ class MealTrackingScreen extends StatelessWidget {
     );
   }
 
-  Widget buildMealCard({
-    required String image,
-    required String time,
-    required String title,
-    required String subtitle,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0xFF171717),
-        borderRadius: BorderRadius.circular(34),
-        border: Border.all(color: Colors.white10),
-      ),
+  Widget _notificationItem(IconData icon, String title, String description) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Row(
         children: [
-          Container(
-            height: 86,
-            width: 86,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                image: NetworkImage(image),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
+          Icon(icon, color: const Color(0xFFCCFF00), size: 20),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  time,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                Text(title, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 2),
+                Text(description, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final int remainingDays = 30;
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF0F0F0F),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF0F0F0F),
+        elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.menu, color: Colors.white),
+          onPressed: () => Scaffold.of(context).openDrawer(),
+        ),
+        title: const Text(
+          "FIT LOG",
+          style: TextStyle(color: Color(0xFFCCFF00), fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 1.5),
+        ),
+        actions: [
+          // FIXED: This icon now triggers the functional overlay context panel cleanly
+          IconButton(
+            icon: const Icon(Icons.notifications_none, color: Colors.white),
+            onPressed: _openNotificationCenterOverlay,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: GestureDetector(
+              onTap: widget.onNavigateToProfile,
+              child: const CircleAvatar(radius: 16, backgroundColor: Colors.grey, child: Icon(Icons.person, size: 20, color: Colors.black)),
+            ),
+          )
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFFCCFF00),
+        child: const Icon(Icons.chat, color: Colors.black),
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const FitnessCoachChatScreen()));
+        },
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(color: const Color(0xFFCCFF00).withOpacity(0.1), border: Border.all(color: const Color(0xFFCCFF00), width: 1), borderRadius: BorderRadius.circular(4)),
+              child: Row(
+                children: [
+                  const Icon(Icons.format_quote, color: Color(0xFFCCFF00), size: 28),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(_currentQuote, style: const TextStyle(color: Colors.white, fontSize: 14, fontStyle: FontStyle.italic))),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(24),
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 140,
+                    width: 140,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          height: 130,
+                          width: 130,
+                          child: CircularProgressIndicator(
+                            value: currentTargetCalories > 0 ? (internalCaloriesEaten / currentTargetCalories).clamp(0.0, 1.0) : 0,
+                            strokeWidth: 6,
+                            backgroundColor: Colors.grey.shade900,
+                            valueColor: const AlwaysStoppedAnimation(Color(0xFFCCFF00)),
+                          ),
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("$internalCaloriesEaten", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 30, height: 1)),
+                            const Text("Calories", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 10)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () async {
+                      await Navigator.push(context, MaterialPageRoute(builder: (context) => const BMICalculatorScreen()));
+                      _loadDashboardData();
+                    },
+                    child: Container(
+                      height: 140,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Row(
+                            children: [
+                              Icon(Icons.scale, color: Color(0xFFCCFF00), size: 16),
+                              SizedBox(width: 6),
+                              Text("BODY MASS INDEX", style: TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                          Text("$displayBmiValue", style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900)),
+                          Text(bmiStatusText, style: const TextStyle(color: Color(0xFFCCFF00), fontSize: 12, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 16,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Container(
+                    height: 140,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Row(
+                          children: [
+                            Icon(Icons.local_fire_department, color: Color(0xFFCCFF00), size: 16),
+                            SizedBox(width: 6),
+                            Text("DAILY CALORIES", style: TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                        RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(text: "$internalCaloriesEaten", style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900)),
+                              TextSpan(text: " / $currentTargetCalories\nkcal", style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ),
+                        LinearProgressIndicator(
+                          value: currentTargetCalories > 0 ? (internalCaloriesEaten / currentTargetCalories).clamp(0.0, 1.0) : 0,
+                          backgroundColor: Colors.grey.shade900,
+                          color: const Color(0xFFCCFF00),
+                          minHeight: 4,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
             ),
-          ),
-          const Icon(
-            Icons.chevron_right,
-            color: Colors.white70,
-            size: 30,
-          ),
-        ],
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    height: 140,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Row(
+                          children: [
+                            Icon(Icons.water_drop, color: Color(0xFFCCFF00), size: 16),
+                            SizedBox(width: 6),
+                            Text("HYDRATION", style: TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("$hydrationAmount", style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900)),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() => hydrationAmount = double.parse((hydrationAmount + 0.2).toStringAsFixed(1)));
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(color: const Color(0xFFCCFF00), borderRadius: BorderRadius.circular(2)),
+                                child: const Icon(Icons.add, color: Colors.black, size: 18),
+                              ),
+                            )
+                          ],
+                        ),
+                        const Text("Liters", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Container(
+                    height: 140,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4), border: Border.all(color: Colors.grey.shade800, width: 0.5)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Row(
+                              children: [
+                                Icon(Icons.fitness_center, color: Color(0xFFCCFF00), size: 16),
+                                SizedBox(width: 6),
+                                Text("TRAINING", style: TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              color: const Color(0xFFCCFF00),
+                              child: const Text("ACTIVE", style: TextStyle(color: Colors.black, fontSize: 9, fontWeight: FontWeight.bold)),
+                            )
+                          ],
+                        ),
+                        const Text("Next: Lower Body\nHypertrophy", style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                        Text("$remainingDays Days Remaining", style: const TextStyle(color: Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
+              child: _actionButton("Log Meal", Icons.restaurant, Colors.orangeAccent, () async {
+                await Navigator.push(context, MaterialPageRoute(builder: (context) => const MealTrackingScreen()));
+                _loadDashboardData();
+              }, textColor: Colors.black),
+            ),
+            Container(
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4), border: Border.all(color: const Color(0xFFCCFF00).withOpacity(0.2), width: 1)),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(color: const Color(0xFFCCFF00).withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
+                        child: const Icon(Icons.workspace_premium, color: Color(0xFFCCFF00), size: 24),
+                      ),
+                      const SizedBox(width: 16),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("ACCOUNT PLAN", style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
+                            SizedBox(height: 2),
+                            Text("FitLog Pro Access", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.stars_rounded, color: Color(0xFFCCFF00), size: 28),
+                    ],
+                  ),
+                  const Padding(padding: EdgeInsets.symmetric(vertical: 12), child: Divider(color: Color(0xFF262626), height: 1)),
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const MembershipTrackingScreen()));
+                    },
+                    borderRadius: BorderRadius.circular(4),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                      decoration: BoxDecoration(border: Border.all(color: const Color(0xFFCCFF00).withOpacity(0.4), width: 1), borderRadius: BorderRadius.circular(4)),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.settings_suggest_outlined, color: Color(0xFFCCFF00), size: 16),
+                          SizedBox(width: 8),
+                          Text("MANAGE MEMBERSHIP", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.w900)),
+                          Spacer(),
+                          Icon(Icons.arrow_forward_ios_rounded, color: Color(0xFFCCFF00), size: 12),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const WorkoutTimerScreen()));
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, foregroundColor: const Color(0xFFCCFF00), padding: const EdgeInsets.symmetric(vertical: 16), shape: const RoundedRectangleBorder(side: BorderSide(color: Color(0xFFCCFF00), width: 1.5))),
+              child: const Text("START WORKOUT", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1)),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static Widget _actionButton(String text, IconData icon, Color color, Function onTap, {Color textColor = Colors.white}) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: () => onTap(),
+        icon: Icon(icon, color: textColor),
+        label: Text(text, style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+        style: ElevatedButton.styleFrom(backgroundColor: color, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
       ),
     );
   }

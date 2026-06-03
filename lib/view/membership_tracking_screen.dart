@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MembershipTrackingScreen extends StatefulWidget {
   const MembershipTrackingScreen({super.key});
@@ -11,16 +12,43 @@ class MembershipTrackingScreen extends StatefulWidget {
 class _MembershipTrackingScreenState extends State<MembershipTrackingScreen> {
   static const Color neon = Color(0xFFD4FF00);
 
-  /// Dynamic App States (This makes it fully functional)
   bool _isBarcodeExpanded = false;
   bool _isFrozen = false;
   bool _isCheckedIn = false;
   String _membershipTier = "ELITE";
   int _daysLeft = 24;
 
+  int _guestPassesRemaining = 2;
+  bool _lockerClaimed = false;
+  String _assignedLockerNumber = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedStates();
+  }
+
+  Future<void> _loadSavedStates() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _membershipTier = prefs.getString('membership_tier') ?? "ELITE";
+      _isFrozen = prefs.getBool('membership_frozen') ?? false;
+      _daysLeft = prefs.getInt('membership_days_left') ?? 24;
+      _guestPassesRemaining = prefs.getInt('guest_passes_count') ?? 2;
+      _lockerClaimed = prefs.getBool('locker_claimed_state') ?? false;
+      _assignedLockerNumber = prefs.getString('assigned_locker_num') ?? "";
+    });
+  }
+
+  Future<void> _persistState(String key, dynamic value) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (value is String) await prefs.setString(key, value);
+    if (value is bool) await prefs.setBool(key, value);
+    if (value is int) await prefs.setInt(key, value);
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Dynamically update UI assets based on upgraded state
     final Color tierColor = _membershipTier == "PLATINUM" ? const Color(0xFF00E5FF) : neon;
 
     return Scaffold(
@@ -31,8 +59,6 @@ class _MembershipTrackingScreenState extends State<MembershipTrackingScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              /// TOP NAVIGATION BAR
               Row(
                 children: [
                   IconButton(
@@ -64,10 +90,7 @@ class _MembershipTrackingScreenState extends State<MembershipTrackingScreen> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 30),
-
-              /// MEMBER INFORMATION CARD
               Center(
                 child: Column(
                   children: [
@@ -78,7 +101,7 @@ class _MembershipTrackingScreenState extends State<MembershipTrackingScreen> {
                         border: Border.all(color: tierColor, width: 3),
                         boxShadow: [
                           BoxShadow(
-                            color: tierColor.withValues(alpha: 0.3),
+                            color: tierColor.withOpacity(0.3),
                             blurRadius: 15,
                           ),
                         ],
@@ -128,10 +151,7 @@ class _MembershipTrackingScreenState extends State<MembershipTrackingScreen> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 35),
-
-              /// DIGITAL CHECK-IN PASS (Workable Functional State Modification)
               AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
@@ -233,10 +253,7 @@ class _MembershipTrackingScreenState extends State<MembershipTrackingScreen> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 28),
-
-              /// MEMBERSHIP COUNTDOWN CARD (Reacts directly to local state modifications)
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
@@ -318,10 +335,7 @@ class _MembershipTrackingScreenState extends State<MembershipTrackingScreen> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 32),
-
-              /// WHAT YOU GET WITH THIS MEMBERSHIP
               const Text(
                 "UNLOCKED GYM FEATURES",
                 style: TextStyle(
@@ -340,18 +354,57 @@ class _MembershipTrackingScreenState extends State<MembershipTrackingScreen> {
                 mainAxisSpacing: 14,
                 childAspectRatio: 1.25,
                 children: [
-                  _buildGymFeatureCard(Icons.all_inclusive, "24/7 Floor Access", "Cardio & Weight Arena", tierColor),
-                  _buildGymFeatureCard(Icons.lock_open_rounded, "Free Digital Locker", "Secure Locker Assigned", tierColor),
-                  _buildGymFeatureCard(Icons.people_outline, "2 Guest Passes / Mo", "Bring a workout buddy", tierColor),
-                  _buildGymFeatureCard(Icons.pool, "Swimming Pool", "Access to Sauna & Pools", tierColor),
-                  _buildGymFeatureCard(Icons.sports_martial_arts, "Group Classes", "MMA, Yoga & CrossFit", tierColor),
-                  _buildGymFeatureCard(Icons.bolt, "Recovery Zone", "Massage chairs & Hydro", tierColor),
+                  _buildFeatureGridItem(
+                    icon: Icons.all_inclusive,
+                    title: "24/7 Floor Access",
+                    description: "Cardio & Weight Arena",
+                    isLocked: false,
+                    themeColor: tierColor,
+                    onTap: () => _showFeatureAccessAlert("24/7 Floor Access", "Your membership grants unrestricted floor access."),
+                  ),
+                  _buildFeatureGridItem(
+                    icon: Icons.lock_open_rounded,
+                    title: _lockerClaimed ? "Locker: $_assignedLockerNumber" : "Free Digital Locker",
+                    description: _lockerClaimed ? "Assigned Locker active" : "Secure Locker Assignment",
+                    isLocked: _membershipTier != "PLATINUM",
+                    themeColor: tierColor,
+                    onTap: _handleLockerFeatureTap,
+                  ),
+                  _buildFeatureGridItem(
+                    icon: Icons.people_outline,
+                    title: "$_guestPassesRemaining Passes Left",
+                    description: "Bring a workout buddy",
+                    isLocked: false,
+                    themeColor: tierColor,
+                    onTap: _handleGuestPassTap,
+                  ),
+                  _buildFeatureGridItem(
+                    icon: Icons.pool,
+                    title: "Swimming Pool",
+                    description: "Access to Sauna & Pools",
+                    isLocked: _membershipTier != "PLATINUM",
+                    themeColor: tierColor,
+                    onTap: () => _showFeatureAccessAlert("Swimming Pool & Sauna", "Welcome to the Aquatic Center! Show this screen to the lifeguard to collect your pool towels."),
+                  ),
+                  _buildFeatureGridItem(
+                    icon: Icons.sports_martial_arts,
+                    title: "Group Classes",
+                    description: "MMA, Yoga & CrossFit",
+                    isLocked: false,
+                    themeColor: tierColor,
+                    onTap: _showGroupClassesRegistration,
+                  ),
+                  _buildFeatureGridItem(
+                    icon: Icons.bolt,
+                    title: "Recovery Zone",
+                    description: "Massage chairs & Hydro",
+                    isLocked: false,
+                    themeColor: tierColor,
+                    onTap: () => _showFeatureAccessAlert("Recovery Zone", "Scan your device barcode at the Hydro-Massage lounger bay to activate a 15-minute sequence."),
+                  ),
                 ],
               ),
-
               const SizedBox(height: 32),
-
-              /// ASSIGNED PERSONAL TRAINER SECTION (Now fully functional on click)
               const Text(
                 "YOUR ASSIGNED COACH",
                 style: TextStyle(
@@ -405,10 +458,7 @@ class _MembershipTrackingScreenState extends State<MembershipTrackingScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 32),
-
-              /// GYM MANAGEMENT PANEL
               const Text(
                 "GYM MANAGEMENT",
                 style: TextStyle(
@@ -441,13 +491,12 @@ class _MembershipTrackingScreenState extends State<MembershipTrackingScreen> {
                     _buildDivider(),
                     _buildSettingsTile(
                       icon: Icons.badge_outlined,
-                      title: _membershipTier == "PLATINUM" ? "Downgrade to Standard Elite" : "Upgrade to Platinum Membership",
+                      title: _membershipTier == "PLATINUM" ? "Downgrade to Standard Elite" : "Claim Code: Upgrade to Platinum",
                       onTap: () => _showUpgradeSheet(context),
                     ),
                   ],
                 ),
               ),
-
               const SizedBox(height: 40),
               const Center(
                 child: Text(
@@ -463,24 +512,57 @@ class _MembershipTrackingScreenState extends State<MembershipTrackingScreen> {
     );
   }
 
-  Widget _buildGymFeatureCard(IconData icon, String title, String description, Color themeColor) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF151515),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white10),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: themeColor, size: 26),
-          const SizedBox(height: 10),
-          Text(title, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 2),
-          Text(description, style: const TextStyle(color: Colors.white54, fontSize: 11), maxLines: 1, overflow: TextOverflow.ellipsis),
-        ],
+  Widget _buildFeatureGridItem({
+    required IconData icon,
+    required String title,
+    required String description,
+    required bool isLocked,
+    required Color themeColor,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF151515),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: isLocked ? Colors.redAccent.withOpacity(0.2) : Colors.white10),
+        ),
+        child: Stack(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, color: isLocked ? Colors.white24 : themeColor, size: 26),
+                const SizedBox(height: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: isLocked ? Colors.white30 : Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  description,
+                  style: TextStyle(color: isLocked ? Colors.white24 : Colors.white54, fontSize: 11),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+            if (isLocked)
+              const Positioned(
+                top: 0,
+                right: 0,
+                child: Icon(Icons.lock_outline, color: Colors.redAccent, size: 16),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -496,17 +578,204 @@ class _MembershipTrackingScreenState extends State<MembershipTrackingScreen> {
   }
 
   Widget _buildDivider() {
-    return Divider(color: Colors.white.withValues(alpha: 0.06), height: 1);
+    return Divider(color: Colors.white.withOpacity(0.06), height: 1);
   }
 
-  /// 1. WORKABLE ACTION: CHANGER OF FREEZE STATE
+  void _showFeatureAccessAlert(String featureName, String accessInstructions) {
+    if (_membershipTier != "PLATINUM" && (featureName.contains("Pool") || featureName.contains("Locker"))) {
+      _showPremiumLockWarning(featureName);
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1C1C1C),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(featureName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        content: Text(accessInstructions, style: const TextStyle(color: Colors.white70, height: 1.4)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Got It", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPremiumLockWarning(String featureName) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1C1C1C),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: const [
+            Icon(Icons.lock, color: Colors.redAccent),
+            SizedBox(width: 10),
+            Text("Access Denied", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Text(
+          "$featureName is a dynamic asset reserved exclusively for PLATINUM tier members. Use the voucher/promo module in the dashboard to upgrade your account structural configuration.",
+          style: const TextStyle(color: Colors.white70, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Dismiss", style: TextStyle(color: Colors.white30)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _showUpgradeSheet(context);
+            },
+            child: const Text("Upgrade Pass", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleLockerFeatureTap() {
+    if (_membershipTier != "PLATINUM") {
+      _showPremiumLockWarning("Digital Locker Allocation");
+      return;
+    }
+
+    if (_lockerClaimed) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: const Color(0xFF1C1C1C),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text("Locker Management", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          content: Text("Your currently assigned locker code key is: $_assignedLockerNumber.\nDo you want to release this allocation?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Keep Allocation", style: TextStyle(color: Colors.white)),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _lockerClaimed = false;
+                  _assignedLockerNumber = "";
+                });
+                _persistState('locker_claimed_state', false);
+                _persistState('assigned_locker_num', "");
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Locker allocation keys wiped clean.")),
+                );
+              },
+              child: const Text("Release Locker", style: TextStyle(color: Colors.redAccent)),
+            ),
+          ],
+        ),
+      );
+    } else {
+      setState(() {
+        _lockerClaimed = true;
+        _assignedLockerNumber = "P-${(100 + (DateTime.now().millisecond % 900))}";
+      });
+      _persistState('locker_claimed_state', true);
+      _persistState('assigned_locker_num', _assignedLockerNumber);
+      _showFeatureAccessAlert("Locker Secured", "Allocation sequence success! Locker Number $_assignedLockerNumber has been synchronized to your digital pass bracelet profiles.");
+    }
+  }
+
+  void _handleGuestPassTap() {
+    if (_guestPassesRemaining <= 0) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: const Color(0xFF1C1C1C),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text("No Passes Left", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          content: const Text("You have consumed all your available monthly allocation guest invitations."),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text("Dismiss", style: TextStyle(color: Colors.white30))),
+          ],
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1C1C1C),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text("Redeem Guest Pass", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        content: Text("Are you bringing a friend today? This will deduct 1 invitation pass from your account configuration matrix. (Remaining: $_guestPassesRemaining)"),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel", style: TextStyle(color: Colors.white54))),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _guestPassesRemaining--;
+              });
+              _persistState('guest_passes_count', _guestPassesRemaining);
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("🎟️ Guest pass active! Remaining monthly counter: $_guestPassesRemaining"),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            },
+            child: const Text("Confirm Entry", style: TextStyle(color: neon, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showGroupClassesRegistration() {
+    final List<String> syntheticClasses = ["MMA Grappling • 04:00 PM", "Vinyasa Yoga • 06:00 PM", "CrossFit Engine • 07:30 PM"];
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1C1C1C),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text("Daily Group Classes", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: syntheticClasses.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(syntheticClasses[index], style: const TextStyle(color: Colors.white, fontSize: 14)),
+                trailing: ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: neon, foregroundColor: Colors.black),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Booked spot in ${syntheticClasses[index].split('•')[0].trim()}!")),
+                    );
+                  },
+                  child: const Text("Book", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
   void _toggleFreezeStatus() {
     setState(() {
       _isFrozen = !_isFrozen;
       if (_isFrozen) {
-        _isBarcodeExpanded = false; // Close barcode if frozen
+        _isBarcodeExpanded = false;
       }
     });
+    _persistState('membership_frozen', _isFrozen);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(_isFrozen ? "⏸️ Membership Frozen. Countdown suspended." : "▶️ Membership Resumed! Active pass restored."),
@@ -515,72 +784,119 @@ class _MembershipTrackingScreenState extends State<MembershipTrackingScreen> {
     );
   }
 
-
   void _showUpgradeSheet(BuildContext context) {
+    final TextEditingController promoController = TextEditingController();
+    String errorText = "";
+
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: const Color(0xFF151515),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.workspace_premium, color: _membershipTier == "ELITE" ? const Color(0xFF00E5FF) : neon, size: 28),
-                const SizedBox(width: 10),
-                Text(
-                    _membershipTier == "ELITE" ? "Upgrade to Platinum" : "Downgrade to Elite",
-                    style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              _membershipTier == "ELITE"
-                  ? "Unlock premium blue neon design modifications, private lounge spaces, and full spa access."
-                  : "Return back to the high-performance standard neon package dashboard plan options.",
-              style: const TextStyle(color: Colors.white54, fontSize: 14, height: 1.4),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _membershipTier == "ELITE" ? const Color(0xFF00E5FF) : neon,
-                foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              onPressed: () {
-                setState(() {
-                  _membershipTier = _membershipTier == "ELITE" ? "PLATINUM" : "ELITE";
-                });
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text("🚀 Account structural upgrade changed to $_membershipTier!"),
-                    backgroundColor: Colors.indigo,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Padding(
+          padding: EdgeInsets.only(
+            top: 24.0,
+            left: 24.0,
+            right: 24.0,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 24.0,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.workspace_premium, color: _membershipTier == "ELITE" ? const Color(0xFF00E5FF) : neon, size: 28),
+                  const SizedBox(width: 10),
+                  Text(
+                      _membershipTier == "ELITE" ? "Platinum Academic Upgrade" : "Downgrade Account Tier",
+                      style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)
                   ),
-                );
-              },
-              child: Text(
-                  _membershipTier == "ELITE" ? "Confirm Platinum Switch" : "Confirm Standard Switch",
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)
+                ],
               ),
-            ),
-            const SizedBox(height: 10),
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Dismiss", style: TextStyle(color: Colors.white30)),
-            ),
-          ],
+              const SizedBox(height: 12),
+              Text(
+                _membershipTier == "ELITE"
+                    ? "Enter your college authorization coupon code (e.g., CAMPUS2026 or PLATINUMFREE) to bypass real financial payment gateways."
+                    : "Return back to the high-performance standard neon package dashboard plan options.",
+                style: const TextStyle(color: Colors.white54, fontSize: 14, height: 1.4),
+              ),
+              const SizedBox(height: 20),
+              if (_membershipTier == "ELITE") ...[
+                TextField(
+                  controller: promoController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: "Enter Code: CAMPUS2026",
+                    hintStyle: const TextStyle(color: Colors.white24),
+                    filled: true,
+                    fillColor: Colors.black,
+                    errorText: errorText.isEmpty ? null : errorText,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _membershipTier == "ELITE" ? const Color(0xFF00E5FF) : neon,
+                  foregroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                onPressed: () {
+                  if (_membershipTier == "ELITE") {
+                    String input = promoController.text.trim().toUpperCase();
+                    if (input == "CAMPUS2026" || input == "PLATINUMFREE") {
+                      setState(() {
+                        _membershipTier = "PLATINUM";
+                      });
+                      _persistState('membership_tier', "PLATINUM");
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("🚀 Code Authorized! Account structural upgrade verified to PLATINUM!"),
+                          backgroundColor: Colors.indigo,
+                        ),
+                      );
+                    } else {
+                      setModalState(() {
+                        errorText = "Invalid code. Use CAMPUS2026";
+                      });
+                    }
+                  } else {
+                    setState(() {
+                      _membershipTier = "ELITE";
+                      _lockerClaimed = false;
+                      _assignedLockerNumber = "";
+                    });
+                    _persistState('membership_tier', "ELITE");
+                    _persistState('locker_claimed_state', false);
+                    _persistState('assigned_locker_num', "");
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Downgraded to standard Elite structure.")),
+                    );
+                  }
+                },
+                child: Text(
+                    _membershipTier == "ELITE" ? "Verify Code & Activate" : "Confirm Standard Switch",
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Dismiss", style: TextStyle(color: Colors.white30)),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  /// 3. WORKABLE TRAINER DETAILS DISPLAY (Requested Implementation)
   void _showTrainerDetailsDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -607,13 +923,10 @@ class _MembershipTrackingScreenState extends State<MembershipTrackingScreen> {
             const SizedBox(height: 20),
             const Divider(color: Colors.white12),
             const SizedBox(height: 10),
-
-            // Dynamic Key Value Display rows
             _buildTrainerInfoRow(Icons.person_outline, "Trainer Name", "Rijan Gunda"),
             _buildTrainerInfoRow(Icons.phone_android, "Contact Number", "+977 9841-XXXXXX"),
             _buildTrainerInfoRow(Icons.workspace_premium, "Certification Type", "ISSA Certified Master Coach"),
             _buildTrainerInfoRow(Icons.fitness_center, "Specialization", "Hypertrophy & Bodybuilding"),
-
             const SizedBox(height: 20),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
@@ -653,7 +966,6 @@ class _MembershipTrackingScreenState extends State<MembershipTrackingScreen> {
     );
   }
 
-  /// 4. VIEW POPUP LIST OF GYM RULES
   void _showGymRulesDialog(BuildContext context, Color themeColor) {
     showDialog(
       context: context,

@@ -5,368 +5,407 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fitlog.R
 
+private val DarkBackground = Color(0xFF121212)
+private val SurfaceDark = Color(0xFF1E1E1E)
+private val PrimaryOrange = Color(0xFFFF6D00)
+private val SecondaryLime = Color(0xFFC6FF00)
+private val TextGray = Color(0xFFBDBDBD)
+private val IndicatorGray = Color(0xFF333333)
+
 @Composable
 fun CreateProfileScreen(
     modifier: Modifier = Modifier,
-    onInitializeClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onNotificationClick: () -> Unit = {},
+    onCreateAccountClick: () -> Unit = {},
+    onLoginClick: () -> Unit = {}
 ) {
-    val backgroundColor = Color.Black
-    val accentColor = Color(0xFFD0FD3E)
-    val fieldBackgroundColor = Color(0xFF1C1C1E)
-    val labelTextColor = Color(0xFF8E8E93)
+    var fullName by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var age by remember { mutableStateOf("25") }
+    var gender by remember { mutableStateOf("Male") }
+    var height by remember { mutableStateOf("180") }
+    var weight by remember { mutableStateOf("75") }
+    var selectedGoal by remember { mutableStateOf("Muscle Gain") }
 
-    var athleteHandle by remember { mutableStateOf("") }
-    var emailProtocol by remember { mutableStateOf("") }
-    var commsLink by remember { mutableStateOf("") }
-    var accessKey by remember { mutableStateOf("") }
-    var verifyKey by remember { mutableStateOf("") }
-    var athleticObjective by remember { mutableStateOf("") }
-    var termsAccepted by remember { mutableStateOf(false) }
-
-    Scaffold(
+    Surface(
         modifier = modifier.fillMaxSize(),
-        containerColor = backgroundColor
-    ) { innerPadding ->
+        color = DarkBackground
+    ) {
         Column(
             modifier = Modifier
-                .padding(innerPadding)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp)
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-            
+            // Top Bar
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_back_arrow),
-                    contentDescription = stringResource(R.string.back_button_content_description),
-                    tint = Color.White,
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clickable { /* Handle back */ }
-                )
-                Text(
-                    text = stringResource(R.string.fitlog_logo),
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Black,
-                    letterSpacing = 2.sp
-                )
-                Spacer(modifier = Modifier.width(24.dp))
-            }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Text(
-                text = buildAnnotatedString {
-                    append(stringResource(R.string.create_profile_title))
-                    append("\n")
-                    withStyle(style = SpanStyle(color = accentColor)) {
-                        append(stringResource(R.string.profile_title_accent))
-                    }
-                },
-                color = Color.White,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Black,
-                lineHeight = 36.sp
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = stringResource(R.string.create_profile_subtitle),
-                color = labelTextColor,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Box(
-                modifier = Modifier
-                    .size(120.dp)
-                    .align(Alignment.CenterHorizontally)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(CircleShape)
-                        .background(Color(0xFF1C1C1E))
-                        .border(1.dp, Color(0xFF333333), CircleShape)
-                )
-                
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(accentColor)
-                        .clickable { /* Handle photo */ },
-                    contentAlignment = Alignment.Center
-                ) {
+                IconButton(onClick = onBackClick) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_camera),
-                        contentDescription = stringResource(R.string.camera_icon_description),
-                        tint = Color.Black,
-                        modifier = Modifier.size(20.dp)
+                        painter = painterResource(id = R.drawable.ic_menu),
+                        contentDescription = "Menu",
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                Text(
+                    text = "FIT LOG",
+                    color = Color.White,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = 1.sp
+                )
+                IconButton(onClick = onNotificationClick) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_notifications),
+                        contentDescription = "Notifications",
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(40.dp))
-
-            ProfileInputField(
-                label = stringResource(R.string.athlete_handle_label),
-                value = athleteHandle,
-                onValueChange = { athleteHandle = it },
-                hint = stringResource(R.string.athlete_handle_hint),
-                backgroundColor = fieldBackgroundColor,
-                labelColor = labelTextColor
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            ProfileInputField(
-                label = stringResource(R.string.email_protocol_label),
-                value = emailProtocol,
-                onValueChange = { emailProtocol = it },
-                hint = stringResource(R.string.email_protocol_hint),
-                backgroundColor = fieldBackgroundColor,
-                labelColor = labelTextColor,
-                keyboardType = KeyboardType.Email
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            ProfileInputField(
-                label = stringResource(R.string.comms_link_label),
-                value = commsLink,
-                onValueChange = { commsLink = it },
-                hint = stringResource(R.string.comms_link_hint),
-                backgroundColor = fieldBackgroundColor,
-                labelColor = labelTextColor,
-                keyboardType = KeyboardType.Phone
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            ProfileInputField(
-                label = stringResource(R.string.access_key_label),
-                value = accessKey,
-                onValueChange = { accessKey = it },
-                hint = "********",
-                backgroundColor = fieldBackgroundColor,
-                labelColor = labelTextColor,
-                isPassword = true
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            ProfileInputField(
-                label = stringResource(R.string.verify_key_label),
-                value = verifyKey,
-                onValueChange = { verifyKey = it },
-                hint = "********",
-                backgroundColor = fieldBackgroundColor,
-                labelColor = labelTextColor,
-                isPassword = true
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            ProfileInputField(
-                label = stringResource(R.string.athletic_objective_label),
-                value = athleticObjective,
-                onValueChange = { athleticObjective = it },
-                hint = stringResource(R.string.athletic_objective_hint),
-                backgroundColor = fieldBackgroundColor,
-                labelColor = labelTextColor,
-                singleLine = false,
-                minHeight = 100.dp
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(bottom = 32.dp)
-                    .clickable { termsAccepted = !termsAccepted }
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(20.dp)
-                        .border(
-                            width = 1.dp,
-                            color = if (termsAccepted) accentColor else Color(0xFF3A3A3C),
-                            shape = RoundedCornerShape(4.dp)
-                        )
-                        .background(
-                            color = if (termsAccepted) accentColor else Color.Transparent,
-                            shape = RoundedCornerShape(4.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (termsAccepted) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_chevron_right),
-                            contentDescription = null,
-                            tint = Color.Black,
-                            modifier = Modifier.size(14.dp)
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(
-                    text = buildAnnotatedString {
-                        append(stringResource(R.string.accept_terms_prefix))
-                        append(" ")
-                        withStyle(style = SpanStyle(color = accentColor, fontWeight = FontWeight.Bold)) {
-                            append(stringResource(R.string.terms_and_conditions))
-                        }
-                    },
-                    color = Color.White,
-                    fontSize = 14.sp
-                )
-            }
-
-            Button(
-                onClick = onInitializeClick,
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(64.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = accentColor)
+                    .padding(horizontal = 24.dp)
             ) {
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Text(
+                    text = stringResource(id = R.string.create_profile_title),
+                    color = Color.White,
+                    fontSize = 44.sp,
+                    lineHeight = 44.sp,
+                    fontWeight = FontWeight.Black,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                Text(
+                    text = stringResource(id = R.string.create_profile_subtitle),
+                    color = TextGray,
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,
+                    modifier = Modifier.padding(bottom = 32.dp)
+                )
+
+                ProfileTextField(
+                    label = stringResource(id = R.string.full_name_label),
+                    value = fullName,
+                    onValueChange = { fullName = it },
+                    placeholder = stringResource(id = R.string.full_name_hint)
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                ProfileTextField(
+                    label = stringResource(id = R.string.email_label_cp),
+                    value = email,
+                    onValueChange = { email = it },
+                    placeholder = stringResource(id = R.string.email_hint_cp)
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                ProfileTextField(
+                    label = stringResource(id = R.string.password_label_cp),
+                    value = password,
+                    onValueChange = { password = it },
+                    placeholder = stringResource(id = R.string.password_hint_cp),
+                    isPassword = true
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    repeat(4) { index ->
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(4.dp)
+                                .background(
+                                    color = if (index == 0) Color.DarkGray else IndicatorGray,
+                                    shape = RoundedCornerShape(2.dp)
+                                )
+                        )
+                    }
                     Text(
-                        text = stringResource(R.string.initialize_performance),
-                        color = Color.Black,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Black
+                        text = stringResource(id = R.string.required_label),
+                        color = Color.Gray,
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(start = 8.dp)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_arrow_forward),
-                        contentDescription = null,
-                        tint = Color.Black,
-                        modifier = Modifier.size(20.dp)
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    ProfileDropdownField(
+                        label = stringResource(id = R.string.age_label),
+                        value = age,
+                        modifier = Modifier.weight(1f)
+                    )
+                    ProfileDropdownField(
+                        label = stringResource(id = R.string.gender_label),
+                        value = gender,
+                        modifier = Modifier.weight(1f),
+                        isGender = true
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    ProfileDropdownField(
+                        label = stringResource(id = R.string.height_label),
+                        value = height,
+                        modifier = Modifier.weight(1f)
+                    )
+                    ProfileDropdownField(
+                        label = stringResource(id = R.string.weight_label),
+                        value = weight,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Text(
+                    text = stringResource(id = R.string.fitness_goal_label),
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+
+                FitnessGoalItem(
+                    title = stringResource(id = R.string.muscle_gain),
+                    iconRes = R.drawable.ic_muscle,
+                    isSelected = selectedGoal == "Muscle Gain",
+                    onClick = { selectedGoal = "Muscle Gain" }
+                )
+
+                FitnessGoalItem(
+                    title = stringResource(id = R.string.weight_loss),
+                    iconRes = R.drawable.ic_running,
+                    isSelected = selectedGoal == "Weight Loss",
+                    onClick = { selectedGoal = "Weight Loss" }
+                )
+
+                FitnessGoalItem(
+                    title = stringResource(id = R.string.endurance),
+                    iconRes = R.drawable.ic_bolt,
+                    isSelected = selectedGoal == "Endurance",
+                    onClick = { selectedGoal = "Endurance" }
+                )
+
+                Spacer(modifier = Modifier.height(48.dp))
+
+                Button(
+                    onClick = onCreateAccountClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = PrimaryOrange
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.create_account_btn),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Color.Black
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = buildAnnotatedString {
+                            append(stringResource(id = R.string.already_have_account))
+                            withStyle(style = SpanStyle(color = SecondaryLime, fontWeight = FontWeight.Bold)) {
+                                append(stringResource(id = R.string.login_link))
+                            }
+                        },
+                        color = TextGray,
+                        fontSize = 14.sp,
+                        modifier = Modifier
+                            .clickable { onLoginClick() }
+                            .padding(bottom = 40.dp)
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Text(
-                text = stringResource(R.string.step_count),
-                color = Color(0xFF48484A),
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                letterSpacing = 2.sp
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileInputField(
+fun ProfileTextField(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
-    hint: String,
-    backgroundColor: Color,
-    labelColor: Color,
+    placeholder: String,
     isPassword: Boolean = false,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    singleLine: Boolean = true,
-    minHeight: Dp = 56.dp
+    modifier: Modifier = Modifier
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = modifier) {
         Text(
             text = label,
-            color = labelColor,
-            fontSize = 10.sp,
+            color = TextGray,
+            fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 8.dp)
         )
         TextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = Modifier
-                .fillMaxWidth()
-                .defaultMinSize(minHeight = minHeight)
-                .clip(RoundedCornerShape(12.dp)),
+            modifier = Modifier.fillMaxWidth(),
             placeholder = {
                 Text(
-                    text = hint,
-                    color = Color(0xFF3A3A3C),
+                    text = placeholder,
+                    color = Color.Gray.copy(alpha = 0.6f),
                     fontSize = 14.sp
                 )
             },
-            visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = keyboardType,
-                imeAction = ImeAction.Next
-            ),
-            singleLine = singleLine,
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = backgroundColor,
-                unfocusedContainerColor = backgroundColor,
-                disabledContainerColor = backgroundColor,
-                cursorColor = Color(0xFFD0FD3E),
+                focusedContainerColor = SurfaceDark,
+                unfocusedContainerColor = SurfaceDark,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
+                cursorColor = PrimaryOrange,
                 focusedTextColor = Color.White,
                 unfocusedTextColor = Color.White
             ),
-            textStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium)
+            shape = RoundedCornerShape(12.dp),
+            singleLine = true
         )
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+fun ProfileDropdownField(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    isGender: Boolean = false
+) {
+    Column(modifier = modifier) {
+        Text(
+            text = label,
+            color = TextGray,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .background(SurfaceDark, RoundedCornerShape(12.dp))
+                .padding(horizontal = 16.dp),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = value,
+                    color = Color.White,
+                    fontSize = 14.sp
+                )
+                Icon(
+                    painter = painterResource(id = if (isGender) R.drawable.ic_expand_more else R.drawable.ic_unfold_more),
+                    contentDescription = null,
+                    tint = Color.Gray,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun FitnessGoalItem(
+    title: String,
+    iconRes: Int,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp)
+            .height(64.dp)
+            .background(SurfaceDark, RoundedCornerShape(12.dp))
+            .border(
+                width = if (isSelected) 1.dp else 0.dp,
+                color = if (isSelected) SecondaryLime else Color.Transparent,
+                shape = RoundedCornerShape(12.dp)
+            )
+            .clickable { onClick() }
+            .padding(horizontal = 20.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                color = if (isSelected) SecondaryLime else Color.White,
+                fontSize = 16.sp,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+            )
+            Icon(
+                painter = painterResource(id = iconRes),
+                contentDescription = null,
+                tint = if (isSelected) SecondaryLime else Color.White,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF121212)
 @Composable
 fun CreateProfileScreenPreview() {
     MaterialTheme {

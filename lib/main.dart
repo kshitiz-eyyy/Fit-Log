@@ -1,18 +1,22 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:fitlog/view/account_screen.dart';
-import 'package:fitlog/view/cycle_tracking_screen.dart';
-import 'package:fitlog/view/dashboard.dart';
-import 'package:fitlog/view/hydration_settings_screen.dart';
-import 'package:fitlog/view/splash_screen.dart';
+import 'package:fitlog/binesh/create_profile_screen.dart';
+import 'package:fitlog/binesh/sleep_screen.dart';
+import 'package:fitlog/view/meal_tracking_screen.dart';
+import 'package:fitlog/binesh/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'firebase_options.dart';
-import 'view/fuel_log_screen.dart';
+import 'view/library.dart';
+import 'view/activity_screen.dart';
+import 'view/favourite_exercise.dart';
+import 'view/change_password_screen.dart';
+import 'view/dashboard.dart';
+import 'view/features_screen.dart';
+import 'view/splash_screen.dart';
+import 'view/membership_tracking_screen.dart';
+import 'view/workout_tracking_screen.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
+void main() {
   runApp(const FitLogApp());
 }
 
@@ -24,20 +28,21 @@ class FitLogApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'FitLog',
-      theme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
+
+      theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: Colors.black,
+
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.black,
           titleTextStyle: TextStyle(
-            color: Color(0xFFD4FF00),
+            color: Colors.lightGreenAccent,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
-      home: const FuelLogScreen(),
+
+      home: const SleepScreen(),
     );
   }
 }
