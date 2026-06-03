@@ -1,5 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:fitlog/binesh/create_profile_screen.dart';
+import 'package:fitlog/binesh/sleep_screen.dart';
 import 'package:fitlog/view/meal_tracking_screen.dart';
+import 'package:fitlog/binesh/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'firebase_options.dart';
 import 'view/library.dart';
@@ -39,7 +42,7 @@ class FitLogApp extends StatelessWidget {
         ),
       ),
 
-      home: const DashboardScreen(),
+      home: const SleepScreen(),
     );
   }
 }

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Fit-Log</string>
+    <string name="tagline">YOUR PERSONAL FITNESS COMPANION</string>
+    <string name="email_label">EMAIL ADDRESS</string>
+    <string name="email_hint">name@example.com</string>
+    <string name="password_label">PASSWORD</string>
+    <string name="password_hint">••••••••</string>
+    <string name="forgot_password">Forgot?</string>
+    <string name="login">LOGIN</string>
+    <string name="or_separator">OR</string>
+    <string name="create_account">CREATE ACCOUNT</string>
+    <string name="social_proof_text">Join 50,000+ athletes worldwide</string>
+
+    <string name="create_profile_title">CREATE YOUR PROFILE</string>
+    <string name="create_profile_subtitle">Step into the high-intensity world of precision fitness.</string>
+    <string name="full_name_label">FULL NAME</string>
+    <string name="full_name_hint">Enter your name</string>
+    <string name="email_label_cp">EMAIL</string>
+    <string name="email_hint_cp">email@example.com</string>
+    <string name="password_label_cp">PASSWORD</string>
+    <string name="password_hint_cp">Min. 8 characters</string>
+    <string name="required_label">REQUIRED</string>
+    <string name="age_label">AGE</string>
+    <string name="gender_label">GENDER</string>
+    <string name="height_label">HEIGHT (CM)</string>
+    <string name="weight_label">WEIGHT (KG)</string>
+    <string name="fitness_goal_label">FITNESS GOAL</string>
+    <string name="muscle_gain">Muscle Gain</string>
+    <string name="weight_loss">Weight Loss</string>
+    <string name="endurance">Endurance</string>
+    <string name="create_account_btn">CREATE ACCOUNT</string>
+    <string name="already_have_account">Already have an account? </string>
+    <string name="login_link">Login</string>
+
+    <string name="sleep_history_title">SLEEP HISTORY</string>
+    <string name="log_sleep_button">LOG SLEEP</string>
+    <string name="tonight_tracking_title">TONIGHT’S TRACKING</string>
+    <string name="sleep_mode_label">Sleep Mode</string>
+    <string name="sleep_mode_desc">Automatic silencing</string>
+    <string name="bedtime_alarm_label">Bedtime Alarm</string>
+    <string name="bedtime_alarm_desc">Wake up at 06:30 AM</string>
+    <string name="quality_good_sleep">QUALITY: GOOD SLEEP</string>
+    <string name="last_night_sleep">LAST NIGHT’S SLEEP</string>
+    <string name="hours_label">HOURS</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_features">Features</string>
+    <string name="nav_library">Library</string>
+    <string name="nav_activity">Activity</string>
+    <string name="nav_profile">Profile</string>
+</resources>
