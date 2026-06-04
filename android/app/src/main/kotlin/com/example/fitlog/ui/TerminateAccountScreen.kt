@@ -223,55 +223,6 @@ fun TerminateAccountScreen(
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            Text(
-                text = "SECURITY & PRIVACY",
-                color = textColor,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Black
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            TerminateOptionItem(
-                iconRes = R.drawable.ic_lock,
-                title = "Update Password",
-                onClick = onUpdatePasswordClick,
-                backgroundColor = cardBackgroundColor
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            var biometricEnabled by remember { mutableStateOf(true) }
-            TerminateOptionItem(
-                iconRes = R.drawable.ic_biometric,
-                title = "Biometric Authentication",
-                backgroundColor = cardBackgroundColor,
-                trailing = {
-                    Switch(
-                        checked = biometricEnabled,
-                        onCheckedChange = { biometricEnabled = it },
-                        colors = SwitchDefaults.colors(
-                            checkedThumbColor = Color.Black,
-                            checkedTrackColor = accentColor,
-                            uncheckedThumbColor = Color.White,
-                            uncheckedTrackColor = Color(0xFF3A3A3C),
-                            uncheckedBorderColor = Color.Transparent
-                        )
-                    )
-                }
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            TerminateOptionItem(
-                iconRes = R.drawable.ic_history,
-                title = "Data Export History",
-                onClick = onDataExportClick,
-                backgroundColor = cardBackgroundColor
-            )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
             TerminateSection(
                 onDeleteClick = onDeleteAccountClick,
                 warningColor = warningColor,
