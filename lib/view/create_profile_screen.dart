@@ -35,7 +35,12 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Icon(Icons.arrow_back, color: textColor, size: 24),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back, color: textColor, size: 24),
+                    onPressed: () => Navigator.pop(context),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
                   const Text(
                     'FITLOG',
                     style: TextStyle(

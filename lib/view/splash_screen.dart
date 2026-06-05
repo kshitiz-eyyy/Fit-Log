@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-import 'fitlog_login.dart';
+import 'welcome_screen.dart';
 
 
 class SplashScreen extends StatefulWidget {
@@ -16,9 +16,9 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     // Countdown timer to move to the login screen
-    Timer(const Duration(seconds: 10), () {
+    Timer(const Duration(seconds: 3), () {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const FitLogLogin()),
+        MaterialPageRoute(builder: (context) => const WelcomeScreen()),
       );
     });
   }

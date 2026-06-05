@@ -37,8 +37,8 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
         backgroundColor: darkBackground,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.white),
-          onPressed: () {},
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'FIT LOG',
@@ -147,7 +147,6 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: _buildBottomNav(),
     );
   }
 
@@ -382,22 +381,6 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
     );
   }
 
-  Widget _buildBottomNav() {
-    return BottomNavigationBar(
-      backgroundColor: darkBackground,
-      type: BottomNavigationBarType.fixed,
-      selectedItemColor: secondaryLime,
-      unselectedItemColor: const Color(0xFF48484A),
-      currentIndex: 0,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.bolt), label: 'Features'),
-        BottomNavigationBarItem(icon: Icon(Icons.list_alt), label: 'Library'),
-        BottomNavigationBarItem(icon: Icon(Icons.directions_run), label: 'Activity'),
-        BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
-      ],
-    );
-  }
 }
 
 class WaterProgressPainter extends CustomPainter {
