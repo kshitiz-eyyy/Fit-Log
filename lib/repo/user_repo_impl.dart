@@ -1,8 +1,6 @@
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Added for FirebaseFirestore
+import 'package:firebase_auth/firebase_auth.dart'; // Added for FirebaseAuth
 import 'package:fitlog/repo/user_repo.dart';
-
 import '../model/user_model.dart';
 
 class UserRepoImpl implements UserRepo {
@@ -37,31 +35,27 @@ class UserRepoImpl implements UserRepo {
   }
 
   @override
-  Future<List<UserModel>> getAllUser() async{
-    final users = await firestore
-        .collection("users").get();
+  Future<List<UserModel>> getAllUser() async {
+    final users = await firestore.collection("users").get();
 
     List<UserModel> data = [];
 
-    for(int i =0;i<users.docs.length;i++){
+    for (int i = 0; i < users.docs.length; i++) {
       data.add(UserModel.fromMap(users.docs[i].data()));
     }
 
     return data;
-
   }
 
   @override
   Future<UserModel> getUserByID(String id) async {
-    final users = await firestore
-        .collection("users").doc(id).get();
+    final users = await firestore.collection("users").doc(id).get();
     final data = users.data();
 
-    if(data == null){
+    if (data == null) {
       throw Exception("unable to fetch data");
     }
     return UserModel.fromMap(data);
-
   }
 
   @override
