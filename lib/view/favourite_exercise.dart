@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'library.dart';
+import 'user_library.dart';
 import 'favourite_manager.dart'; // ✅ global favourites list
 
 class FavouriteExerciseScreen extends StatelessWidget {

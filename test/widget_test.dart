@@ -1,6 +1,6 @@
 
 
-import 'package:fitlog/view/library.dart';
+import 'package:fitlog/view/user_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

@@ -2,7 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
-import 'membership_tracking_screen.dart';
+import 'premium_membership.dart';
+import 'admin_panel_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -21,6 +22,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool biometricAuthEnabled = false;
   bool pushNotificationsEnabled = true;
   bool workoutRemindersEnabled = true;
+
+  bool isAdministrativeAccount = true;
 
   final ImagePicker _picker = ImagePicker();
 
@@ -191,6 +194,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
             ),
+
+            if (isAdministrativeAccount) ...[
+              const SizedBox(height: 20),
+              const Text("ROOT INFRASTRUCTURE", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1)),
+              const SizedBox(height: 8),
+              InkWell(
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminPanelScreen())),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF161616),
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: const Color(0xFFCCFF00).withValues(alpha: 0.3)),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.admin_panel_settings, color: Color(0xFFCCFF00), size: 18),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("LAUNCH SYSTEM OVERRIDES", style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                            Text("Modify network environments & challenge configurations", style: TextStyle(color: Colors.grey, fontSize: 10)),
+                          ],
+                        ),
+                      ),
+                      Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 12),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+
             const SizedBox(height: 20),
             const Text("SECURITY & OPERATIONS", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1)),
             const SizedBox(height: 8),
