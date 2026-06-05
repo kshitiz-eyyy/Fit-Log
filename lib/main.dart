@@ -7,7 +7,7 @@ import 'package:fitlog/view/calorie_tracker_screen.dart';
 import 'package:fitlog/view/meal_tracking_screen.dart';
 import 'package:fitlog/view/welcome_screen.dart';
 import 'package:fitlog/view/water_tracker_screen.dart';
-import 'package:fitlog/view/profile.dart';
+import 'package:fitlog/view/user_profile.dart';
 import 'package:flutter/material.dart';
 import 'firebase_options.dart'; // This connects your unique project keys block
 import 'view/library.dart';
@@ -56,7 +56,7 @@ class FitLogApp extends StatelessWidget {
         ),
       ),
 
-      home: const CreateProfileScreen(),
+      home: const ProfileScreen(),
     );
   }
 }
