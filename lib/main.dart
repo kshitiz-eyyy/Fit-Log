@@ -1,19 +1,31 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:fitlog/view/admin_dashboard.dart';
 import 'package:fitlog/view/meal_tracking_screen.dart';
+import 'view/fitlog_login.dart';
+import 'package:fitlog/view/testing_gateway_screen.dart;.dart';
 import 'package:flutter/material.dart';
 import 'firebase_options.dart';
-import 'view/library.dart';
-import 'view/activity_screen.dart';
+import 'view/user_library.dart';
+import 'view/user_activity_screen.dart';
 import 'view/favourite_exercise.dart';
 import 'view/change_password_screen.dart';
-import 'view/dashboard.dart';
+import 'view/user_dashboard.dart';
 import 'view/features_screen.dart';
 import 'view/splash_screen.dart';
-import 'view/membership_tracking_screen.dart';
+import 'view/premium_membership.dart';
 import 'view/workout_tracking_screen.dart';
 
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-void main() {
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    print("Firebase Engine Init Error: $e");
+  }
+
   runApp(const FitLogApp());
 }
 
@@ -39,7 +51,12 @@ class FitLogApp extends StatelessWidget {
         ),
       ),
 
-      home: const DashboardScreen(),
-    );
+      home: const TestingGatewayScreen(),
+routes: {
+  '/login': (context) => const FitLogLogin()
+}
+);
+
+
   }
 }
