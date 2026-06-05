@@ -123,7 +123,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.redAccent),
               title: const Text("Sign Out Session", style: TextStyle(color: Colors.redAccent)),
-              onTap: () => Navigator.pop(context),
+              onTap: () async {
+                Navigator.pop(context);
+
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.setBool('is_logged_in', false);
+
+                if (context.mounted) {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/login',
+                        (Route<dynamic> route) => false,
+                  );
+                }
+              },
             ),
             const SizedBox(height: 20),
           ],
