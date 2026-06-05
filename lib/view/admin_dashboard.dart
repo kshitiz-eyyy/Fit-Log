@@ -1,6 +1,6 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -11,9 +11,10 @@ class AdminDashboardScreen extends StatefulWidget {
 
 class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   int _activeTab = 0;
-  int _totalUsersCount = 1420;
-  int _activeProMembers = 385;
-  double _serverUptime = 99.98;
+  final int _totalUsersCount = 1420;
+  final int _activeProMembers = 385;
+  final double _serverUptime = 99.98;
+
   final _challengeNameCtrl = TextEditingController();
   final _newExerciseNameCtrl = TextEditingController();
   String _selectedMuscleGroup = "Chest";
@@ -48,20 +49,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   Future<void> _updateBroadcastChallenge() async {
     final prefs = await SharedPreferences.getInstance();
-
     await prefs.setString('admin_global_challenge_name', _challengeNameCtrl.text.trim());
-
     _showAdminAlert("SYSTEM BROADCAST UPDATE: Parameters synchronized system-wide.");
   }
+
   void _injectCustomExercise() async {
     String exercise = _newExerciseNameCtrl.text.trim();
     if (exercise.isNotEmpty) {
       final prefs = await SharedPreferences.getInstance();
-
       List<String> currentExercises = prefs.getStringList('admin_custom_exercises') ?? [];
-
       currentExercises.add("$exercise|$_selectedMuscleGroup");
-
       await prefs.setStringList('admin_custom_exercises', currentExercises);
 
       _showAdminAlert("DATABASE INJECTION: '$exercise' appended to $_selectedMuscleGroup logs.");
@@ -72,13 +69,36 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   void _showAdminAlert(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: const Color(0xFF161616),
+        backgroundColor: const Color(0xFF050508).withOpacity(0.9),
         behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(side: const BorderSide(color: Color(0xFFCCFF00), width: 0.5), borderRadius: BorderRadius.circular(4)),
-        content: Text(
-          message,
-          style: const TextStyle(color: Color(0xFFCCFF00), fontFamily: 'monospace', fontSize: 11, fontWeight: FontWeight.bold),
+        margin: const EdgeInsets.all(20),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(color: Color(0xFFCCFF00), width: 1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        content: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+            child: Row(
+              children: [
+                const Icon(Icons.data_object, color: Color(0xFFCCFF00), size: 16),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    message,
+                    style: const TextStyle(
+                      color: Color(0xFFCCFF00),
+                      fontFamily: 'monospace',
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -87,45 +107,108 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F0F),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF0F0F0F),
-        elevation: 0,
-        title: const Text(
-          "SYSTEM CONTROL ROOT",
-          style: TextStyle(color: Color(0xFFCCFF00), fontSize: 15, fontWeight: FontWeight.w900, letterSpacing: 2),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.power_settings_new, color: Colors.redAccent, size: 22),
-            onPressed: () => Navigator.pop(context), // Route back out to gateway
-          ),
-        ],
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      backgroundColor: const Color(0xFF060608),
+      body: Stack(
         children: [
+          // Cyberpunk Background Subtle Ambient Orbs
+          Positioned(
+            top: -100,
+            left: -100,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFFCCFF00).withOpacity(0.03),
 
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            color: const Color(0xFF0F0F0F),
-            child: Row(
-              children: [
-                _buildNavTab(0, "OVERVIEW"),
-                const SizedBox(width: 6),
-                _buildNavTab(1, "DB INJECT"),
-                const SizedBox(width: 6),
-                _buildNavTab(2, "REGISTRY"),
-              ],
+              ),
             ),
           ),
-          const Divider(color: Color(0xFF262626), height: 1, thickness: 1),
 
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: _buildActiveViewport(),
+          SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Top Custom Header Matrix
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "CORE CONTROL NODE",
+                            style: TextStyle(
+                              color: Color(0xFFCCFF00),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 3,
+                              fontFamily: 'monospace',
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            "SECURE ROOT SESSION ACTIVE",
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close_fullscreen_rounded, color: Colors.redAccent, size: 20),
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.redAccent.withOpacity(0.06),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          side: BorderSide(color: Colors.redAccent.withOpacity(0.2), width: 0.5),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+
+                const Divider(color: Color(0xFF161622), height: 1),
+
+                // Main Workspace Layout
+                Expanded(
+                  child: Row(
+                    children: [
+                      // Sidebar Navigation Rail Menu
+                      Container(
+                        width: 76,
+                        decoration: const BoxDecoration(
+                          border: Border(right: BorderSide(color: Color(0xFF161622), width: 1)),
+                        ),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 16),
+                            _buildSidebarItem(0, Icons.grid_view_rounded, "DASH"),
+                            _buildSidebarItem(1, Icons.terminal_rounded, "INJECT"),
+
+                          ],
+                        ),
+                      ),
+
+                      // Primary Workspace Content Dynamic Stream Viewport
+                      Expanded(
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.all(20.0),
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 200),
+                            child: _buildActiveViewport(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -133,31 +216,46 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-
-  Widget _buildNavTab(int index, String label) {
+  Widget _buildSidebarItem(int index, IconData icon, String microLabel) {
     final bool isActive = _activeTab == index;
-    return Expanded(
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: GestureDetector(
         onTap: () => setState(() => _activeTab = index),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          width: 52,
+          height: 56,
           decoration: BoxDecoration(
-            color: isActive ? const Color(0xFFCCFF00) : const Color(0xFF161616),
-            borderRadius: BorderRadius.circular(4),
+            color: isActive ? const Color(0xFFCCFF00) : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: isActive
+                ? [BoxShadow(color: const Color(0xFFCCFF00).withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 2))]
+                : [],
             border: Border.all(
-              color: isActive ? const Color(0xFFCCFF00) : const Color(0xFF262626),
+              color: isActive ? const Color(0xFFCCFF00) : const Color(0xFF161622),
               width: 1,
             ),
           ),
-          alignment: Alignment.center,
-          child: Text(
-            label,
-            style: TextStyle(
-              color: isActive ? Colors.black : Colors.grey,
-              fontSize: 10,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 1,
-            ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color: isActive ? Colors.black : Colors.grey.shade500,
+                size: 18,
+              ),
+              const SizedBox(height: 3),
+              Text(
+                microLabel,
+                style: TextStyle(
+                  color: isActive ? Colors.black : Colors.grey.shade600,
+                  fontSize: 8,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -168,38 +266,35 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     switch (_activeTab) {
       case 0:
         return Column(
+          key: const ValueKey(0),
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text("NETWORK INFRASTRUCTURE METRICS", style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(child: _buildStatCard("TOTAL USERS", "$_totalUsersCount", Icons.people_outline)),
-                const SizedBox(width: 10),
-                Expanded(child: _buildStatCard("PRO PREMIUM", "$_activeProMembers", Icons.workspace_premium)),
-                const SizedBox(width: 10),
-                Expanded(child: _buildStatCard("SYS UPTIME", "$_serverUptime%", Icons.dns_outlined)),
-              ],
-            ),
-            const SizedBox(height: 24),
-            const Text("BROADCAST REFRESH (APP ENGINE)", style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
+            _buildSectionLabel("TELEMETRY STREAM"),
+            const SizedBox(height: 12),
+            _buildStatCard("TOTAL RUNTIME USERS", "$_totalUsersCount", Icons.people_outline, Colors.cyanAccent),
+            const SizedBox(height: 12),
+            _buildStatCard("ACTIVE PREMIUM TIERS", "$_activeProMembers", Icons.workspace_premium, const Color(0xFFCCFF00)),
+            const SizedBox(height: 12),
+            _buildStatCard("BACKEND CORE UPTIME", "$_serverUptime%", Icons.dns_outlined, Colors.purpleAccent),
+            const SizedBox(height: 32),
+
+            _buildSectionLabel("BROADCAST NETWORK CONFIG"),
+            const SizedBox(height: 12),
+            _buildGlassPanel(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text("Global Active Community Challenge", style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                  const Text("Global Community Event Header", style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
                   TextField(
                     controller: _challengeNameCtrl,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    style: const TextStyle(color: Colors.white, fontSize: 13, fontFamily: 'monospace'),
                     decoration: InputDecoration(
                       filled: true,
-                      fillColor: const Color(0xFF262626),
-                      enabledBorder: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.circular(4)),
-                      focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: Color(0xFFCCFF00), width: 1)),
+                      fillColor: const Color(0xFF0F0F14),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xFF1F1F2E)), borderRadius: BorderRadius.circular(6)),
+                      focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xFFCCFF00)), borderRadius: BorderRadius.circular(6)),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -207,10 +302,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     onPressed: _updateBroadcastChallenge,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFCCFF00),
+                      foregroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                     ),
-                    child: const Text("UPDATE NETWORK CONTENT", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12)),
+                    child: const Text("BROADCAST PARAMS", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 11, letterSpacing: 1)),
                   ),
                 ],
               ),
@@ -219,24 +316,26 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         );
       case 1:
         return Column(
+          key: const ValueKey(1),
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text("INJECT NEW MOVEMENT RESOURCE", style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
+            _buildSectionLabel("RESOURCE DATABASE INJECTION"),
+            const SizedBox(height: 12),
+            _buildGlassPanel(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   DropdownButtonFormField<String>(
                     value: _selectedMuscleGroup,
-                    dropdownColor: const Color(0xFF161616),
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(
-                      labelText: "Target Group Category",
-                      labelStyle: TextStyle(color: Colors.grey, fontSize: 12),
-                      enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF262626))),
+                    dropdownColor: const Color(0xFF0D0D12),
+                    style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                    decoration: InputDecoration(
+                      labelText: "Target Classification Mapping",
+                      labelStyle: TextStyle(color: Colors.grey.shade500, fontSize: 11),
+                      filled: true,
+                      fillColor: const Color(0xFF0F0F14),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xFF1F1F2E)), borderRadius: BorderRadius.circular(6)),
                     ),
                     items: _muscleGroups.map((group) {
                       return DropdownMenuItem(value: group, child: Text(group));
@@ -246,24 +345,29 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   const SizedBox(height: 16),
                   TextField(
                     controller: _newExerciseNameCtrl,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
-                    decoration: const InputDecoration(
-                      labelText: "Movement Name (e.g. Incline DB Flyes)",
-                      labelStyle: TextStyle(color: Colors.grey, fontSize: 12),
-                      enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF262626))),
-                      focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFFCCFF00))),
+                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                    decoration: InputDecoration(
+                      labelText: "Target Resource Identifier String",
+                      labelStyle: TextStyle(color: Colors.grey.shade500, fontSize: 11),
+                      hintText: "Ex: Kettlebell Clean & Press",
+                      hintStyle: TextStyle(color: Colors.grey.shade700, fontSize: 12),
+                      filled: true,
+                      fillColor: const Color(0xFF0F0F14),
+                      enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xFF1F1F2E)), borderRadius: BorderRadius.circular(6)),
+                      focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xFFCCFF00)), borderRadius: BorderRadius.circular(6)),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
+                  const SizedBox(height: 24),
+                  OutlinedButton.icon(
                     onPressed: _injectCustomExercise,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
+                    icon: const Icon(Icons.add_to_photos_rounded, size: 14),
+                    label: const Text("EXECUTE DICTIONARY INJECTION", style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFFCCFF00),
+                      side: const BorderSide(color: Color(0xFFCCFF00), width: 1),
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      side: const BorderSide(color: Color(0xFFCCFF00)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                     ),
-                    child: const Text("PUSH RAW EXERCISE OBJECT", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 12, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -272,10 +376,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         );
       case 2:
         return Column(
+          key: const ValueKey(2),
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text("ATHLETE SECURITY REGISTRY MAP", style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
-            const SizedBox(height: 8),
+            _buildSectionLabel("RUNTIME SECURITY USER PROTOCOLS"),
+            const SizedBox(height: 12),
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -285,28 +390,43 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 final isPro = user["tier"] == "Pro Premium";
 
                 return Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
+                  margin: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0D0D12),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFF1A1A26)),
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(user["name"]!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-                          Text(user["email"]!, style: const TextStyle(color: Colors.grey, fontSize: 11)),
-                        ],
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(user["name"]!, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                            const SizedBox(height: 2),
+                            Text(user["email"]!, style: TextStyle(color: Colors.grey.shade500, fontSize: 11, fontFamily: 'monospace')),
+                          ],
+                        ),
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: isPro ? const Color(0xFFCCFF00).withOpacity(0.1) : const Color(0xFF262626),
-                          borderRadius: BorderRadius.circular(2),
+                          color: isPro ? const Color(0xFFCCFF00).withOpacity(0.05) : Colors.transparent,
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(
+                            color: isPro ? const Color(0xFFCCFF00).withOpacity(0.3) : Colors.grey.shade800,
+                            width: 0.8,
+                          ),
                         ),
                         child: Text(
                           user["tier"]!.toUpperCase(),
-                          style: TextStyle(color: isPro ? const Color(0xFFCCFF00) : Colors.grey, fontSize: 9, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: isPro ? const Color(0xFFCCFF00) : Colors.grey.shade500,
+                            fontSize: 8,
+                            fontWeight: FontWeight.w900,
+                          ),
                         ),
                       ),
                     ],
@@ -316,25 +436,73 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             ),
           ],
         );
-      default:
-        return const SizedBox.shrink();
     }
+    return const SizedBox.shrink();
   }
 
-  Widget _buildStatCard(String label, String value, IconData icon) {
+  Widget _buildSectionLabel(String title) {
+    return Text(
+      title,
+      style: TextStyle(
+        color: Colors.grey.shade600,
+        fontSize: 9,
+        fontWeight: FontWeight.w900,
+        letterSpacing: 1.5,
+        fontFamily: 'monospace',
+      ),
+    );
+  }
+
+  Widget _buildStatCard(String label, String value, IconData icon, Color dynamicAccent) {
     return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0D0D12),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFF1A1A26)),
+      ),
+      child: Row(
         children: [
-          Icon(icon, color: const Color(0xFFCCFF00), size: 16),
-          const SizedBox(height: 12),
-          Text(value, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900)),
-          const SizedBox(height: 2),
-          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 9, fontWeight: FontWeight.bold)),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: dynamicAccent.withOpacity(0.06),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: dynamicAccent.withOpacity(0.15), width: 0.5),
+            ),
+            child: Icon(icon, color: dynamicAccent, size: 16),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value,
+                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'monospace'),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  label,
+                  style: TextStyle(color: Colors.grey.shade500, fontSize: 8, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
+    );
+  }
+
+  Widget _buildGlassPanel({required Widget child}) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0D0D12),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFF1A1A26)),
+      ),
+      child: child,
     );
   }
 }
