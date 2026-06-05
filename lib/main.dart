@@ -35,27 +35,27 @@ class FitLogApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'FitLog',
+        debugShowCheckedModeBanner: false,
+        title: 'FitLog',
 
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: Colors.black,
+        theme: ThemeData.dark().copyWith(
+          scaffoldBackgroundColor: Colors.black,
 
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.black,
-          titleTextStyle: TextStyle(
-            color: Colors.lightGreenAccent,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.black,
+            titleTextStyle: TextStyle(
+              color: Colors.lightGreenAccent,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-      ),
 
-      home: const TestingGatewayScreen(),
-routes: {
-  '/login': (context) => const FitLogLogin()
-}
-);
+        home: const TestingGatewayScreen(),
+        routes: {
+          '/login': (context) => const FitLogLogin()
+        }
+    );
 
 
   }

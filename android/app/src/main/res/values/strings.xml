@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="full_name_label">FULL NAME</string>
+    <string name="welcome_to_fitlog">Welcome to Fitlog</string>
+    <string name="stitch_design_with_ai">Stitch - Design with AI</string>
+    <string name="your_personal_fitness_companion">YOUR PERSONAL\nFITNESS COMPANION</string>
+    <string name="welcome_description">Track every move, analyze every set, and\nconquer your goals with precision data.</string>
+    <string name="login_btn">LOGIN</string>
+    <string name="signup_btn">SIGN UP</string>
+    <string name="login">LOGIN</string>
+    <string name="create_account">CREATE ACCOUNT</string>
+    <string name="tagline">YOUR PERSONAL FITNESS COMPANION</string>
+    <string name="email_label">EMAIL</string>
+    <string name="email_hint">Enter your email</string>
+    <string name="password_label">PASSWORD</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="password_hint">Enter your password</string>
+    <string name="or_separator">OR</string>
+    <string name="social_proof_text">Joined by 10,000+ fitness enthusiasts</string>
+    <string name="login_link">Login</string>
+
+    <!-- Account Screen Strings -->
+    <string name="athlete_profile">ATHLETE PROFILE</string>
+    <string name="account_title">Account</string>
+    <string name="member_since">MEMBER SINCE\n%s</string>
+    <string name="personal_details">PERSONAL DETAILS</string>
+    <string name="edit_all">EDIT ALL</string>
+    <string name="email_address_label">Email Address</string>
+    <string name="height_label">Height</string>
+    <string name="weight_label">Weight</string>
+    <string name="body_fat_label">Body Fat</string>
+    <string name="security_privacy">SECURITY &amp; PRIVACY</string>
+    <string name="update_password">Update Password</string>
+    <string name="biometric_authentication">Biometric Authentication</string>
+    <string name="data_export_history">Data Export &amp; History</string>
+    <string name="terminate_account">TERMINATE ACCOUNT</string>
+    <string name="terminate_description">Permanently delete your account and all workout history. This action cannot be undone.</string>
+    <string name="understand_risks">I understand the risks</string>
+    <string name="delete_account">DELETE ACCOUNT</string>
+    <string name="mfa_required">MFA REQUIRED</string>
+
+    <!-- Navigation Strings -->
+    <string name="nav_dash">DASH</string>
+    <string name="nav_train">TRAIN</string>
+    <string name="nav_fuel">FUEL</string>
+    <string name="nav_goals">GOALS</string>
+    <string name="nav_admin">ADMIN</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_features">Features</string>
+    <string name="nav_library">Library</string>
+    <string name="nav_activity">Activity</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Create Profile Strings -->
+    <string name="create_profile_title">Create Profile</string>
+    <string name="create_profile_subtitle">Tell us about yourself to customize your experience.</string>
+    <string name="full_name_hint">Enter your full name</string>
+    <string name="email_label_cp">EMAIL</string>
+    <string name="email_hint_cp">Enter your email</string>
+    <string name="password_label_cp">PASSWORD</string>
+    <string name="password_hint_cp">Enter your password</string>
+    <string name="required_label">REQUIRED</string>
+    <string name="age_label">Age</string>
+    <string name="gender_label">Gender</string>
+    <string name="fitness_goal_label">FITNESS GOAL</string>
+    <string name="muscle_gain">Muscle Gain</string>
+    <string name="weight_loss">Weight Loss</string>
+    <string name="endurance">Endurance</string>
+    <string name="create_account_btn">CREATE ACCOUNT</string>
+    <string name="already_have_account">Already have an account? </string>
+
+    <!-- Fuel Log Strings -->
+    <string name="daily_energy_balance">DAILY ENERGY BALANCE</string>
+    <string name="kcal">kcal</string>
+    <string name="surplus">SURPLUS</string>
+    <string name="burned">Burned</string>
+    <string name="of_target">of target</string>
+    <string name="goal">goal</string>
+    <string name="intake">Intake</string>
+    <string name="of_limit">of limit</string>
+    <string name="limit">limit</string>
+    <string name="macronutrients">MACRONUTRIENTS</string>
+    <string name="protein">Protein</string>
+    <string name="carbs">Carbs</string>
+    <string name="fats">Fats</string>
+    <string name="fuel_log">FUEL LOG</string>
+    <string name="breakfast">Breakfast</string>
+    <string name="lunch">Lunch</string>
+    <string name="dinner">Dinner</string>
+    <string name="not_logged_yet">Not logged yet</string>
+    <string name="snacks">Snacks</string>
+
+    <!-- Hydration Strings -->
+    <string name="hydration_daily_target">HYDRATION DAILY TARGET</string>
+    <string name="hydration_motivation">Stay hydrated for peak performance.</string>
+    <string name="intake_reminders_title">Intake Reminders</string>
+    <string name="intake_reminders_desc">Get notified to drink water throughout the day.</string>
+    <string name="interval_frequency_title">Interval Frequency</string>
+    <string name="every_1h">Every 1h</string>
+    <string name="every_2h">Every 2h</string>
+    <string name="every_3h">Every 3h</string>
+    <string name="smart_reminder_title">Smart Reminder</string>
+    <string name="high_intensity">HIGH INTENSITY</string>
+    <string name="smart_reminder_desc">Auto-adjust intervals during active workouts.</string>
+    <string name="enabled_for_elite_pro">ENABLED FOR ELITE PRO</string>
+    <string name="monitoring_window_title">Monitoring Window</string>
+    <string name="start_time_label">Start Time</string>
+    <string name="end_time_label">End Time</string>
+    <string name="save_preferences">SAVE PREFERENCES</string>
+    <string name="back_button_content_description">Back</string>
+
+    <!-- Personal Details Strings -->
+    <string name="settings_title">SETTINGS</string>
+    <string name="edit_profile_title">Edit Profile</string>
+    <string name="discard_changes">DISCARD CHANGES</string>
+    <string name="primary_fitness_goal_label">PRIMARY FITNESS GOAL</string>
+    <string name="weight_loss_conditioning">Weight Loss &amp; Conditioning</string>
+    <string name="personal_details_subtitle">Manage your biometric data and identifiers.</string>
+    <string name="cm_unit">cm</string>
+    <string name="kg_unit">kg</string>
+    <string name="body_composition_label">Body Composition</string>
+    <string name="bf_percentage_unit">% BF</string>
+    <string name="save_changes_button">SAVE CHANGES</string>
+    <string name="reset_button_content_description">Reset</string>
+    <string name="identity_label">IDENTITY</string>
+    <string name="performance_email_label">PERFORMANCE EMAIL</string>
+    <string name="metrics_info_description">Biometric data is used to calculate calorie burn and performance metrics.</string>
+
+    <!-- Sleep Strings -->
+    <string name="sleep_history_title">SLEEP HISTORY</string>
+    <string name="last_night_sleep">LAST NIGHT SLEEP</string>
+    <string name="hours_label">hours</string>
+    <string name="quality_good_sleep">Quality Good Sleep</string>
+    <string name="tonight_tracking_title">TONIGHT TRACKING</string>
+    <string name="sleep_mode_label">Sleep Mode</string>
+    <string name="sleep_mode_desc">Dim screen and silence notifications</string>
+    <string name="bedtime_alarm_label">Bedtime Alarm</string>
+    <string name="bedtime_alarm_desc">Gentle wake-up call at optimal phase</string>
+    <string name="log_sleep_button">LOG SLEEP SESSION</string>
+
+    <!-- Calorie Tracker Strings -->
+    <string name="calorie_tracker_title">Calorie Tracker</string>
+    <string name="fit_log_display">FIT LOG</string>
+    <string name="todays_total">Today\'s Total</string>
+    <string name="macros_title">MACROS</string>
+    <string name="meals_today_title">MEALS TODAY</string>
+    <string name="entries_count">%d ENTRIES</string>
+    <string name="log_meal_btn">LOG MEAL</string>
+    <string name="snack">Snack</string>
+    <string name="kcal_uppercase">KCAL</string>
+
+    <!-- Water Tracker Strings -->
+    <string name="water_tracker_title">Water Tracker</string>
+    <string name="liters_label">LITERS</string>
+    <string name="water_goal_format">GOAL: %s LITERS</string>
+    <string name="plus_1_cup">+ 1 Cup</string>
+    <string name="plus_500ml">+ 500ml</string>
+    <string name="minus_250ml">- 250ml</string>
+    <string name="reminder_settings_label">REMINDER SETTINGS</string>
+    <string name="frequency_label">Frequency</string>
+    <string name="hydration_log_label">HYDRATION LOG</string>
+    <string name="add_water_btn">+ Add Water</string>
+    <string name="bottled_water_label">Bottled Water</string>
+    <string name="glass_of_water_label">Glass of Water</string>
+    <string name="protein_shake_label">Protein Shake</string>
+    <string name="time_8_45_am">08:45 AM</string>
+    <string name="time_10_15_am">10:15 AM</string>
+    <string name="time_12_30_pm">12:30 PM</string>
+    <string name="vol_500ml">500ml</string>
+    <string name="vol_250ml">250ml</string>
+    <string name="vol_400ml">400ml</string>
+
+</resources>
