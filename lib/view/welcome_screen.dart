@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fitlog/binesh/create_profile_screen.dart';
+import 'package:fitlog/view/create_profile_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
