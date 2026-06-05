@@ -1,15 +1,12 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fitlog/repo/user_repo.dart';
-
+import 'user_repo.dart';
 import '../model/user_model.dart';
 
 class UserRepoImpl implements UserRepo {
-  final auth = FirebaseAuth.instance;
-  final firestore = FirebaseFirestore.instance;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  //firestore
   @override
   Future<void> addUser(UserModel userModel) {
     return firestore
@@ -37,40 +34,31 @@ class UserRepoImpl implements UserRepo {
   }
 
   @override
-  Future<List<UserModel>> getAllUser() async{
-    final users = await firestore
-        .collection("users").get();
-
-    List<UserModel> data = [];
-
-    for(int i =0;i<users.docs.length;i++){
-      data.add(UserModel.fromMap(users.docs[i].data()));
-    }
-
-    return data;
-
+  Future<List<UserModel>> getAllUser() async {
+    final snapshot = await firestore.collection("users").get();
+    return snapshot.docs
+        .map((doc) => UserModel.fromMap(doc.data()))
+        .toList();
   }
 
   @override
   Future<UserModel> getUserByID(String id) async {
-    final users = await firestore
-        .collection("users").doc(id).get();
-    final data = users.data();
+    final doc = await firestore.collection("users").doc(id).get();
+    final data = doc.data();
 
-    if(data == null){
-      throw Exception("unable to fetch data");
+    if (data == null) {
+      throw Exception("User not found");
     }
     return UserModel.fromMap(data);
-
   }
 
   @override
   Future<String> login(String email, String password) async {
-    final user = await auth.signInWithEmailAndPassword(
+    final userCredential = await auth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
-    final userId = user.user?.uid;
+    final userId = userCredential.user?.uid;
 
     if (userId == null) {
       throw Exception("Login failed");
@@ -83,14 +71,13 @@ class UserRepoImpl implements UserRepo {
     return auth.signOut();
   }
 
-  //authentication
   @override
   Future<String> register(String email, String password) async {
-    final user = await auth.createUserWithEmailAndPassword(
+    final userCredential = await auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
-    final userId = user.user?.uid;
+    final userId = userCredential.user?.uid;
 
     if (userId == null) {
       throw Exception("Registration failed");
