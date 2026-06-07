@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:787175973990:android:495b0d3bab7016ff55b9a7",
         "android_client_info": {
-          "package_name": "fitlog.fitnessapp.com"
+          "package_name": "com.example.fitlog"
         }
       },
       "oauth_client": [],

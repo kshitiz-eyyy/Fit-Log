@@ -131,7 +131,7 @@ class _MembershipTrackingScreenState extends State<MembershipTrackingScreen> {
                     ),
                     const SizedBox(height: 14),
                     const Text(
-                      "Rijan Gunda",
+                      "Kshitiz Pokharel",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,

@@ -2,7 +2,7 @@
 import 'package:fitlog/view/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'forgot_password_screen.dart';
-import 'dashboard.dart';
+import 'user_dashboard.dart';
 
 
 class FitLogLogin extends StatefulWidget {
