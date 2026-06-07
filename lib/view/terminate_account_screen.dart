@@ -297,7 +297,7 @@ class _TerminateAccountScreenState extends State<TerminateAccountScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFF1A1210),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: warningColor.withOpacity(0.2)),
+        border: Border.all(color: warningColor.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

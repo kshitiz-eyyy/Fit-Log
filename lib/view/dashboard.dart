@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'features_screen.dart';
-import 'library.dart';
-import 'activity_screen.dart';
-import 'user_profile.dart';
-import 'bmi_calculator_screen.dart';
-import 'workout_timer_screen.dart';
-import 'meal_tracking_screen.dart';
-import 'chatbot.dart';
+import 'package:fitlog/view/features_screen.dart';
+import 'package:fitlog/view/library.dart';
+import 'package:fitlog/view/user_activity_screen.dart';
+import 'package:fitlog/view/user_profile.dart';
+import 'package:fitlog/view/bmi_calculator_screen.dart';
+import 'package:fitlog/view/workout_timer_screen.dart';
+import 'package:fitlog/view/meal_tracking_screen.dart';
+import 'package:fitlog/view/chatbot.dart';
+import 'package:fitlog/view/water_tracker_screen.dart';
+import 'package:fitlog/view/premium_membership.dart';
 import 'dart:math';
 
 class DashboardScreen extends StatefulWidget {
@@ -19,7 +21,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
-  String _userName = "FitLog Athlete"; // Connected dynamically to SharedPreferences
+  String _userName = "FitLog Athlete";
 
   @override
   void initState() {
@@ -27,7 +29,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _loadUserProfileName();
   }
 
-  // Fetches the saved name from the user profile database
   Future<void> _loadUserProfileName() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -35,102 +36,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
-  List<Widget> get _screens => [
-    _DashboardContent(
-      onNavigateToActivity: () => _onItemTapped(3),
-      onNavigateToProfile: () => _onItemTapped(4),
-      onProfileUpdated: _loadUserProfileName, // Callback to refresh name when profile changes
-    ),
-    FeaturesScreen(),
-    const LibraryScreen(),
-    const ActivityScreen(),
-    const ProfileScreen(),
-  ];
-
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
     if (index == 0) {
-      _loadUserProfileName(); // Keep it synced when returning home
+      _loadUserProfileName();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: Drawer(
-        backgroundColor: const Color(0xFF121212),
-        child: Column(
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(color: Color(0xFF161616)),
-              child: Row(
-                children: [
-                  const CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Color(0xFFCCFF00),
-                    child: Icon(Icons.person, color: Colors.black, size: 35),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _userName, // Dynamically driven user name matching image_6b6ffd.png
-                          style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
-                        ),
-                        const Text("Pro Premium Member", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 11)),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.dashboard, color: Colors.white),
-              title: const Text("Dashboard Home", style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(context);
-                _onItemTapped(0);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.person, color: Colors.white),
-              title: const Text("My Profile & Settings", style: TextStyle(color: Colors.white)),
-              onTap: () async {
-                Navigator.pop(context);
-                _onItemTapped(4);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.calculate, color: Colors.white),
-              title: const Text("BMI Engine Analyzer", style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const BMICalculatorScreen())).then((_) => _loadUserProfileName());
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.timer, color: Colors.white),
-              title: const Text("Workout Session Timer", style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const WorkoutTimerScreen()));
-              },
-            ),
-            const Spacer(),
-            const Divider(color: Color(0xFF262626)),
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.redAccent),
-              title: const Text("Sign Out Session", style: TextStyle(color: Colors.redAccent)),
-              onTap: () => Navigator.pop(context),
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
+    final List<Widget> screens = [
+      _DashboardContent(
+        onNavigateToActivity: () => _onItemTapped(3),
+        onNavigateToProfile: () => _onItemTapped(4),
+        onProfileUpdated: _loadUserProfileName,
       ),
-      body: _screens[_selectedIndex],
+      FeaturesScreen(),
+      const LibraryScreen(),
+      const ActivityScreen(),
+      const ProfileScreen(),
+    ];
+
+    return Scaffold(
+      drawer: _buildDrawer(),
+      body: screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF0F0F0F),
         selectedItemColor: const Color(0xFFCCFF00),
@@ -139,11 +68,95 @@ class _DashboardScreenState extends State<DashboardScreen> {
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.grid_view), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.featured_video_outlined), label: "Features"),
           BottomNavigationBarItem(icon: Icon(Icons.library_add), label: "Library"),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: "Activity"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDrawer() {
+    return Drawer(
+      backgroundColor: const Color(0xFF121212),
+      child: Column(
+        children: [
+          DrawerHeader(
+            decoration: const BoxDecoration(color: Color(0xFF161616)),
+            child: Row(
+              children: [
+                const CircleAvatar(
+                  radius: 30,
+                  backgroundColor: Color(0xFFCCFF00),
+                  child: Icon(Icons.person, color: Colors.black, size: 35),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _userName,
+                        style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
+                      ),
+                      const Text("Pro Premium Member", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 11)),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.dashboard, color: Colors.white),
+            title: const Text("Dashboard Home", style: TextStyle(color: Colors.white)),
+            onTap: () {
+              Navigator.pop(context);
+              _onItemTapped(0);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.person, color: Colors.white),
+            title: const Text("My Profile & Settings", style: TextStyle(color: Colors.white)),
+            onTap: () async {
+              Navigator.pop(context);
+              _onItemTapped(4);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.calculate, color: Colors.white),
+            title: const Text("BMI Engine Analyzer", style: TextStyle(color: Colors.white)),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const BMICalculatorScreen())).then((_) => _loadUserProfileName());
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.timer, color: Colors.white),
+            title: const Text("Workout Session Timer", style: TextStyle(color: Colors.white)),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const WorkoutTimerScreen()));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.card_membership, color: Colors.white),
+            title: const Text("Membership Operations", style: TextStyle(color: Colors.white)),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const MembershipTrackingScreen()));
+            },
+          ),
+          const Spacer(),
+          const Divider(color: Color(0xFF262626)),
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.redAccent),
+            title: const Text("Sign Out Session", style: TextStyle(color: Colors.redAccent)),
+            onTap: () => Navigator.pop(context),
+          ),
+          const SizedBox(height: 20),
         ],
       ),
     );
@@ -172,13 +185,12 @@ class _DashboardContentState extends State<_DashboardContent> {
   double displayBmiValue = 22.9;
   String bmiStatusText = "Normal Range";
   bool hydrationReminderActive = true;
-
   int currentStreak = 5;
   int personalRecordStreak = 12;
   bool loggedToday = false;
 
   final List<String> _quotes = [
-    "The only bad workout is the one that didn't happen.",
+    "Consistency beats talent every single day.",
     "Success isn't always about greatness. It's about consistency.",
     "Your body can stand almost anything. It's your mind that you have to convince.",
   ];
@@ -208,7 +220,7 @@ class _DashboardContentState extends State<_DashboardContent> {
       bmiStatusText = displayBmiValue < 25.0 ? "Normal Range" : "Overweight Range";
       currentTargetCalories = 2800;
     });
-    widget.onProfileUpdated(); // Keep name string in sync with drawer
+    widget.onProfileUpdated();
   }
 
   Future<void> _toggleDailyLog() async {
@@ -250,9 +262,7 @@ class _DashboardContentState extends State<_DashboardContent> {
                 ],
               ),
               const Divider(color: Color(0xFF262626)),
-              _notificationItem(Icons.workspace_premium, "Subscription Active", "Your FitLog Pro access plan has renewed smoothly."),
-              _notificationItem(Icons.local_fire_department, "Calorie Target Goal Alert", "You are within 15% of hitting your target metrics today."),
-              _notificationItem(Icons.water_drop, "Hydration Reminder", "Time to log another 250ml water window input."),
+              _notificationItem(Icons.workspace_premium, "Subscription Active", "Your FitLog Pro plan is active."),
             ],
           ),
         ),
@@ -283,10 +293,6 @@ class _DashboardContentState extends State<_DashboardContent> {
 
   @override
   Widget build(BuildContext context) {
-    double caloriePercentage = (internalCaloriesEaten / currentTargetCalories).clamp(0.0, 1.0);
-    int caloriesRemaining = max(0, currentTargetCalories - internalCaloriesEaten);
-    double waterRemaining = max(0.0, 3.5 - hydrationAmount);
-
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F0F),
       appBar: AppBar(
@@ -296,7 +302,7 @@ class _DashboardContentState extends State<_DashboardContent> {
         leading: IconButton(
           icon: const Icon(Icons.menu, color: Colors.white),
           onPressed: () {
-            _loadDashboardData(); // Refresh metrics and name right before drawer slides out
+            _loadDashboardData();
             Scaffold.of(context).openDrawer();
           },
         ),
@@ -322,122 +328,10 @@ class _DashboardContentState extends State<_DashboardContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(
-              padding: const EdgeInsets.all(14),
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(color: const Color(0xFFCCFF00).withValues(alpha: 0.08), border: Border.all(color: const Color(0xFFCCFF00), width: 0.8), borderRadius: BorderRadius.circular(4)),
-              child: Row(
-                children: [
-                  const Icon(Icons.format_quote, color: Color(0xFFCCFF00), size: 24),
-                  const SizedBox(width: 12),
-                  Expanded(child: Text(_currentQuote, style: const TextStyle(color: Colors.white, fontSize: 13, fontStyle: FontStyle.italic))),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(16),
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.local_fire_department, color: loggedToday ? const Color(0xFFCCFF00) : Colors.grey, size: 28),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("$currentStreak DAY STREAK", style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
-                          Text("Personal Record: $personalRecordStreak days", style: const TextStyle(color: Colors.grey, fontSize: 11)),
-                        ],
-                      ),
-                    ],
-                  ),
-                  OutlinedButton(
-                    onPressed: _toggleDailyLog,
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: loggedToday ? Colors.grey : const Color(0xFFCCFF00)),
-                      backgroundColor: loggedToday ? Colors.transparent : const Color(0xFFCCFF00).withValues(alpha: 0.1),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    ),
-                    child: Text(
-                      loggedToday ? "COMPLETED" : "LOG TODAY",
-                      style: TextStyle(color: loggedToday ? Colors.grey : const Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(20),
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
-              child: Row(
-                children: [
-                  SizedBox(
-                    height: 110,
-                    width: 110,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        SizedBox(
-                          height: 100,
-                          width: 100,
-                          child: CircularProgressIndicator(
-                            value: caloriePercentage,
-                            strokeWidth: 6,
-                            backgroundColor: Colors.grey.shade900,
-                            valueColor: const AlwaysStoppedAnimation(Color(0xFFCCFF00)),
-                          ),
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text("$internalCaloriesEaten", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 24)),
-                            const Text("kcal eaten", style: TextStyle(color: Colors.grey, fontSize: 9)),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 24),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text("TARGET VELOCITY ENGINE", style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            const Icon(Icons.flag_outlined, color: Color(0xFFCCFF00), size: 14),
-                            const SizedBox(width: 6),
-                            Text("$caloriesRemaining kcal deficit left", style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500)),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          children: [
-                            const Icon(Icons.water_drop_outlined, color: Colors.blueAccent, size: 14),
-                            const SizedBox(width: 6),
-                            Text("${waterRemaining.toStringAsFixed(2)} L fluid remaining", style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500)),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(color: const Color(0xFF262626), borderRadius: BorderRadius.circular(4)),
-                          child: Text(
-                            caloriePercentage >= 1.0 ? "METABOLIC SURPLUS MET" : "CALORIC DEFICIT PROFILE ACTIVE",
-                            style: const TextStyle(color: Color(0xFFCCFF00), fontSize: 9, fontWeight: FontWeight.bold),
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
+            _buildStreakCard(),
+            const SizedBox(height: 12),
+            _buildTargetCard(),
+            const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
@@ -451,82 +345,36 @@ class _DashboardContentState extends State<_DashboardContent> {
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: _buildMetricCard("DAILY METABOLIC", "$internalCaloriesEaten / $currentTargetCalories", "Target Floor Window", Icons.local_fire_department),
+                  child: _buildMetricCard("DAILY METABOLIC", "$internalCaloriesEaten", "kcal eaten", Icons.local_fire_department),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
-                  child: Container(
-                    height: 120,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Row(
-                          children: [
-                            Icon(Icons.water_drop, color: Color(0xFFCCFF00), size: 14),
-                            SizedBox(width: 6),
-                            Text("HYDRATION", style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
-                          ],
-                        ),
-                        Text("$hydrationAmount L", style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900)),
-                        const Text("Daily Target: 3.5 Liters", style: TextStyle(color: Colors.grey, fontSize: 10)),
-                      ],
-                    ),
+                  child: GestureDetector(
+                    onTap: () async {
+                      await Navigator.push(context, MaterialPageRoute(builder: (context) => const WaterTrackerScreen()));
+                      _loadDashboardData();
+                    },
+                    child: _buildMetricCard("HYDRATION", "$hydrationAmount L", "Daily Target: 3.5L", Icons.water_drop),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Container(
-                    height: 120,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Row(
-                          children: [
-                            Icon(Icons.notifications_active_outlined, color: Color(0xFFCCFF00), size: 14),
-                            SizedBox(width: 6),
-                            Text("HYDRO RADAR", style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
-                          ],
-                        ),
-                        Switch(
-                          value: hydrationReminderActive,
-                          activeColor: const Color(0xFFCCFF00),
-                          onChanged: (val) => setState(() => hydrationReminderActive = val),
-                        ),
-                        Text(hydrationReminderActive ? "Hourly Alerts Active" : "Alert Pings Paused", style: const TextStyle(color: Color(0xFFCCFF00), fontSize: 10)),
-                      ],
-                    ),
-                  ),
+                  child: _buildMetricCard("TRAINING", "ACTIVE", "Next: Lower Body", Icons.fitness_center),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
+            const SizedBox(height: 20),
+            ElevatedButton(
               onPressed: () async {
                 await Navigator.push(context, MaterialPageRoute(builder: (context) => const MealTrackingScreen()));
                 _loadDashboardData();
               },
-              icon: const Icon(Icons.restaurant, color: Colors.black, size: 18),
-              label: const Text("OPEN MEAL DIARY LOG", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 13)),
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFCCFF00), padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () async {
-                await Navigator.push(context, MaterialPageRoute(builder: (context) => const WorkoutTimerScreen()));
-                _loadDashboardData();
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, foregroundColor: const Color(0xFFCCFF00), padding: const EdgeInsets.symmetric(vertical: 14), shape: const RoundedRectangleBorder(side: BorderSide(color: Color(0xFFCCFF00), width: 1))),
-              child: const Text("START ACTIVE TRAINING TIMER", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5, fontSize: 13)),
+              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFCCFF00), padding: const EdgeInsets.symmetric(vertical: 14)),
+              child: const Text("OPEN MEAL DIARY", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -534,9 +382,73 @@ class _DashboardContentState extends State<_DashboardContent> {
     );
   }
 
+  Widget _buildStreakCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.local_fire_department, color: Color(0xFFCCFF00), size: 28),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("$currentStreak DAY STREAK", style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+                  Text("PR: $personalRecordStreak days", style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                ],
+              ),
+            ],
+          ),
+          OutlinedButton(
+            onPressed: _toggleDailyLog,
+            style: OutlinedButton.styleFrom(side: const BorderSide(color: Color(0xFFCCFF00))),
+            child: Text(loggedToday ? "COMPLETED" : "LOG TODAY", style: const TextStyle(color: Color(0xFFCCFF00), fontSize: 10)),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTargetCard() {
+    double progress = (internalCaloriesEaten / currentTargetCalories).clamp(0.0, 1.0);
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
+      child: Row(
+        children: [
+          SizedBox(
+            height: 80,
+            width: 80,
+            child: CircularProgressIndicator(
+              value: progress,
+              strokeWidth: 6,
+              backgroundColor: Colors.grey.shade900,
+              valueColor: const AlwaysStoppedAnimation(Color(0xFFCCFF00)),
+            ),
+          ),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text("TARGET VELOCITY", style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
+                Text("${currentTargetCalories - internalCaloriesEaten} kcal remaining", style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                LinearProgressIndicator(value: progress, backgroundColor: Colors.grey.shade900, color: const Color(0xFFCCFF00)),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   Widget _buildMetricCard(String title, String value, String subtitle, IconData icon) {
     return Container(
-      height: 120,
+      height: 110,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
       child: Column(
@@ -551,7 +463,7 @@ class _DashboardContentState extends State<_DashboardContent> {
             ],
           ),
           Text(value, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
-          Text(subtitle, style: const TextStyle(color: Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.w500)),
+          Text(subtitle, style: const TextStyle(color: Color(0xFFCCFF00), fontSize: 10)),
         ],
       ),
     );

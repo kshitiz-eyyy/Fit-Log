@@ -2,7 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
-import 'membership_tracking_screen.dart';
+import 'package:fitlog/view/premium_membership.dart';
+import 'package:fitlog/view/change_password_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -93,7 +94,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               await _savePreference('user_name', athleteName);
               await _savePreference('user_bio', athleteBio);
               await _savePreference('fitness_goal', fitnessGoal);
-              Navigator.pop(context);
+              if (mounted) Navigator.pop(context);
             },
             child: const Text("SAVE", style: TextStyle(color: Color(0xFFCCFF00))),
           )
@@ -207,12 +208,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
               setState(() => workoutRemindersEnabled = val);
               _savePreference('setting_reminders', val);
             }),
+            _buildActionTile(Icons.lock_reset_outlined, "Update Password", "Modify your performance access key", () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const ChangePasswordScreen()));
+            }),
             const SizedBox(height: 14),
             OutlinedButton(
               onPressed: _showEditProfileDialog,
               style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.grey), padding: const EdgeInsets.symmetric(vertical: 12)),
               child: const Text("EDIT METRIC BIO CHANNELS", style: TextStyle(color: Colors.white, fontSize: 12)),
             )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionTile(IconData icon, String title, String subtitle, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+        decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
+        child: Row(
+          children: [
+            Icon(icon, color: const Color(0xFFCCFF00), size: 18),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(title, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 2),
+                Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 10)),
+              ]),
+            ),
+            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey, size: 12),
           ],
         ),
       ),
@@ -234,7 +263,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 10)),
             ]),
           ),
-          Switch(value: value, activeColor: const Color(0xFFCCFF00), onChanged: onToggle),
+          Switch(value: value, activeThumbColor: const Color(0xFFCCFF00), onChanged: onToggle),
         ],
       ),
     );

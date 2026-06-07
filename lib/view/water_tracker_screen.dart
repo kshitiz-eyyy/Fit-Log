@@ -228,7 +228,7 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
       decoration: BoxDecoration(
         color: surfaceDark,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: cyanBlue.withOpacity(0.3)),
+        border: Border.all(color: cyanBlue.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -252,7 +252,7 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
               Switch(
                 value: _remindersEnabled,
                 onChanged: (val) => setState(() => _remindersEnabled = val),
-                activeColor: Colors.white,
+                activeThumbColor: Colors.white,
                 activeTrackColor: secondaryLime,
                 inactiveTrackColor: Colors.grey[800],
               ),

@@ -81,7 +81,7 @@ class _SleepScreenState extends State<SleepScreen> {
           child: CircularProgressIndicator(
             value: 0.75,
             strokeWidth: 14,
-            backgroundColor: Colors.white.withOpacity(0.1),
+            backgroundColor: Colors.white.withValues(alpha: 0.1),
             valueColor: const AlwaysStoppedAnimation<Color>(Colors.cyanAccent),
             strokeCap: StrokeCap.round,
           ),
@@ -253,7 +253,7 @@ class _SleepScreenState extends State<SleepScreen> {
         Switch(
           value: value,
           onChanged: onChanged,
-          activeColor: Colors.white,
+          activeThumbColor: Colors.white,
           activeTrackColor: Colors.cyanAccent,
           inactiveThumbColor: Colors.white,
           inactiveTrackColor: Colors.grey[800],
