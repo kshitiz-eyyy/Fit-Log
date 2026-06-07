@@ -119,15 +119,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: const Color(0xFF333333)),
-                      color: inputColor,
-                    ),
-                    child: const Icon(Icons.person_outline, color: Colors.grey, size: 24),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back, color: textColor, size: 24),
+                    onPressed: () => Navigator.pop(context),
                   ),
                   const Text(
                     'FITLOG',

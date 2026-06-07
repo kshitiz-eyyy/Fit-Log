@@ -266,19 +266,40 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
                 'Frequency',
                 style: TextStyle(color: textGray, fontSize: 16),
               ),
-              Row(
-                children: [
-                  Text(
-                    _frequency,
-                    style: const TextStyle(
-                      color: secondaryLime,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+              PopupMenuButton<String>(
+                onSelected: (String value) {
+                  setState(() {
+                    _frequency = value;
+                  });
+                },
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                  const PopupMenuItem<String>(
+                    value: 'Every 30 min',
+                    child: Text('Every 30 min'),
                   ),
-                  const SizedBox(width: 4),
-                  const Icon(Icons.keyboard_arrow_down, color: textGray, size: 20),
+                  const PopupMenuItem<String>(
+                    value: 'Every 1 hour',
+                    child: Text('Every 1 hour'),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'Every 2 hours',
+                    child: Text('Every 2 hours'),
+                  ),
                 ],
+                child: Row(
+                  children: [
+                    Text(
+                      _frequency,
+                      style: const TextStyle(
+                        color: secondaryLime,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.keyboard_arrow_down, color: textGray, size: 20),
+                  ],
+                ),
               ),
             ],
           ),

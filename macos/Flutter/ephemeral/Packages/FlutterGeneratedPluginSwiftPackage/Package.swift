@@ -17,6 +17,8 @@ let package = Package(
     dependencies: [
         .package(name: "video_player_avfoundation", path: "../.packages/video_player_avfoundation-2.9.7"),
         .package(name: "shared_preferences_foundation", path: "../.packages/shared_preferences_foundation-2.5.6"),
+        .package(name: "local_auth_darwin", path: "../.packages/local_auth_darwin-2.0.3"),
+        .package(name: "file_selector_macos", path: "../.packages/file_selector_macos-0.9.5"),
         .package(name: "firebase_core", path: "../.packages/firebase_core-3.15.2"),
         .package(name: "firebase_auth", path: "../.packages/firebase_auth-5.7.0"),
         .package(name: "cloud_firestore", path: "../.packages/cloud_firestore-5.6.12"),
@@ -29,6 +31,8 @@ let package = Package(
             dependencies: [
                 .product(name: "video-player-avfoundation", package: "video_player_avfoundation"),
                 .product(name: "shared-preferences-foundation", package: "shared_preferences_foundation"),
+                .product(name: "local-auth-darwin", package: "local_auth_darwin"),
+                .product(name: "file-selector-macos", package: "file_selector_macos"),
                 .product(name: "firebase-core", package: "firebase_core"),
                 .product(name: "firebase-auth", package: "firebase_auth"),
                 .product(name: "cloud-firestore", package: "cloud_firestore"),
