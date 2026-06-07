@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart'; // To show response status
+import 'package:provider/provider.dart';       // To listen to the view model
+
+import '../viewmodel/user_view_model.dart'; // Adjust path if needed
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -11,8 +15,47 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   bool _obscureNew = true;
   bool _obscureConfirm = true;
 
+  // 1. ADD THE CONTROLLER FOR THE EMAIL INPUT FIELD
+  final TextEditingController _emailController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  // 2. BACKEND HANDLER FUNCTION FOR FIREBASE
+  void _handleResetRequest(UserViewModel viewModel) async {
+    final String email = _emailController.text.trim();
+
+    if (email.isEmpty) {
+      Fluttertoast.showToast(msg: "Please enter your email address");
+      return;
+    }
+
+    // Call the exact repo method via your ViewModel
+    final bool success = await viewModel.forgetPassword(email);
+
+    if (success) {
+      Fluttertoast.showToast(
+        msg: "Reset link dispatched! Please check your email inbox.",
+        toastLength: Toast.LENGTH_LONG,
+      );
+      // Automatically return to login screen on success
+      Navigator.pop(context);
+    } else {
+      Fluttertoast.showToast(
+        msg: viewModel.error ?? "An unexpected error occurred",
+        toastLength: Toast.LENGTH_LONG,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // 3. LISTEN TO YOUR PROVIDER VIEWMODEL
+    final viewModel = context.watch<UserViewModel>();
+
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
       body: SafeArea(
@@ -63,54 +106,74 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                 // Email Address
                 const _FieldLabel(label: 'EMAIL ADDRESS'),
-                const _CustomInput(
+                _CustomInput(
                   hint: 'CHAMPION@FITLOG.COM',
                   icon: Icons.email_outlined,
                   isSuffixIcon: true,
+                  controller: _emailController, // 4. PASS CONTROLLER HERE
                 ),
 
                 const SizedBox(height: 16),
 
-                // Send OTP Button
-                _ActionButton(
-                  text: 'SEND OTP',
-                  onPressed: () {},
+                // Send Reset Link Button (Replaces static SEND OTP action)
+                viewModel.loading
+                    ? const Center(child: CircularProgressIndicator(color: Color(0xFFCCFF00)))
+                    : _ActionButton(
+                  text: 'SEND RESET LINK',
+                  onPressed: () => _handleResetRequest(viewModel), // 5. HOOK FUNCTION HERE
                   color: const Color(0xFFCCFF00),
                 ),
 
                 const SizedBox(height: 24),
 
-                // OTP Input
-                const _FieldLabel(label: 'ENTER OTP'),
-                const _CustomInput(hint: 'CODE'),
+                // Note: The fields below are kept intact to preserve your UI design completely.
+                // Because Firebase sends an external link, these inputs are decorative structural fillers.
+                const Opacity(
+                  opacity: 0.4, // Dimming fields to reflect external nature of reset flow
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _FieldLabel(label: 'ENTER OTP (SENT VIA LINK)'),
+                      _CustomInput(hint: 'CODE'),
+                    ],
+                  ),
+                ),
 
                 const SizedBox(height: 20),
 
                 // New Password
-                const _FieldLabel(label: 'NEW PASSWORD'),
-                _CustomInput(
-                  hint: '●●●●●●●●',
-                  isPassword: true,
-                  obscure: _obscureNew,
-                  onToggle: () => setState(() => _obscureNew = !_obscureNew),
-                ),
+                Opacity(
+                  opacity: 0.4,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const _FieldLabel(label: 'NEW PASSWORD'),
+                      _CustomInput(
+                        hint: '●●●●●●●●',
+                        isPassword: true,
+                        obscure: _obscureNew,
+                        onToggle: () => setState(() => _obscureNew = !_obscureNew),
+                      ),
 
-                // Confirm Password
-                const _FieldLabel(label: 'CONFIRM PASSWORD'),
-                _CustomInput(
-                  hint: '●●●●●●●●',
-                  isPassword: true,
-                  obscure: _obscureConfirm,
-                  onToggle: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                      // Confirm Password
+                      const _FieldLabel(label: 'CONFIRM PASSWORD'),
+                      _CustomInput(
+                        hint: '●●●●●●●●',
+                        isPassword: true,
+                        obscure: _obscureConfirm,
+                        onToggle: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                      ),
+                    ],
+                  ),
                 ),
 
                 const SizedBox(height: 30),
 
-                // Reset Password Button
+                // Secondary Reset Password Button (Disabled placeholder to prevent interaction conflicts)
                 _ActionButton(
-                  text: 'RESET PASSWORD',
+                  text: 'RESET VIA EMAIL LINK',
                   onPressed: () {},
-                  color: const Color(0xFFCCFF00),
+                  color: Colors.white12,
                 ),
 
                 const SizedBox(height: 24),
@@ -159,6 +222,7 @@ class _CustomInput extends StatelessWidget {
   final bool obscure;
   final bool isSuffixIcon;
   final VoidCallback? onToggle;
+  final TextEditingController? controller; // 6. RECEPTOR CONTROLLER PROP
 
   const _CustomInput({
     required this.hint,
@@ -167,6 +231,7 @@ class _CustomInput extends StatelessWidget {
     this.obscure = false,
     this.isSuffixIcon = false,
     this.onToggle,
+    this.controller,
   });
 
   @override
@@ -174,6 +239,7 @@ class _CustomInput extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: TextField(
+        controller: controller, // 7. LINK TO FLUTTER FIELD ENGINE
         obscureText: obscure,
         style: const TextStyle(color: Colors.white, letterSpacing: 2),
         decoration: InputDecoration(

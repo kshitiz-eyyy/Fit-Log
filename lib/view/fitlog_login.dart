@@ -1,9 +1,10 @@
-
 import 'package:fitlog/view/register_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';       // 1. IMPORT PROVIDER
+import '../viewmodel/user_view_model.dart';
 import 'forgot_password_screen.dart';
 import 'dashboard.dart';
-
 
 class FitLogLogin extends StatefulWidget {
   const FitLogLogin({super.key});
@@ -13,7 +14,6 @@ class FitLogLogin extends StatefulWidget {
 }
 
 class _FitLogLoginState extends State<FitLogLogin> {
-
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -24,25 +24,35 @@ class _FitLogLoginState extends State<FitLogLogin> {
     super.dispose();
   }
 
-
-  void _handleLogin() {
+  // 3. UPDATED BACKEND METHOD
+  void _handleLogin(UserViewModel viewModel) async {
     final String email = _emailController.text.trim();
     final String password = _passwordController.text.trim();
 
+    // Basic client validation
+    if (email.isEmpty || password.isEmpty) {
+      Fluttertoast.showToast(msg: "Please fill in all fields");
+      return;
+    }
 
-    if (email == "admin@fitlog.com" && password == "password123") {
+    // Call your repository via the ViewModel
+    final String userId = await viewModel.login(email, password);
+
+    if (userId.isEmpty) {
+      // Login failed -> Show the Firebase exception parsed by your view model
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(viewModel.error ?? 'Login Failed!'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    } else {
+      // Login Success!
+      Fluttertoast.showToast(msg: "Welcome back!");
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => const DashboardScreen(),
-        ),
-      );
-    } else {
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Invalid Credentials! Use admin@fitlog.com / password123'),
-          backgroundColor: Colors.redAccent,
         ),
       );
     }
@@ -50,6 +60,9 @@ class _FitLogLoginState extends State<FitLogLogin> {
 
   @override
   Widget build(BuildContext context) {
+    // 4. LISTEN TO THE VIEW MODEL FOR THE LOADING STATE
+    final viewModel = context.watch<UserViewModel>();
+
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
       body: Padding(
@@ -59,7 +72,6 @@ class _FitLogLoginState extends State<FitLogLogin> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 80),
-
               Row(
                 children: [
                   Image.asset(
@@ -95,7 +107,6 @@ class _FitLogLoginState extends State<FitLogLogin> {
                 style: TextStyle(color: Colors.grey, fontSize: 18),
               ),
               const SizedBox(height: 40),
-
               const _FieldLabel(label: 'EMAIL ADDRESS', size: 16),
               const SizedBox(height: 8),
               _CustomTextField(
@@ -103,9 +114,7 @@ class _FitLogLoginState extends State<FitLogLogin> {
                 icon: Icons.email_outlined,
                 controller: _emailController,
               ),
-
               const SizedBox(height: 24),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -132,20 +141,21 @@ class _FitLogLoginState extends State<FitLogLogin> {
                 isPassword: true,
                 controller: _passwordController,
               ),
-
               const SizedBox(height: 32),
 
-
+              // 5. LOADING SPINNER / BUTTON INTERACTION CONTROL
               SizedBox(
                 width: double.infinity,
                 height: 60,
                 child: ElevatedButton(
-                  onPressed: _handleLogin,
+                  onPressed: viewModel.loading ? null : () => _handleLogin(viewModel),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFCCFF00),
                     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                   ),
-                  child: const Row(
+                  child: viewModel.loading
+                      ? const CircularProgressIndicator(color: Colors.black)
+                      : const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
@@ -163,7 +173,6 @@ class _FitLogLoginState extends State<FitLogLogin> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 40),
               Row(
                 children: const [
@@ -193,7 +202,6 @@ class _FitLogLoginState extends State<FitLogLogin> {
                 ),
               ),
               const SizedBox(height: 40),
-
               Center(
                 child: Wrap(
                   alignment: WrapAlignment.center,
@@ -229,6 +237,7 @@ class _FitLogLoginState extends State<FitLogLogin> {
   }
 }
 
+// Keep your existing _FieldLabel and _CustomTextField classes unchanged below
 class _FieldLabel extends StatelessWidget {
   final String label;
   final double size;
@@ -246,7 +255,6 @@ class _FieldLabel extends StatelessWidget {
     );
   }
 }
-
 
 class _CustomTextField extends StatefulWidget {
   final String hint;
