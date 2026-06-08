@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fitlog/view/premium_membership.dart';
 import 'package:fitlog/view/change_password_screen.dart';
 
@@ -13,36 +15,73 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  String athleteName = "FitLog Athlete";
+  String athleteName = "Loading Athlete...";
   String athleteEmail = "athlete@fitlog.com";
   String athleteBio = "Consistency beats talent every single day.";
   String fitnessGoal = "Hypertrophy Conditioning";
+  String membershipPlanText = "FitLog Regular Member";
   String? _profileImagePath;
 
   bool biometricAuthEnabled = false;
   bool pushNotificationsEnabled = true;
   bool workoutRemindersEnabled = true;
+  bool _isDataSyncLoading = true;
 
   final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
-    _loadUserPreferences();
+    _fetchLiveFirebaseProfileData();
   }
 
-  Future<void> _loadUserPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      athleteName = prefs.getString('user_name') ?? "FitLog Athlete";
-      athleteEmail = prefs.getString('user_email') ?? "athlete@fitlog.com";
-      athleteBio = prefs.getString('user_bio') ?? "Consistency beats talent every single day.";
-      fitnessGoal = prefs.getString('fitness_goal') ?? "Hypertrophy Conditioning";
-      _profileImagePath = prefs.getString('user_profile_img');
+  Future<void> _fetchLiveFirebaseProfileData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      setState(() {
+        _profileImagePath = prefs.getString('user_profile_img');
+        biometricAuthEnabled = prefs.getBool('setting_biometric') ?? false;
+        pushNotificationsEnabled = prefs.getBool('setting_push') ?? true;
+        workoutRemindersEnabled = prefs.getBool('setting_reminders') ?? true;
+      });
 
-      biometricAuthEnabled = prefs.getBool('setting_biometric') ?? false;
-      pushNotificationsEnabled = prefs.getBool('setting_push') ?? true;
-      workoutRemindersEnabled = prefs.getBool('setting_reminders') ?? true;
+      User? liveFirebaseUser = FirebaseAuth.instance.currentUser;
+
+      if (liveFirebaseUser != null) {
+        setState(() {
+          athleteEmail = liveFirebaseUser.email ?? "athlete@fitlog.com";
+        });
+
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(liveFirebaseUser.uid)
+            .get();
+
+        if (userDoc.exists && userDoc.data() != null) {
+          Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
+          setState(() {
+            athleteName = data['name'] ?? "FitLog Athlete";
+            athleteBio = data['user_bio'] ?? "Consistency beats talent every single day.";
+            fitnessGoal = data['fitness_goal'] ?? "Hypertrophy Conditioning";
+
+            String systemRole = data['role'] ?? 'user';
+            membershipPlanText = systemRole == 'admin'
+                ? "FitLog System Administrator"
+                : "FitLog Pro Premium Access";
+
+            _isDataSyncLoading = false;
+          });
+          return;
+        }
+      }
+    } catch (e) {
+      debugPrint("Profile data pipeline sync telemetry failure: $e");
+    }
+
+    final sharedPrefs = await SharedPreferences.getInstance();
+    setState(() {
+      athleteName = sharedPrefs.getString('user_name') ?? "FitLog Athlete";
+      _isDataSyncLoading = false;
     });
   }
 
@@ -86,14 +125,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL", style: TextStyle(color: Colors.grey))),
           TextButton(
             onPressed: () async {
+              final newName = nameCtrl.text.trim();
+              final newBio = bioCtrl.text.trim();
+              final newGoal = goalCtrl.text.trim();
+
               setState(() {
-                athleteName = nameCtrl.text.trim();
-                athleteBio = bioCtrl.text.trim();
-                fitnessGoal = goalCtrl.text.trim();
+                athleteName = newName;
+                athleteBio = newBio;
+                fitnessGoal = newGoal;
+                _isDataSyncLoading = true;
               });
-              await _savePreference('user_name', athleteName);
-              await _savePreference('user_bio', athleteBio);
-              await _savePreference('fitness_goal', fitnessGoal);
+
+              try {
+                User? currentFirebaseUser = FirebaseAuth.instance.currentUser;
+                if (currentFirebaseUser != null) {
+                  await FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(currentFirebaseUser.uid)
+                      .update({
+                    'name': newName,
+                    'user_bio': newBio,
+                    'fitness_goal': newGoal,
+                  });
+                }
+
+                await _savePreference('user_name', newName);
+                await _savePreference('user_bio', newBio);
+                await _savePreference('fitness_goal', newGoal);
+
+                _showToastSnackBar("Cloud Database Profile synchronized successfully.");
+              } catch (e) {
+                _showToastSnackBar("Cloud push failure point: ${e.toString()}");
+              } finally {
+                setState(() => _isDataSyncLoading = false);
+              }
+
               if (mounted) Navigator.pop(context);
             },
             child: const Text("SAVE", style: TextStyle(color: Color(0xFFCCFF00))),
@@ -111,7 +177,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F0F),
-      body: SingleChildScrollView(
+      body: _isDataSyncLoading
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFFCCFF00)))
+          : SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -146,6 +214,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Text(athleteEmail, textAlign: TextAlign.center, style: const TextStyle(color: Colors.grey, fontSize: 12)),
             const SizedBox(height: 4),
             Text("Goal: $fitnessGoal", textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFFCCFF00), fontSize: 11)),
+            const SizedBox(height: 6),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Text(athleteBio, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white60, fontSize: 12, fontStyle: FontStyle.italic)),
+            ),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(14),
@@ -160,12 +233,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: const Icon(Icons.workspace_premium, color: Color(0xFFCCFF00), size: 22),
                       ),
                       const SizedBox(width: 12),
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("CURRENT SERVICE PLAN", style: TextStyle(color: Colors.grey, fontSize: 9, fontWeight: FontWeight.bold)),
-                            Text("FitLog Pro Premium Access", style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+                            const Text("CURRENT SERVICE PLAN", style: TextStyle(color: Colors.grey, fontSize: 9, fontWeight: FontWeight.bold)),
+                            Text(membershipPlanText, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
                           ],
                         ),
                       ),
