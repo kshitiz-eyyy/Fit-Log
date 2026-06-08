@@ -51,7 +51,7 @@ class FitLogApp extends StatelessWidget {
           ),
         ),
 
-        home: const AdminPanelScreen(),
+        home: const DashboardScreen(),
         routes: {
           '/login': (context) => const FitLogLogin()
         }
