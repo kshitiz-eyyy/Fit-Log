@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fitlog/view/exercise_data.dart';
-import 'package:fitlog/view/exerciselistscreen.dart';
-import 'package:fitlog/view/user_activity_screen.dart';
+import 'exercise_data.dart';
+import 'exerciselistscreen.dart';
+import 'user_activity_screen.dart';
 
 class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key});
@@ -13,6 +13,14 @@ class LibraryScreen extends StatefulWidget {
 class _LibraryScreenState extends State<LibraryScreen> {
   int _selectedIndex = 2;
 
+  final List<Widget> _screens = [
+    Center(child: Text("HOME", style: TextStyle(color: Colors.white))),
+    Center(child: Text("FEATURES", style: TextStyle(color: Colors.white))),
+    _LibraryContent(),
+    ActivityScreen(),
+    Center(child: Text("PROFILE", style: TextStyle(color: Colors.white))),
+  ];
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -21,16 +29,9 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> screens = [
-      const Center(child: Text("HOME", style: TextStyle(color: Colors.white))),
-      const Center(child: Text("FEATURES", style: TextStyle(color: Colors.white))),
-      _LibraryContent(),
-      const ActivityScreen(),
-      const Center(child: Text("PROFILE", style: TextStyle(color: Colors.white))),
-    ];
-
     return Scaffold(
-      body: screens[_selectedIndex],
+
+      body: _screens[_selectedIndex],
     );
   }
 }
@@ -72,10 +73,10 @@ class _LibraryContent extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: const AssetImage("assets/images/gym.png"),
+              image: AssetImage("assets/images/gym.png"),
               fit: BoxFit.cover,
               colorFilter: ColorFilter.mode(
-                const Color(0xFF121212).withValues(alpha: 0.7),
+                const Color(0xFF121212).withOpacity(0.7),
                 BlendMode.darken,
               ),
             ),
@@ -89,6 +90,7 @@ class _LibraryContent extends StatelessWidget {
             title: const Text(
               "Library",
               style: TextStyle(
+
                 fontWeight: FontWeight.bold,
                 letterSpacing: 2,
                 fontSize: 22,
@@ -98,6 +100,7 @@ class _LibraryContent extends StatelessWidget {
           ),
           body: Column(
             children: [
+              // Muscle Group Grid (full screen focus)
               Expanded(
                 flex: 3,
                 child: GridView.builder(
@@ -130,7 +133,7 @@ class _LibraryContent extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFFCCFF00).withValues(alpha: 0.4),
+                              color: const Color(0xFFCCFF00).withOpacity(0.4),
                               blurRadius: 12,
                               offset: const Offset(0, 6),
                             ),
@@ -152,9 +155,9 @@ class _LibraryContent extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(20),
                                 gradient: LinearGradient(
                                   colors: [
-                                    Colors.black.withValues(alpha: 0.7),
+                                    Colors.black.withOpacity(0.7),
                                     Colors.transparent,
-                                    const Color(0xFFCCFF00).withValues(alpha: 0.3),
+                                    const Color(0xFFCCFF00).withOpacity(0.3),
                                   ],
                                   begin: Alignment.bottomCenter,
                                   end: Alignment.topCenter,
@@ -165,8 +168,8 @@ class _LibraryContent extends StatelessWidget {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(Icons.fitness_center,
-                                      color: Color(0xFFCCFF00), size: 42),
+                                  Icon(Icons.fitness_center,
+                                      color: const Color(0xFFCCFF00), size: 42),
                                   const SizedBox(height: 10),
                                   Text(
                                     group.toUpperCase(),
@@ -194,6 +197,8 @@ class _LibraryContent extends StatelessWidget {
                   },
                 ),
               ),
+
+              // Splits Section at bottom
               Expanded(
                 flex: 1,
                 child: ListView(
