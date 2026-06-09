@@ -4,8 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fitlog/view/premium_membership.dart';
+import 'package:fitlog/view/fitlog_premium_screen.dart';
 import 'package:fitlog/view/change_password_screen.dart';
+import 'fitlog_premium_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -50,7 +51,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (liveFirebaseUser != null) {
       return liveFirebaseUser.uid;
     }
-    // Hardcoded fallback identifier from your Firestore console screenshot
     return "Eb3LsmAGcqNpd5pfwO28TpPyFWL2";
   }
 
@@ -332,7 +332,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const Divider(color: Color(0xFF262626), height: 20),
                   InkWell(
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const MembershipTrackingScreen())),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const FitLogPremiumScreen())),
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                       decoration: BoxDecoration(border: Border.all(color: const Color(0xFFCCFF00).withValues(alpha: 0.3)), borderRadius: BorderRadius.circular(4)),

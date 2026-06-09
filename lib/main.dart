@@ -13,7 +13,7 @@ import 'view/change_password_screen.dart';
 import 'view/user_dashboard.dart';
 import 'view/features_screen.dart';
 import 'view/splash_screen.dart';
-import 'view/premium_membership.dart';
+import 'view/fitlog_premium_screen.dart';
 import 'view/workout_tracking_screen.dart';
 
 void main() async {
@@ -52,7 +52,7 @@ class FitLogApp extends StatelessWidget {
           ),
         ),
 
-        home: const ProfileScreen(),
+        home: const FitLogPremiumScreen(),
         routes: {
           '/login': (context) => const FitLogLogin()
         }

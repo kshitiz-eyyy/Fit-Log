@@ -9,7 +9,7 @@ import 'package:fitlog/view/workout_timer_screen.dart';
 import 'package:fitlog/view/meal_tracking_screen.dart';
 import 'package:fitlog/view/chatbot.dart';
 import 'package:fitlog/view/water_tracker_screen.dart';
-import 'package:fitlog/view/premium_membership.dart';
+import 'package:fitlog/view/fitlog_premium_screen.dart';
 import 'dart:math';
 
 class DashboardScreen extends StatefulWidget {
@@ -146,7 +146,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             title: const Text("Membership Operations", style: TextStyle(color: Colors.white)),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const MembershipTrackingScreen()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const FitLogPremiumScreen()));
             },
           ),
           const Spacer(),
