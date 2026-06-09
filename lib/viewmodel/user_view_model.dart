@@ -52,7 +52,6 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
-  /// Fixed: Returns a map containing both 'userId' and 'role' directly to prevent UI race conditions.
   Future<Map<String, String>> login(String email, String password) async {
     _loading = true;
     _error = null;
@@ -63,6 +62,7 @@ class UserViewModel extends ChangeNotifier {
 
     try {
       final String userId = await _userRepo.login(email, password);
+      print("DEBUG ViewModel - userId from auth: '$userId'");
 
       if (userId.isNotEmpty) {
         try {
@@ -71,26 +71,41 @@ class UserViewModel extends ChangeNotifier {
               .doc(userId)
               .get();
 
+          print("DEBUG ViewModel - doc exists: ${userDoc.exists}");
+
           if (userDoc.exists && userDoc.data() != null) {
             final Object? rawData = userDoc.data();
+            print("DEBUG ViewModel - raw Firestore data: $rawData");
+
             if (rawData is Map<String, dynamic>) {
               detectedRole = rawData['role']?.toString() ?? 'user';
+              print("DEBUG ViewModel - detectedRole from Firestore: '$detectedRole'");
+            } else {
+              print("DEBUG ViewModel - rawData is NOT Map<String, dynamic>, it is: ${rawData.runtimeType}");
             }
+          } else {
+            print("DEBUG ViewModel - doc does NOT exist for userId: '$userId'");
           }
         } catch (databaseError) {
+          print("DEBUG ViewModel - Firestore fetch ERROR: $databaseError");
           detectedRole = 'user';
         }
+      } else {
+        print("DEBUG ViewModel - userId is empty, skipping Firestore fetch");
       }
 
       _role = detectedRole;
       _loading = false;
       notifyListeners();
 
+      print("DEBUG ViewModel - returning role: '$detectedRole'");
+
       return {
         "userId": userId,
         "role": detectedRole,
       };
     } catch (e) {
+      print("DEBUG ViewModel - login ERROR: $e");
       _setError(e.toString().replaceAll("Exception: ", ""));
       _loading = false;
       notifyListeners();

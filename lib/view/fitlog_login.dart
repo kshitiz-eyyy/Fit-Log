@@ -34,13 +34,15 @@ class _FitLogLoginState extends State<FitLogLogin> {
       return;
     }
 
-    // Access the view model using context.read for handling events safely
     final viewModel = context.read<UserViewModel>();
 
-    // Await the auth result map containing both values directly
     final Map<String, String> authResult = await viewModel.login(email, password);
     final String userId = authResult["userId"] ?? "";
     final String userRole = authResult["role"] ?? "user";
+
+    // DEBUG - check Logcat for these
+    print("DEBUG userId: '$userId'");
+    print("DEBUG userRole: '$userRole'");
 
     if (!mounted) return;
 
@@ -54,9 +56,8 @@ class _FitLogLoginState extends State<FitLogLogin> {
     } else {
       Fluttertoast.showToast(msg: "Welcome back!");
 
-      // Fixed: Checked via the local scoped userRole string variable
-      // with extra trim/lowercase checking to prevent database typo bugs.
       if (userRole.trim().toLowerCase() == 'admin') {
+        print("DEBUG: Navigating to AdminPanelScreen");
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -64,6 +65,7 @@ class _FitLogLoginState extends State<FitLogLogin> {
           ),
         );
       } else {
+        print("DEBUG: Navigating to DashboardScreen");
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -76,7 +78,6 @@ class _FitLogLoginState extends State<FitLogLogin> {
 
   @override
   Widget build(BuildContext context) {
-    // Only watch the loading boolean to keep build cycles lightweight
     final isLoading = context.select((UserViewModel vm) => vm.loading);
 
     return Scaffold(
