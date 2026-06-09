@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fitlog/view/admin_panel_screen.dart';
 import 'package:fitlog/view/meal_tracking_screen.dart';
+import 'package:fitlog/view/user_profile.dart';
 import 'view/fitlog_login.dart';
 import 'package:fitlog/view/testing_gateway_screen.dart;.dart';
 import 'package:flutter/material.dart';
@@ -51,7 +52,7 @@ class FitLogApp extends StatelessWidget {
           ),
         ),
 
-        home: const DashboardScreen(),
+        home: const ProfileScreen(),
         routes: {
           '/login': (context) => const FitLogLogin()
         }

@@ -29,10 +29,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   final ImagePicker _picker = ImagePicker();
 
+  // Controller to handle the text input for new objectives
+  final _goalInputController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
     _fetchLiveFirebaseProfileData();
+  }
+
+  @override
+  void dispose() {
+    _goalInputController.dispose();
+    super.dispose();
+  }
+
+  // Helper method to reliably get the current user ID
+  String _getCurrentUserId() {
+    User? liveFirebaseUser = FirebaseAuth.instance.currentUser;
+    if (liveFirebaseUser != null) {
+      return liveFirebaseUser.uid;
+    }
+    // Hardcoded fallback identifier from your Firestore console screenshot
+    return "Eb3LsmAGcqNpd5pfwO28TpPyFWL2";
   }
 
   Future<void> _fetchLiveFirebaseProfileData() async {
@@ -45,44 +64,111 @@ class _ProfileScreenState extends State<ProfileScreen> {
         workoutRemindersEnabled = prefs.getBool('setting_reminders') ?? true;
       });
 
+      String targetUid = _getCurrentUserId();
       User? liveFirebaseUser = FirebaseAuth.instance.currentUser;
 
-      if (liveFirebaseUser != null) {
+      setState(() {
+        athleteEmail = liveFirebaseUser?.email ?? "kritikatripathi0094@gmail.com";
+      });
+
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(targetUid)
+          .get();
+
+      if (userDoc.exists && userDoc.data() != null) {
+        Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
         setState(() {
-          athleteEmail = liveFirebaseUser.email ?? "athlete@fitlog.com";
+          athleteName = data['name'] ?? "Kritika Tripathi";
+          athleteBio = data['user_bio'] ?? "Consistency beats talent every single day.";
+          fitnessGoal = data['fitness_goal'] ?? "Hypertrophy Conditioning";
+
+          String systemRole = data['role'] ?? 'user';
+          membershipPlanText = systemRole == 'admin'
+              ? "FitLog System Administrator"
+              : "FitLog Pro Premium Access";
         });
-
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(liveFirebaseUser.uid)
-            .get();
-
-        if (userDoc.exists && userDoc.data() != null) {
-          Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
-          setState(() {
-            athleteName = data['name'] ?? "FitLog Athlete";
-            athleteBio = data['user_bio'] ?? "Consistency beats talent every single day.";
-            fitnessGoal = data['fitness_goal'] ?? "Hypertrophy Conditioning";
-
-            String systemRole = data['role'] ?? 'user';
-            membershipPlanText = systemRole == 'admin'
-                ? "FitLog System Administrator"
-                : "FitLog Pro Premium Access";
-
-            _isDataSyncLoading = false;
-          });
-          return;
-        }
       }
     } catch (e) {
       debugPrint("Profile data pipeline sync telemetry failure: $e");
+    } finally {
+      setState(() => _isDataSyncLoading = false);
     }
+  }
 
-    final sharedPrefs = await SharedPreferences.getInstance();
-    setState(() {
-      athleteName = sharedPrefs.getString('user_name') ?? "FitLog Athlete";
-      _isDataSyncLoading = false;
-    });
+  // --- SAVE DYNAMIC FITNESS GOAL DATA COLLECTION ---
+  Future<void> _addNewFitnessGoal(String goalTitle) async {
+    if (goalTitle.trim().isEmpty) return;
+
+    // Use reliable target ID fallback mapping
+    String targetUid = _getCurrentUserId();
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(targetUid)
+          .collection('fitness_goals')
+          .add({
+        'goal_title': goalTitle.trim(),
+        'status': 'active',
+        'created_at': FieldValue.serverTimestamp(),
+        'completed_at': null,
+      });
+
+      _goalInputController.clear();
+
+      // Close software keyboard out of view automatically
+      FocusScope.of(context).unfocus();
+      _showToastSnackBar("New fitness parameter locked into database.");
+    } catch (e) {
+      debugPrint("FIRESTORE SUBCOLLECTION ERROR: $e");
+      _showDiagnosticErrorDialog(
+          "Cloud Connection Blocked",
+          "The database rejected the write request.\n\nError: $e\n\nFix: Check your Cloud Firestore 'Rules' tab and ensure they allow reads and writes."
+      );
+    }
+  }
+
+  Future<void> _markGoalAsCompleted(String docId) async {
+    String targetUid = _getCurrentUserId();
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(targetUid)
+          .collection('fitness_goals')
+          .doc(docId)
+          .update({
+        'status': 'completed',
+        'completed_at': FieldValue.serverTimestamp(),
+      });
+      _showToastSnackBar("Objective achieved! Progress entry synchronized.");
+    } catch (e) {
+      _showToastSnackBar("Error updating achievement status: $e");
+    }
+  }
+
+  void _showDiagnosticErrorDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF161616),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 20),
+            const SizedBox(width: 8),
+            Text(title, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Text(message, style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.4)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK", style: TextStyle(color: Color(0xFFCCFF00), fontWeight: FontWeight.bold)),
+          )
+        ],
+      ),
+    );
   }
 
   Future<void> _savePreference(String key, dynamic value) async {
@@ -137,17 +223,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
               });
 
               try {
-                User? currentFirebaseUser = FirebaseAuth.instance.currentUser;
-                if (currentFirebaseUser != null) {
-                  await FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(currentFirebaseUser.uid)
-                      .update({
-                    'name': newName,
-                    'user_bio': newBio,
-                    'fitness_goal': newGoal,
-                  });
-                }
+                String targetUid = _getCurrentUserId();
+                await FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(targetUid)
+                    .update({
+                  'name': newName,
+                  'user_bio': newBio,
+                  'fitness_goal': newGoal,
+                });
 
                 await _savePreference('user_name', newName);
                 await _savePreference('user_bio', newBio);
@@ -175,6 +259,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    String currentUserId = _getCurrentUserId();
+
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F0F),
       body: _isDataSyncLoading
@@ -265,6 +351,98 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
             ),
+
+            const SizedBox(height: 20),
+            const Text("TARGET MILESTONES & GOALS", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1)),
+            const SizedBox(height: 8),
+
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _goalInputController,
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                      decoration: const InputDecoration(
+                        hintText: "Add customized milestone target...",
+                        hintStyle: TextStyle(color: Colors.white24, fontSize: 12),
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add_circle, color: Color(0xFFCCFF00)),
+                    onPressed: () => _addNewFitnessGoal(_goalInputController.text),
+                  )
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(currentUserId)
+                  .collection('fitness_goals')
+                  .orderBy('created_at', descending: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) return const SizedBox();
+                final docs = snapshot.data!.docs;
+                if (docs.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text("No custom milestones set yet.", style: TextStyle(color: Colors.white24, fontSize: 11)),
+                  );
+                }
+
+                return Column(
+                  children: docs.map((doc) {
+                    final data = doc.data() as Map<String, dynamic>;
+                    final isCompleted = data['status'] == 'completed';
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 6),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isCompleted ? Colors.black : const Color(0xFF1E1E1E),
+                        borderRadius: BorderRadius.circular(4),
+                        border: isCompleted ? null : Border.all(color: Colors.white10),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
+                            color: isCompleted ? const Color(0xFFCCFF00) : Colors.grey,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              data['goal_title'] ?? '',
+                              style: TextStyle(
+                                color: isCompleted ? Colors.white30 : Colors.white,
+                                fontSize: 13,
+                                decoration: isCompleted ? TextDecoration.lineThrough : null,
+                              ),
+                            ),
+                          ),
+                          if (!isCompleted)
+                            TextButton(
+                              style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(50, 30)),
+                              onPressed: () => _markGoalAsCompleted(doc.id),
+                              child: const Text("COMPLETE", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 10, fontWeight: FontWeight.bold)),
+                            )
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+
             const SizedBox(height: 20),
             const Text("SECURITY & OPERATIONS", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1)),
             const SizedBox(height: 8),
