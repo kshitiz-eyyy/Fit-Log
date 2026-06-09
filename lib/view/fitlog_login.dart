@@ -25,7 +25,7 @@ class _FitLogLoginState extends State<FitLogLogin> {
     super.dispose();
   }
 
-  void _handleLogin(UserViewModel viewModel) async {
+  void _handleLogin(BuildContext context) async {
     final String email = _emailController.text.trim();
     final String password = _passwordController.text.trim();
 
@@ -34,7 +34,15 @@ class _FitLogLoginState extends State<FitLogLogin> {
       return;
     }
 
-    final String userId = await viewModel.login(email, password);
+    // Access the view model using context.read for handling events safely
+    final viewModel = context.read<UserViewModel>();
+
+    // Await the auth result map containing both values directly
+    final Map<String, String> authResult = await viewModel.login(email, password);
+    final String userId = authResult["userId"] ?? "";
+    final String userRole = authResult["role"] ?? "user";
+
+    if (!mounted) return;
 
     if (userId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -46,7 +54,9 @@ class _FitLogLoginState extends State<FitLogLogin> {
     } else {
       Fluttertoast.showToast(msg: "Welcome back!");
 
-      if (viewModel.role == 'admin') {
+      // Fixed: Checked via the local scoped userRole string variable
+      // with extra trim/lowercase checking to prevent database typo bugs.
+      if (userRole.trim().toLowerCase() == 'admin') {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -66,7 +76,8 @@ class _FitLogLoginState extends State<FitLogLogin> {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<UserViewModel>();
+    // Only watch the loading boolean to keep build cycles lightweight
+    final isLoading = context.select((UserViewModel vm) => vm.loading);
 
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
@@ -151,12 +162,12 @@ class _FitLogLoginState extends State<FitLogLogin> {
                 width: double.infinity,
                 height: 60,
                 child: ElevatedButton(
-                  onPressed: viewModel.loading ? null : () => _handleLogin(viewModel),
+                  onPressed: isLoading ? null : () => _handleLogin(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFCCFF00),
                     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                   ),
-                  child: viewModel.loading
+                  child: isLoading
                       ? const CircularProgressIndicator(color: Colors.black)
                       : const Row(
                     mainAxisAlignment: MainAxisAlignment.center,

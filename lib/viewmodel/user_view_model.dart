@@ -1,4 +1,4 @@
-import 'package:fitlog/model/user_model.dart'; // <-- UPDATE THIS PATH TO MATCH YOUR ACTUAL MODEL FILE
+import 'package:fitlog/model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../repo/user_repo_impl.dart';
@@ -52,10 +52,15 @@ class UserViewModel extends ChangeNotifier {
     }
   }
 
-  Future<String> login(String email, String password) async {
-    _setLoading(true);
-    _setError(null);
+  /// Fixed: Returns a map containing both 'userId' and 'role' directly to prevent UI race conditions.
+  Future<Map<String, String>> login(String email, String password) async {
+    _loading = true;
+    _error = null;
     _role = null;
+    notifyListeners();
+
+    String detectedRole = 'user';
+
     try {
       final String userId = await _userRepo.login(email, password);
 
@@ -69,24 +74,30 @@ class UserViewModel extends ChangeNotifier {
           if (userDoc.exists && userDoc.data() != null) {
             final Object? rawData = userDoc.data();
             if (rawData is Map<String, dynamic>) {
-              _role = rawData['role']?.toString() ?? 'user';
-            } else {
-              _role = 'user';
+              detectedRole = rawData['role']?.toString() ?? 'user';
             }
-          } else {
-            _role = 'user';
           }
         } catch (databaseError) {
-          _role = 'user';
+          detectedRole = 'user';
         }
       }
 
-      _setLoading(false);
-      return userId;
+      _role = detectedRole;
+      _loading = false;
+      notifyListeners();
+
+      return {
+        "userId": userId,
+        "role": detectedRole,
+      };
     } catch (e) {
       _setError(e.toString().replaceAll("Exception: ", ""));
-      _setLoading(false);
-      return "";
+      _loading = false;
+      notifyListeners();
+      return {
+        "userId": "",
+        "role": "",
+      };
     }
   }
 
