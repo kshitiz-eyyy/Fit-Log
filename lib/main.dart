@@ -1,7 +1,9 @@
+import 'package:fitlog/view/fitlog_login.dart';
 import 'package:fitlog/view/meal_tracking_screen.dart';
 import 'package:fitlog/view/membership_tracking_screen.dart';
 import 'package:fitlog/view/performance_screen.dart';
 import 'package:fitlog/view/rate_screen.dart';
+import 'package:fitlog/view/register_screen.dart';
 import 'package:fitlog/view/splash_screen.dart';
 import 'package:fitlog/view/workout_tracking_screen.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +32,7 @@ class FitLogApp extends StatelessWidget {
         ),
       ),
 
-      home: const SplashScreen(),
+      home: const RateScreen(),
     );
   }
 }
