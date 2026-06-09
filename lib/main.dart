@@ -3,6 +3,7 @@ import 'package:fitlog/view/admin_panel_screen.dart';
 import 'package:fitlog/view/contact_dietitan_screen.dart';
 import 'package:fitlog/view/contact_trainer_screen.dart';
 import 'package:fitlog/view/fitlog_login.dart';
+import 'package:fitlog/view/terms_and_conditions_screen.dart';
 import 'package:fitlog/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; // 1. Add this import
@@ -55,7 +56,7 @@ class FitLogApp extends StatelessWidget {
           ),
         ),
       ),
-      home: DashboardScreen(),
+      home: TermsAndConditionsScreen(),
     );
   }
 }

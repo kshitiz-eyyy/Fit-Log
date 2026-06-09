@@ -6,6 +6,7 @@ import '../viewmodel/user_view_model.dart';
 import 'admin_panel_screen.dart';
 import 'forgot_password_screen.dart';
 import 'dashboard.dart';
+import 'terms_and_conditions_screen.dart'; // Import your Terms Screen file
 
 class FitLogLogin extends StatefulWidget {
   const FitLogLogin({super.key});
@@ -40,7 +41,6 @@ class _FitLogLoginState extends State<FitLogLogin> {
     final String userId = authResult["userId"] ?? "";
     final String userRole = authResult["role"] ?? "user";
 
-    // DEBUG - check Logcat for these
     print("DEBUG userId: '$userId'");
     print("DEBUG userRole: '$userRole'");
 
@@ -200,22 +200,7 @@ class _FitLogLoginState extends State<FitLogLogin> {
                   Expanded(child: Divider(color: Colors.white24)),
                 ],
               ),
-              const SizedBox(height: 24),
-              OutlinedButton(
-                onPressed: () {},
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 50),
-                  side: const BorderSide(color: Colors.white12),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.g_mobiledata, color: Colors.white, size: 30),
-                    SizedBox(width: 8),
-                    Text('GOOGLE', style: TextStyle(color: Colors.white)),
-                  ],
-                ),
-              ),
+
               const SizedBox(height: 40),
               Center(
                 child: Wrap(
@@ -236,6 +221,34 @@ class _FitLogLoginState extends State<FitLogLogin> {
                           color: Color(0xFFCCFF00),
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              Center(
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  children: [
+                    const Text('BY LOGGING IN, YOU AGREE TO OUR ',
+                        style: TextStyle(color: Colors.white38, fontSize: 11, letterSpacing: 0.5)),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const TermsAndConditionsScreen()),
+                        );
+                      },
+                      child: const Text(
+                        'TERMS & CONDITIONS',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
                           decoration: TextDecoration.underline,
                         ),
                       ),
@@ -274,14 +287,14 @@ class _CustomTextField extends StatefulWidget {
   final String hint;
   final IconData icon;
   final bool isPassword;
-  final TextEditingController controller;
+  final TextEditingController widgetController;
 
   const _CustomTextField({
     required this.hint,
     required this.icon,
-    required this.controller,
+    required TextEditingController controller,
     this.isPassword = false,
-  });
+  }) : widgetController = controller;
 
   @override
   State<_CustomTextField> createState() => _CustomTextFieldState();
@@ -299,7 +312,7 @@ class _CustomTextFieldState extends State<_CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: widget.controller,
+      controller: widget.widgetController,
       obscureText: _obscureText,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
