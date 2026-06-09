@@ -1,8 +1,9 @@
 import 'package:fitlog/view/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';       // 1. IMPORT PROVIDER
+import 'package:provider/provider.dart';
 import '../viewmodel/user_view_model.dart';
+import 'admin_panel_screen.dart';
 import 'forgot_password_screen.dart';
 import 'dashboard.dart';
 
@@ -24,22 +25,18 @@ class _FitLogLoginState extends State<FitLogLogin> {
     super.dispose();
   }
 
-  // 3. UPDATED BACKEND METHOD
   void _handleLogin(UserViewModel viewModel) async {
     final String email = _emailController.text.trim();
     final String password = _passwordController.text.trim();
 
-    // Basic client validation
     if (email.isEmpty || password.isEmpty) {
       Fluttertoast.showToast(msg: "Please fill in all fields");
       return;
     }
 
-    // Call your repository via the ViewModel
     final String userId = await viewModel.login(email, password);
 
     if (userId.isEmpty) {
-      // Login failed -> Show the Firebase exception parsed by your view model
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(viewModel.error ?? 'Login Failed!'),
@@ -47,20 +44,28 @@ class _FitLogLoginState extends State<FitLogLogin> {
         ),
       );
     } else {
-      // Login Success!
       Fluttertoast.showToast(msg: "Welcome back!");
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const DashboardScreen(),
-        ),
-      );
+
+      if (viewModel.role == 'admin') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const AdminPanelScreen(),
+          ),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const DashboardScreen(),
+          ),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // 4. LISTEN TO THE VIEW MODEL FOR THE LOADING STATE
     final viewModel = context.watch<UserViewModel>();
 
     return Scaffold(
@@ -142,8 +147,6 @@ class _FitLogLoginState extends State<FitLogLogin> {
                 controller: _passwordController,
               ),
               const SizedBox(height: 32),
-
-              // 5. LOADING SPINNER / BUTTON INTERACTION CONTROL
               SizedBox(
                 width: double.infinity,
                 height: 60,
@@ -237,7 +240,6 @@ class _FitLogLoginState extends State<FitLogLogin> {
   }
 }
 
-// Keep your existing _FieldLabel and _CustomTextField classes unchanged below
 class _FieldLabel extends StatelessWidget {
   final String label;
   final double size;

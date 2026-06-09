@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart'; // Added for feedback toasts
-import 'package:provider/provider.dart';       // Added to watch the view model
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
 import '../model/user_model.dart';
-import '../viewmodel/user_view_model.dart';         // Adjust based on your model path
+import '../viewmodel/user_view_model.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -17,7 +17,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscurePw = true;
   bool _obscureConfirmPw = true;
 
-  // 1. ADD CONTROLLERS TO MANAGE THE USER INPUT
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -25,7 +24,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   void dispose() {
-    // Clean up controllers when widget is destroyed
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -33,14 +31,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  // 2. BACKEND INTEGRATION HANDLER
   void _handleRegistration(UserViewModel viewModel) async {
     final String name = _nameController.text.trim();
     final String email = _emailController.text.trim();
     final String password = _passwordController.text.trim();
     final String confirmPassword = _confirmPasswordController.text.trim();
 
-    // Basic Form Validations
     if (name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
       Fluttertoast.showToast(msg: "Please fill in all details");
       return;
@@ -56,27 +52,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    // Step A: Register User in Firebase Authentication
     final String userId = await viewModel.register(email, password);
 
     if (userId.isEmpty) {
-      // Show Firebase registration failure error
       Fluttertoast.showToast(msg: viewModel.error ?? "Registration failed");
     } else {
-      // Step B: Formulate UserModel matching your teacher's structure
       final userProfile = UserModel(
         id: userId,
         name: name,
         email: email,
-        contact: null, // Left as optional null value since UI has no phone field
+        contact: null,
       );
 
-      // Step C: Save user metadata into Cloud Firestore Database
       final bool dbSuccess = await viewModel.addUser(userProfile);
 
       if (dbSuccess) {
         Fluttertoast.showToast(msg: "Registration success!");
-        Navigator.pop(context); // Clear registration view and go back to login screen
+        Navigator.pop(context);
       } else {
         Fluttertoast.showToast(msg: viewModel.error ?? "Failed to save profile context");
       }
@@ -85,7 +77,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 3. LISTEN TO THE USER VIEW MODEL PROVIDER
     final viewModel = context.watch<UserViewModel>();
 
     return Scaffold(
@@ -97,7 +88,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              // Header Logo
               const Center(
                 child: Text(
                   'FITLOG',
@@ -111,7 +101,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
               const SizedBox(height: 40),
-
               const Text(
                 'CREATE ACCOUNT',
                 style: TextStyle(
@@ -126,24 +115,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 style: TextStyle(color: Colors.grey, fontSize: 16),
               ),
               const SizedBox(height: 30),
-
-              // Full Name
               const _FieldLabel(label: 'FULL NAME'),
               _CustomInput(
                 hint: 'ENTER NAME',
                 icon: Icons.person_outline,
-                controller: _nameController, // Pass matching controller
+                controller: _nameController,
               ),
-
-              // Email Address
               const _FieldLabel(label: 'EMAIL ADDRESS'),
               _CustomInput(
                 hint: 'ENTER EMAIL',
                 icon: Icons.email_outlined,
-                controller: _emailController, // Pass matching controller
+                controller: _emailController,
               ),
-
-              // Password
               const _FieldLabel(label: 'PASSWORD'),
               _CustomInput(
                 hint: '●●●●●●●●',
@@ -151,10 +134,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 isPassword: true,
                 obscure: _obscurePw,
                 onToggle: () => setState(() => _obscurePw = !_obscurePw),
-                controller: _passwordController, // Pass matching controller
+                controller: _passwordController,
               ),
-
-              // Confirm Password
               const _FieldLabel(label: 'CONFIRM PASSWORD'),
               _CustomInput(
                 hint: '●●●●●●●●',
@@ -162,12 +143,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 isPassword: true,
                 obscure: _obscureConfirmPw,
                 onToggle: () => setState(() => _obscureConfirmPw = !_obscureConfirmPw),
-                controller: _confirmPasswordController, // Pass matching controller
+                controller: _confirmPasswordController,
               ),
-
               const SizedBox(height: 20),
-
-              // Terms & Conditions
               Row(
                 children: [
                   Theme(
@@ -199,10 +177,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 30),
-
-              // Create Account Button linked with loading logic states
               SizedBox(
                 width: double.infinity,
                 height: 56,
@@ -231,10 +206,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 24),
-
-              // Sign In Link
               Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -257,10 +229,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 40),
-
-              // Step Progress Indicators
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -327,7 +296,7 @@ class _CustomInput extends StatelessWidget {
   final bool isPassword;
   final bool obscure;
   final VoidCallback? onToggle;
-  final TextEditingController? controller; // 4. PROP TO HOOK THE CONTROLLERS
+  final TextEditingController? controller;
 
   const _CustomInput({
     required this.hint,
@@ -341,7 +310,7 @@ class _CustomInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: controller, // 5. INTEGRATED TEXT CONTROLLER ENGINE
+      controller: controller,
       obscureText: obscure,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
