@@ -19,7 +19,6 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
   final TextEditingController _heightController = TextEditingController();
   final TextEditingController _weightController = TextEditingController();
 
-  // State elements to update the screen display
   double? _bmiResult;
   String _bmiCategory = "";
   String _bmiFeedback = "Enter your metrics above to calculate your current score.";
@@ -31,7 +30,6 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
   static const Color neonLime = Color(0xFFCCFF00);
   static const Color textGray = Color(0xFF8E8E93);
 
-  // This calls your separate BMIBrain when the button is clicked
   void _executeCalculation() {
     final double? height = double.tryParse(_heightController.text);
     final double? weight = double.tryParse(_weightController.text);
@@ -43,11 +41,9 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
       return;
     }
 
-    // Initialize the logic class we created in the other file
     BMIBrain brain = BMIBrain(height: height, weight: weight);
     double bmi = brain.calculateBMI();
 
-    // Pull calculations dynamically into our UI state
     setState(() {
       _bmiResult = bmi;
       _bmiCategory = brain.getCategory(bmi);
@@ -73,171 +69,193 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
       },
       child: Scaffold(
         backgroundColor: bgColor,
-        body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-                      onPressed: () => Navigator.of(context).maybePop(),
-                    ),
-                    const Text(
-                      'FITLOG',
-                      style: TextStyle(
-                        color: neonLime,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        fontStyle: FontStyle.italic,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                    const CircleAvatar(
-                      radius: 18,
-                      backgroundColor: cardBgColor,
-                      child: Icon(Icons.person, color: textGray, size: 20),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-                const Text(
-                  'PERFORMANCE METRICS',
-                  style: TextStyle(
-                    color: neonLime,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'BMI CALCULATOR',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 32,
-                    fontWeight: FontWeight.w900,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: cardBgColor,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: const AssetImage('assets/images/newbmi.png'),
+              fit: BoxFit.cover,
+              alignment: Alignment.center,
+              colorFilter: ColorFilter.mode(
+                Colors.black.withValues(alpha: 0.45),
+                BlendMode.darken,
+              ),
+            ),
+          ),
+          child: SafeArea(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildInputField(
-                        label: 'HEIGHT (CM)',
-                        hint: '180',
-                        suffix: 'CM',
-                        controller: _heightController,
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+                        onPressed: () => Navigator.of(context).maybePop(),
                       ),
-                      const SizedBox(height: 20),
-                      _buildInputField(
-                        label: 'WEIGHT (KG)',
-                        hint: '85',
-                        suffix: 'KG',
-                        controller: _weightController,
-                      ),
-                      const SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: neonLime,
-                            foregroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                          ),
-                          onPressed: _executeCalculation,
-                          child: const Text(
-                            'CALCULATE RESULT',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontStyle: FontStyle.italic,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: cardBgColor,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: _bmiResult != null ? neonLime : Colors.transparent,
-                      width: 1.5,
-                    ),
-                  ),
-                  child: Column(
-                    children: [
                       const Text(
-                        'YOUR CURRENT SCORE',
+                        'FITLOG',
                         style: TextStyle(
-                          color: textGray,
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
+                          color: neonLime,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w900,
+                          fontStyle: FontStyle.italic,
                           letterSpacing: 1.2,
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      Text(
-                        _bmiResult != null ? _bmiResult!.toStringAsFixed(1) : '--.-',
-                        style: const TextStyle(
-                          color: neonLime,
-                          fontSize: 54,
-                          fontWeight: FontWeight.w900,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                      Text(
-                        _bmiCategory.isNotEmpty ? _bmiCategory : 'AWAITING INPUT',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: LinearProgressIndicator(
-                          value: _progressValue,
-                          minHeight: 8,
-                          backgroundColor: Colors.white12,
-                          valueColor: const AlwaysStoppedAnimation<Color>(neonLime),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        _bmiFeedback,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: textGray,
-                          fontSize: 13,
-                          height: 1.4,
-                        ),
+                      const CircleAvatar(
+                        radius: 18,
+                        backgroundColor: cardBgColor,
+                        child: Icon(Icons.person, color: textGray, size: 20),
                       ),
                     ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 32),
+                  const Text(
+                    'PERFORMANCE METRICS',
+                    style: TextStyle(
+                      color: neonLime,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.5,
+                      shadows: [
+                        Shadow(offset: Offset(0, 1), blurRadius: 4.0, color: Colors.black),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'BMI CALCULATOR',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 32,
+                      fontWeight: FontWeight.w900,
+                      fontStyle: FontStyle.italic,
+                      shadows: [
+                        Shadow(offset: Offset(0, 1), blurRadius: 4.0, color: Colors.black),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: cardBgColor.withValues(alpha: 0.92),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildInputField(
+                          label: 'HEIGHT (CM)',
+                          hint: '180',
+                          suffix: 'CM',
+                          controller: _heightController,
+                        ),
+                        const SizedBox(height: 20),
+                        _buildInputField(
+                          label: 'WEIGHT (KG)',
+                          hint: '85',
+                          suffix: 'KG',
+                          controller: _weightController,
+                        ),
+                        const SizedBox(height: 24),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: neonLime,
+                              foregroundColor: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            onPressed: _executeCalculation,
+                            child: const Text(
+                              'CALCULATE RESULT',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w900,
+                                fontStyle: FontStyle.italic,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: cardBgColor.withValues(alpha: 0.92),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: _bmiResult != null ? neonLime : Colors.transparent,
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        const Text(
+                          'YOUR CURRENT SCORE',
+                          style: TextStyle(
+                            color: textGray,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          _bmiResult != null ? _bmiResult!.toStringAsFixed(1) : '--.-',
+                          style: const TextStyle(
+                            color: neonLime,
+                            fontSize: 54,
+                            fontWeight: FontWeight.w900,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                        Text(
+                          _bmiCategory.isNotEmpty ? _bmiCategory : 'AWAITING INPUT',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: LinearProgressIndicator(
+                            value: _progressValue,
+                            minHeight: 8,
+                            backgroundColor: Colors.white12,
+                            valueColor: const AlwaysStoppedAnimation<Color>(neonLime),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          _bmiFeedback,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: textGray,
+                            fontSize: 13,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
