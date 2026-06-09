@@ -188,18 +188,7 @@ class _FitLogLoginState extends State<FitLogLogin> {
                   ),
                 ),
               ),
-              const SizedBox(height: 40),
-              Row(
-                children: const [
-                  Expanded(child: Divider(color: Colors.white24)),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Text('OR CONNECT WITH',
-                        style: TextStyle(color: Colors.grey, fontSize: 12)),
-                  ),
-                  Expanded(child: Divider(color: Colors.white24)),
-                ],
-              ),
+
 
               const SizedBox(height: 40),
               Center(
@@ -234,7 +223,7 @@ class _FitLogLoginState extends State<FitLogLogin> {
                   alignment: WrapAlignment.center,
                   children: [
                     const Text('BY LOGGING IN, YOU AGREE TO OUR ',
-                        style: TextStyle(color: Colors.white38, fontSize: 11, letterSpacing: 0.5)),
+                        style: TextStyle(color: Colors.white38, fontSize: 14, letterSpacing: 0.5)),
                     GestureDetector(
                       onTap: () {
                         Navigator.push(

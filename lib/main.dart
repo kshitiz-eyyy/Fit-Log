@@ -56,7 +56,7 @@ class FitLogApp extends StatelessWidget {
           ),
         ),
       ),
-      home: TermsAndConditionsScreen(),
+      home: FitLogLogin(),
     );
   }
 }
