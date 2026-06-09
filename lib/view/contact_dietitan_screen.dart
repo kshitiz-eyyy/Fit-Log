@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../viewmodel/tainer_view_model.dart';
+import '../viewmodel/dietitian_view_model.dart';
 
-
-class ContactTrainerScreen extends StatelessWidget {
-  const ContactTrainerScreen({super.key});
+class ContactDietitianScreen extends StatelessWidget {
+  const ContactDietitianScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => TrainerViewModel(),
+      create: (_) => DietitianViewModel(),
       child: Scaffold(
         backgroundColor: const Color(0xFF121212),
         appBar: AppBar(
@@ -19,10 +18,7 @@ class ContactTrainerScreen extends StatelessWidget {
             icon: const Icon(Icons.arrow_back_ios, color: Color(0xFFCCFF00), size: 18),
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text(
-            "IRON & ONYX",
-            style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 1.5),
-          ),
+
           centerTitle: true,
         ),
         extendBodyBehindAppBar: true,
@@ -31,7 +27,7 @@ class ContactTrainerScreen extends StatelessWidget {
           height: double.infinity,
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: const AssetImage('assets/images/trainer.png'),
+              image: const AssetImage('assets/images/diet.png'),
               fit: BoxFit.cover,
               colorFilter: ColorFilter.mode(
                 Colors.black.withValues(alpha: 0.85),
@@ -45,9 +41,9 @@ class ContactTrainerScreen extends StatelessWidget {
               child: Column(
                 children: [
                   const SizedBox(height: 16),
-                  const Text("Contact Trainer?", style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
+                  const Text("Contact Dietitian?", style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 4),
-                  const Text("Want a personal guidance?", style: TextStyle(color: Colors.grey, fontSize: 18, fontStyle: FontStyle.italic)),
+                  const Text("Want a customized diet plan?", style: TextStyle(color: Colors.grey, fontSize: 18, fontStyle: FontStyle.italic)),
                   const SizedBox(height: 16),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
@@ -56,18 +52,18 @@ class ContactTrainerScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   Expanded(
-                    child: Consumer<TrainerViewModel>(
+                    child: Consumer<DietitianViewModel>(
                       builder: (context, viewModel, child) {
                         if (viewModel.isLoading) {
                           return const Center(child: CircularProgressIndicator(color: Color(0xFFCCFF00)));
                         }
-                        if (viewModel.trainers.isEmpty) {
-                          return const Center(child: Text("No trainers found in database.", style: TextStyle(color: Colors.grey)));
+                        if (viewModel.dietitian.isEmpty) {
+                          return const Center(child: Text("No dietitians found in database.", style: TextStyle(color: Colors.grey)));
                         }
                         return ListView.builder(
-                          itemCount: viewModel.trainers.length,
+                          itemCount: viewModel.dietitian.length,
                           itemBuilder: (context, index) {
-                            final trainer = viewModel.trainers[index];
+                            final dietitian = viewModel.dietitian[index];
                             return Container(
                               margin: const EdgeInsets.only(bottom: 16),
                               padding: const EdgeInsets.all(20),
@@ -78,14 +74,14 @@ class ContactTrainerScreen extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text("${index + 1}. ${trainer.name}", style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w900)),
+                                  Text("${index + 1}. ${dietitian.name}", style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w900)),
                                   const SizedBox(height: 10),
                                   const Divider(color: Colors.black12, thickness: 1),
                                   const SizedBox(height: 6),
-                                  _buildDataRow("CONTACT NO:", trainer.contact),
-                                  _buildDataRow("EXPERIENCE:", trainer.experience),
-                                  _buildDataRow("SPECIALIZATION:", trainer.specialization),
-                                  _buildDataRow("LOCATION:", trainer.location),
+                                  _buildDataRow("CONTACT NO:", dietitian.contact),
+                                  _buildDataRow("EXPERIENCE:", dietitian.experience),
+                                  _buildDataRow("SPECIALIZATION:", dietitian.specialization),
+                                  _buildDataRow("LOCATION:", dietitian.location),
                                 ],
                               ),
                             );

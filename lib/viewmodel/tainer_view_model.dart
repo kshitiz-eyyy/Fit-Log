@@ -18,13 +18,13 @@ class TrainerViewModel extends ChangeNotifier {
     listenToTrainers();
   }
 
-  // Opens a live telemetry stream to sync UI with Firestore continuously
+
   void listenToTrainers() {
     _trainerSubscription?.cancel();
     _trainerSubscription = _trainerRepo.getTrainersStream().listen((trainerList) {
       _trainers = trainerList;
       _isLoading = false;
-      notifyListeners(); // Tells the UI layer to draw changes instantly
+      notifyListeners();
     }, onError: (error) {
       _isLoading = false;
       notifyListeners();

@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fitlog/view/admin_panel_screen.dart';
+import 'package:fitlog/view/contact_dietitan_screen.dart';
 import 'package:fitlog/view/contact_trainer_screen.dart';
 import 'package:fitlog/view/fitlog_login.dart';
 import 'package:fitlog/viewmodel/user_view_model.dart';
@@ -54,7 +55,7 @@ class FitLogApp extends StatelessWidget {
           ),
         ),
       ),
-      home: ContactTrainerScreen(),
+      home: DashboardScreen(),
     );
   }
 }

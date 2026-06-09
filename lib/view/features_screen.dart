@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'bmi_calculator_screen.dart'; // <--- Added connection import here
+import 'bmi_calculator_screen.dart';
+import 'contact_dietitan_screen.dart';
+import 'contact_trainer_screen.dart';    // <--- IMPORT TRAINER SCREEN
+
 
 class AppColors {
   static const Color background = Color(0xFF121212);
@@ -159,12 +162,26 @@ class FeaturesScreen extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
           onTap: () {
-            // <--- CONNECTED NAVIGATION TRACKING HERE
+
             if (item.title == 'BMI Calculator') {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const BMICalculatorScreen(),
+                ),
+              );
+            } else if (item.title == 'Contact Trainer') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ContactTrainerScreen(),
+                ),
+              );
+            } else if (item.title == 'Contact Dietitian') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ContactDietitianScreen(),
                 ),
               );
             } else {

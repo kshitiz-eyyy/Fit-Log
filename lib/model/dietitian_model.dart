@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class TrainerModel {
+class DietitianModel {
   final String id;
   final String name;
   final String contact;
@@ -8,7 +8,7 @@ class TrainerModel {
   final String specialization;
   final String location;
 
-  TrainerModel({
+  DietitianModel({
     required this.id,
     required this.name,
     required this.contact,
@@ -17,12 +17,11 @@ class TrainerModel {
     required this.location,
   });
 
-
-  factory TrainerModel.fromSnapshot(DocumentSnapshot doc) {
+  factory DietitianModel.fromSnapshot(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>? ?? {};
-    return TrainerModel(
+    return DietitianModel(
       id: doc.id,
-      name: data['Name']?.toString() ?? 'Unknown Trainer',
+      name: data['Name']?.toString() ?? 'Unknown Dietitian',
       contact: data['Contact']?.toString() ?? 'N/A',
       experience: data['Experience']?.toString() ?? 'N/A',
       specialization: data['Specialization']?.toString() ?? 'N/A',
