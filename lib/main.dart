@@ -1,23 +1,35 @@
+﻿import 'package:fitlog/user_profile_screen.dart';
 import 'package:flutter/material.dart';
-import 'change_password_screen.dart';
+
+import 'admin_dashboard_screen.dart';
+import 'admin_management_screen.dart';
+import 'admin_profile_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const FitLogApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class FitLogApp extends StatelessWidget {
+  const FitLogApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'FitLog',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+      title: 'FitLog',
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: Colors.black,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.black,
+          titleTextStyle: TextStyle(
+            color: Colors.lightGreenAccent,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
-      home: const ChangePasswordScreen(),
+
+      home: AdminProfileScreen(),
     );
   }
 }

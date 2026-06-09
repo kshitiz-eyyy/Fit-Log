@@ -17,18 +17,24 @@ class ProfileScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: bg,
         elevation: 0,
-        leading: IconButton(
+        // Changed to check if it can pop to prevent black screen errors
+        leading: Navigator.canPop(context)
+            ? IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: textLight, size: 20),
           onPressed: () => Navigator.pop(context),
-        ),
+        )
+            : null,
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined, color: accent),
-            onPressed: () {},
+            onPressed: () {
+              // Add edit logic here
+            },
           ),
         ],
       ),
       body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(), // Added for smoother scrolling on iOS/Web
         padding: const EdgeInsets.symmetric(horizontal: 30),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,12 +43,12 @@ class ProfileScreen extends StatelessWidget {
             Center(
               child: Column(
                 children: [
-                  CircleAvatar(
+                  const CircleAvatar(
                     radius: 60,
                     backgroundColor: accent,
-                    child: const CircleAvatar(
+                    child: CircleAvatar(
                       radius: 56,
-                      backgroundImage: NetworkImage('https://i.pravatar.cc/300'), // Placeholder image
+                      backgroundImage: NetworkImage('https://i.pravatar.cc/300'),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -54,12 +60,13 @@ class ProfileScreen extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
+                  const SizedBox(height: 4),
                   const Text(
                     'PRO MEMBER',
                     style: TextStyle(
                       color: accent,
                       fontSize: 12,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w900,
                       letterSpacing: 2,
                     ),
                   ),
@@ -69,20 +76,17 @@ class ProfileScreen extends StatelessWidget {
 
             const SizedBox(height: 40),
 
-            // Bio / Info Section
-            const Text(
-              'BIO',
-              style: TextStyle(
-                color: mutedOlive,
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.5,
-              ),
-            ),
+            // Bio Section
+            const _SectionHeader(title: 'BIO'),
             const SizedBox(height: 8),
             const Text(
               'Fitness enthusiast and marathon runner. Focus on strength training and high-intensity interval training.',
-              style: TextStyle(color: textLight, fontSize: 16, height: 1.5),
+              style: TextStyle(
+                color: textLight,
+                fontSize: 16,
+                height: 1.5,
+                fontWeight: FontWeight.w400,
+              ),
             ),
 
             const SizedBox(height: 32),
@@ -90,31 +94,23 @@ class ProfileScreen extends StatelessWidget {
             // Stats Row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildStat('Weight', '64', 'kg'),
-                _buildStat('Height', '172', 'cm'),
-                _buildStat('Age', '26', 'yo'),
+              children: const [
+                _StatCard(label: 'Weight', value: '64', unit: 'kg'),
+                _StatCard(label: 'Height', unit: 'cm', value: '172'),
+                _StatCard(label: 'Age', value: '26', unit: 'yo'),
               ],
             ),
 
             const SizedBox(height: 32),
 
             // Settings/Options List
-            const Text(
-              'ACCOUNT SETTINGS',
-              style: TextStyle(
-                color: mutedOlive,
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.5,
-              ),
-            ),
+            const _SectionHeader(title: 'ACCOUNT SETTINGS'),
             const SizedBox(height: 16),
 
-            _buildProfileOption(Icons.person_outline, 'Personal Information'),
-            _buildProfileOption(Icons.notifications_none_rounded, 'Notifications'),
-            _buildProfileOption(Icons.security_outlined, 'Security & Privacy'),
-            _buildProfileOption(Icons.help_outline_rounded, 'Support Center'),
+            const _ProfileOption(icon: Icons.person_outline, title: 'Personal Information'),
+            const _ProfileOption(icon: Icons.notifications_none_rounded, title: 'Notifications'),
+            const _ProfileOption(icon: Icons.security_outlined, title: 'Security & Privacy'),
+            const _ProfileOption(icon: Icons.help_outline_rounded, title: 'Support Center'),
 
             const SizedBox(height: 40),
 
@@ -124,13 +120,20 @@ class ProfileScreen extends StatelessWidget {
               height: 55,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF222730),
+                  backgroundColor: surface,
+                  elevation: 0,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  // Add logout logic here
+                },
                 child: const Text(
                   'LOG OUT',
-                  style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: Colors.redAccent,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.2,
+                  ),
                 ),
               ),
             ),
@@ -140,20 +143,53 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildStat(String label, String value, String unit) {
+// Sub-widget for Section Headers to reduce repetition
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  const _SectionHeader({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: const TextStyle(
+        color: ProfileScreen.mutedOlive,
+        fontSize: 11,
+        fontWeight: FontWeight.w900,
+        letterSpacing: 1.5,
+      ),
+    );
+  }
+}
+
+// Sub-widget for Stats to improve performance
+class _StatCard extends StatelessWidget {
+  final String label;
+  final String value;
+  final String unit;
+
+  const _StatCard({
+    required this.label,
+    required this.value,
+    required this.unit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      width: 100,
+      width: 95, // Slightly smaller to ensure fit on all screens
       padding: const EdgeInsets.symmetric(vertical: 20),
       decoration: BoxDecoration(
-        color: surface,
+        color: ProfileScreen.surface,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
           Text(
             label,
-            style: const TextStyle(color: mutedOlive, fontSize: 12),
+            style: const TextStyle(color: ProfileScreen.mutedOlive, fontSize: 12),
           ),
           const SizedBox(height: 4),
           Row(
@@ -164,7 +200,7 @@ class ProfileScreen extends StatelessWidget {
               Text(
                 value,
                 style: const TextStyle(
-                  color: textLight,
+                  color: ProfileScreen.textLight,
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
@@ -172,7 +208,7 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(width: 2),
               Text(
                 unit,
-                style: const TextStyle(color: accent, fontSize: 12),
+                style: const TextStyle(color: ProfileScreen.accent, fontSize: 12),
               ),
             ],
           ),
@@ -180,21 +216,34 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildProfileOption(IconData icon, String title) {
+// Sub-widget for Profile Options
+class _ProfileOption extends StatelessWidget {
+  final IconData icon;
+  final String title;
+
+  const _ProfileOption({required this.icon, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: surface,
+        color: ProfileScreen.surface,
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
-        leading: Icon(icon, color: accent, size: 22),
+        leading: Icon(icon, color: ProfileScreen.accent, size: 22),
         title: Text(
           title,
-          style: const TextStyle(color: textLight, fontSize: 16, fontWeight: FontWeight.w500),
+          style: const TextStyle(
+            color: ProfileScreen.textLight,
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+          ),
         ),
-        trailing: const Icon(Icons.chevron_right, color: mutedOlive),
+        trailing: const Icon(Icons.chevron_right, color: ProfileScreen.mutedOlive, size: 20),
         onTap: () {},
       ),
     );
