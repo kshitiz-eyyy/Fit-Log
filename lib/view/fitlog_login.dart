@@ -6,7 +6,7 @@ import '../viewmodel/user_view_model.dart';
 import 'admin_panel_screen.dart';
 import 'forgot_password_screen.dart';
 import 'dashboard.dart';
-import 'terms_and_conditions_screen.dart'; // Import your Terms Screen file
+import 'terms_and_conditions_screen.dart';
 
 class FitLogLogin extends StatefulWidget {
   const FitLogLogin({super.key});

@@ -6,7 +6,7 @@ import 'package:fitlog/view/fitlog_login.dart';
 import 'package:fitlog/view/terms_and_conditions_screen.dart';
 import 'package:fitlog/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // 1. Add this import
+import 'package:provider/provider.dart';
 
 
 
@@ -21,15 +21,14 @@ import 'view/features_screen.dart';
 import 'view/splash_screen.dart';
 
 void main() async {
-  // Side note: Since you imported firebase_options, make sure you initialize Firebase
-  // if you haven't already done so elsewhere!
+
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
   runApp(
-    // 2. Wrap your app with the provider here
+
     ChangeNotifierProvider(
       create: (context) => UserViewModel(),
       child: const FitLogApp(),
@@ -56,7 +55,7 @@ class FitLogApp extends StatelessWidget {
           ),
         ),
       ),
-      home: FitLogLogin(),
+      home:const FitLogLogin()
     );
   }
 }
