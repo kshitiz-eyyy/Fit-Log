@@ -30,6 +30,47 @@ class AdminDashboardScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+<<<<<<< HEAD:lib/change_password_screen.dart
+=======
+              // Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back, color: textColor, size: 24),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  const Text(
+                    'FITLOG',
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 2,
+                    ),
+                  ),
+                  const Icon(Icons.notifications_none, color: textColor, size: 24),
+                ],
+              ),
+              const SizedBox(height: 32),
+              // Section Title
+              Row(
+                children: [
+                  const Icon(Icons.lock_outline, color: accentColor, size: 14),
+                  const SizedBox(width: 8),
+                  Text(
+                    'SECURITY PROTOCOL',
+                    style: const TextStyle(
+                      color: accentColor,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+>>>>>>> d6631082131c35622e13a9dd1f1a1a05390a6d49:lib/view/change_password_screen.dart
               const Text(
                 'DASHBOARD OVERVIEW',
                 style: TextStyle(
