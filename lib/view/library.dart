@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'exercise_data.dart';
 import 'exerciselistscreen.dart';
-import 'activity_screen.dart';
+import 'user_activity_screen.dart';
 
 class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key});

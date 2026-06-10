@@ -42,10 +42,10 @@ class FeaturesScreen extends StatelessWidget {
       imagePath: 'assets/images/diet.png',
     ),
     FeatureItem(
-      title: 'BMI Calculator',
-      description: 'Track your body mass index progress effortlessly.',
-      icon: Icons.calculate,
-      imagePath: 'assets/images/bmi.png'
+        title: 'BMI Calculator',
+        description: 'Track your body mass index progress effortlessly.',
+        icon: Icons.calculate,
+        imagePath: 'assets/images/bmi.png'
     ),
     FeatureItem(
       title: 'Calorie Tracker',

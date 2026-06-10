@@ -61,9 +61,8 @@ Widget exerciseCard(Map<String, String> data, BuildContext context, String muscl
             exerciseName: data["name"] ?? "",
             muscleGroup: muscleGroup,
             imagePath: data["image"] ?? "",
-            instructions: data.containsKey("instructions") && data["instructions"] != null
-                ? data["instructions"]!
-                : "No instructions available",
+            instructions: data["instructions"] ?? "No instructions available",
+            // ❌ videoUrl: data["video"], // This parameter is currently MISSING here!
           ),
         ),
       );

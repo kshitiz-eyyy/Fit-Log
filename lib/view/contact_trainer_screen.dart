@@ -19,10 +19,7 @@ class ContactTrainerScreen extends StatelessWidget {
             icon: const Icon(Icons.arrow_back_ios, color: Color(0xFFCCFF00), size: 18),
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text(
-            "IRON & ONYX",
-            style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 1.5),
-          ),
+
           centerTitle: true,
         ),
         extendBodyBehindAppBar: true,

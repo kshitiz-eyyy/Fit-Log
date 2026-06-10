@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../viewmodel/terms_view_model.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import '../viewmodel/terms_view_model.dart';
 
 class TermsAndConditionsScreen extends StatefulWidget {
   const TermsAndConditionsScreen({super.key});
@@ -29,7 +29,7 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
           elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.close, color: Colors.white),
-            onPressed: () => Navigator.of(context).maybePop(),
+            onPressed: () => Navigator.of(context).maybePop(false),
           ),
           title: const Text(
             'LEGAL AGREEMENT',
@@ -51,7 +51,7 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                 const Center(
                   child: Text(
                     'TERMS OF SERVICE',
-                    textAlign: TextAlign.center, // Ensures multiple lines center if it wraps
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 28,
@@ -66,36 +66,34 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                 ),
                 const SizedBox(height: 24),
                 Expanded(
-                  child:
-
-                Container(
-                width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: cardBgColor,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.white12, width: 1),
-                  ),
-                  child: Consumer<TermsViewModel>(
-                    builder: (context, viewModel, child) {
-                      if (viewModel.isLoading) {
-                        return const Center(
-                          child: CircularProgressIndicator(color: neonLime),
-                        );
-                      }
-                      return SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(),
-                        child: MarkdownBody(
-                          data: viewModel.termsText,
-                          styleSheet: MarkdownStyleSheet(
-                            p: const TextStyle(color: Colors.white70, fontSize: 14, height: 1.6),
-                            strong: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: cardBgColor,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.white12, width: 1),
+                    ),
+                    child: Consumer<TermsViewModel>(
+                      builder: (context, viewModel, child) {
+                        if (viewModel.isLoading) {
+                          return const Center(
+                            child: CircularProgressIndicator(color: neonLime),
+                          );
+                        }
+                        return SingleChildScrollView(
+                          physics: const BouncingScrollPhysics(),
+                          child: MarkdownBody(
+                            data: viewModel.termsText,
+                            styleSheet: MarkdownStyleSheet(
+                              p: const TextStyle(color: Colors.white70, fontSize: 14, height: 1.6),
+                              strong: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+                            ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
-                ),
                 ),
                 const SizedBox(height: 20),
                 Theme(
@@ -133,11 +131,8 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
                       elevation: _hasAccepted ? 4 : 0,
                     ),
                     onPressed: _hasAccepted
-                        ? () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Terms Accepted! Welcome to FITLOG.')),
-                      );
-                    }
+
+                        ? () => Navigator.of(context).pop(true)
                         : null,
                     child: const Text(
                       'ACCEPT & CONTINUE',

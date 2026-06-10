@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-import 'fitlog_login.dart';
+import 'welcome_screen.dart';
 
 
 class SplashScreen extends StatefulWidget {
@@ -15,15 +15,13 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Countdown timer to move to the login screen
-    Timer(const Duration(seconds: 10), () {
+    Timer(const Duration(seconds: 3), () {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const FitLogLogin()),
+        MaterialPageRoute(builder: (context) => const WelcomeScreen()),
       );
     });
   }
 
-  // Exact matching UI colors from your image design
   static const Color bgColor = Color(0xFF121212);
   static const Color neonLime = Color(0xFFCCFF00);
   static const Color textGray = Color(0xFF555555);
@@ -82,7 +80,6 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                   const SizedBox(height: 40),
 
-                  // Loading/Progress Indicator Line
                   SizedBox(
                     width: 140,
                     child: ClipRRect(

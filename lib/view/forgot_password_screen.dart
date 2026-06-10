@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart'; // To show response status
-import 'package:provider/provider.dart';       // To listen to the view model
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
-import '../viewmodel/user_view_model.dart'; // Adjust path if needed
+import '../viewmodel/user_view_model.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -12,10 +12,6 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  bool _obscureNew = true;
-  bool _obscureConfirm = true;
-
-  // 1. ADD THE CONTROLLER FOR THE EMAIL INPUT FIELD
   final TextEditingController _emailController = TextEditingController();
 
   @override
@@ -24,7 +20,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     super.dispose();
   }
 
-  // 2. BACKEND HANDLER FUNCTION FOR FIREBASE
   void _handleResetRequest(UserViewModel viewModel) async {
     final String email = _emailController.text.trim();
 
@@ -33,7 +28,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       return;
     }
 
-    // Call the exact repo method via your ViewModel
     final bool success = await viewModel.forgetPassword(email);
 
     if (success) {
@@ -41,7 +35,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         msg: "Reset link dispatched! Please check your email inbox.",
         toastLength: Toast.LENGTH_LONG,
       );
-      // Automatically return to login screen on success
       Navigator.pop(context);
     } else {
       Fluttertoast.showToast(
@@ -53,7 +46,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 3. LISTEN TO YOUR PROVIDER VIEWMODEL
     final viewModel = context.watch<UserViewModel>();
 
     return Scaffold(
@@ -110,70 +102,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   hint: 'CHAMPION@FITLOG.COM',
                   icon: Icons.email_outlined,
                   isSuffixIcon: true,
-                  controller: _emailController, // 4. PASS CONTROLLER HERE
+                  controller: _emailController,
                 ),
 
                 const SizedBox(height: 16),
 
-                // Send Reset Link Button (Replaces static SEND OTP action)
+                // Send Reset Link Button
                 viewModel.loading
-                    ? const Center(child: CircularProgressIndicator(color: Color(0xFFCCFF00)))
+                    ? const Center(
+                    child: CircularProgressIndicator(
+                        color: Color(0xFFCCFF00)))
                     : _ActionButton(
                   text: 'SEND RESET LINK',
-                  onPressed: () => _handleResetRequest(viewModel), // 5. HOOK FUNCTION HERE
+                  onPressed: () => _handleResetRequest(viewModel),
                   color: const Color(0xFFCCFF00),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Note: The fields below are kept intact to preserve your UI design completely.
-                // Because Firebase sends an external link, these inputs are decorative structural fillers.
-                const Opacity(
-                  opacity: 0.4, // Dimming fields to reflect external nature of reset flow
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _FieldLabel(label: 'ENTER OTP (SENT VIA LINK)'),
-                      _CustomInput(hint: 'CODE'),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // New Password
-                Opacity(
-                  opacity: 0.4,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const _FieldLabel(label: 'NEW PASSWORD'),
-                      _CustomInput(
-                        hint: '●●●●●●●●',
-                        isPassword: true,
-                        obscure: _obscureNew,
-                        onToggle: () => setState(() => _obscureNew = !_obscureNew),
-                      ),
-
-                      // Confirm Password
-                      const _FieldLabel(label: 'CONFIRM PASSWORD'),
-                      _CustomInput(
-                        hint: '●●●●●●●●',
-                        isPassword: true,
-                        obscure: _obscureConfirm,
-                        onToggle: () => setState(() => _obscureConfirm = !_obscureConfirm),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                // Secondary Reset Password Button (Disabled placeholder to prevent interaction conflicts)
-                _ActionButton(
-                  text: 'RESET VIA EMAIL LINK',
-                  onPressed: () {},
-                  color: Colors.white12,
                 ),
 
                 const SizedBox(height: 24),
@@ -182,7 +124,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 Center(
                   child: TextButton.icon(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.arrow_back, color: Colors.grey, size: 16),
+                    icon: const Icon(Icons.arrow_back,
+                        color: Colors.grey, size: 16),
                     label: const Text(
                       'BACK TO LOGIN',
                       style: TextStyle(color: Colors.grey, fontSize: 12),
@@ -198,7 +141,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 }
 
-// Reusable Components
 class _FieldLabel extends StatelessWidget {
   final String label;
   const _FieldLabel({required this.label});
@@ -209,7 +151,8 @@ class _FieldLabel extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
         label,
-        style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+        style: const TextStyle(
+            color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -218,19 +161,13 @@ class _FieldLabel extends StatelessWidget {
 class _CustomInput extends StatelessWidget {
   final String hint;
   final IconData? icon;
-  final bool isPassword;
-  final bool obscure;
   final bool isSuffixIcon;
-  final VoidCallback? onToggle;
-  final TextEditingController? controller; // 6. RECEPTOR CONTROLLER PROP
+  final TextEditingController? controller;
 
   const _CustomInput({
     required this.hint,
     this.icon,
-    this.isPassword = false,
-    this.obscure = false,
     this.isSuffixIcon = false,
-    this.onToggle,
     this.controller,
   });
 
@@ -239,22 +176,20 @@ class _CustomInput extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: TextField(
-        controller: controller, // 7. LINK TO FLUTTER FIELD ENGINE
-        obscureText: obscure,
+        controller: controller,
         style: const TextStyle(color: Colors.white, letterSpacing: 2),
         decoration: InputDecoration(
           filled: true,
           fillColor: const Color(0xFF1E1E1E),
           hintText: hint,
           hintStyle: const TextStyle(color: Colors.white24, fontSize: 14),
-          suffixIcon: isPassword
-              ? IconButton(
-            icon: Icon(obscure ? Icons.visibility_off : Icons.visibility, color: Colors.white54),
-            onPressed: onToggle,
-          )
-              : (isSuffixIcon ? Icon(icon, color: Colors.white54) : null),
-          border: const OutlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
-          enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
+          suffixIcon: isSuffixIcon
+              ? Icon(icon, color: Colors.white54)
+              : null,
+          border: const OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.white12)),
+          enabledBorder: const OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.white12)),
         ),
       ),
     );
@@ -285,7 +220,8 @@ class _ActionButton extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w900),
+          style: const TextStyle(
+              color: Colors.black, fontWeight: FontWeight.w900),
         ),
       ),
     );

@@ -217,34 +217,8 @@ class _FitLogLoginState extends State<FitLogLogin> {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
-              Center(
-                child: Wrap(
-                  alignment: WrapAlignment.center,
-                  children: [
-                    const Text('BY LOGGING IN, YOU AGREE TO OUR ',
-                        style: TextStyle(color: Colors.white38, fontSize: 14, letterSpacing: 0.5)),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const TermsAndConditionsScreen()),
-                        );
-                      },
-                      child: const Text(
-                        'TERMS & CONDITIONS',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+
+
               const SizedBox(height: 20),
             ],
           ),

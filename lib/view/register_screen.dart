@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
-
-import '../model/user_model.dart';
-import '../viewmodel/user_view_model.dart';
+import 'terms_and_conditions_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -17,68 +13,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscurePw = true;
   bool _obscureConfirmPw = true;
 
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
-  }
-
-  void _handleRegistration(UserViewModel viewModel) async {
-    final String name = _nameController.text.trim();
-    final String email = _emailController.text.trim();
-    final String password = _passwordController.text.trim();
-    final String confirmPassword = _confirmPasswordController.text.trim();
-
-    if (name.isEmpty || email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
-      Fluttertoast.showToast(msg: "Please fill in all details");
-      return;
-    }
-
-    if (password != confirmPassword) {
-      Fluttertoast.showToast(msg: "Passwords do not match");
-      return;
-    }
-
-    if (!_isAgreed) {
-      Fluttertoast.showToast(msg: "You must agree to the Terms & Conditions");
-      return;
-    }
-
-    final String userId = await viewModel.register(email, password);
-
-    if (userId.isEmpty) {
-      Fluttertoast.showToast(msg: viewModel.error ?? "Registration failed");
-    } else {
-      final userProfile = UserModel(
-        id: userId,
-        name: name,
-        email: email,
-        contact: null,
-      );
-
-      final bool dbSuccess = await viewModel.addUser(userProfile);
-
-      if (dbSuccess) {
-        Fluttertoast.showToast(msg: "Registration success!");
-        Navigator.pop(context);
-      } else {
-        Fluttertoast.showToast(msg: viewModel.error ?? "Failed to save profile context");
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<UserViewModel>();
-
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
       body: SafeArea(
@@ -88,6 +24,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
+              // Header Logo
               const Center(
                 child: Text(
                   'FITLOG',
@@ -101,6 +38,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
               const SizedBox(height: 40),
+
               const Text(
                 'CREATE ACCOUNT',
                 style: TextStyle(
@@ -115,18 +53,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 style: TextStyle(color: Colors.grey, fontSize: 16),
               ),
               const SizedBox(height: 30),
+
+              // Full Name
               const _FieldLabel(label: 'FULL NAME'),
-              _CustomInput(
-                hint: 'ENTER NAME',
-                icon: Icons.person_outline,
-                controller: _nameController,
-              ),
+              const _CustomInput(hint: 'ENTER NAME', icon: Icons.person_outline),
+
+              // Email Address
               const _FieldLabel(label: 'EMAIL ADDRESS'),
-              _CustomInput(
-                hint: 'ENTER EMAIL',
-                icon: Icons.email_outlined,
-                controller: _emailController,
-              ),
+              const _CustomInput(hint: 'ENTER EMAIL', icon: Icons.email_outlined),
+
+              // Password
               const _FieldLabel(label: 'PASSWORD'),
               _CustomInput(
                 hint: '●●●●●●●●',
@@ -134,8 +70,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 isPassword: true,
                 obscure: _obscurePw,
                 onToggle: () => setState(() => _obscurePw = !_obscurePw),
-                controller: _passwordController,
               ),
+
+              // Confirm Password
               const _FieldLabel(label: 'CONFIRM PASSWORD'),
               _CustomInput(
                 hint: '●●●●●●●●',
@@ -143,9 +80,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 isPassword: true,
                 obscure: _obscureConfirmPw,
                 onToggle: () => setState(() => _obscureConfirmPw = !_obscureConfirmPw),
-                controller: _confirmPasswordController,
               ),
+
               const SizedBox(height: 20),
+
+              // Terms & Conditions Checkbox
               Row(
                 children: [
                   Theme(
@@ -159,16 +98,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   Expanded(
                     child: RichText(
-                      text: const TextSpan(
-                        style: TextStyle(color: Colors.white, fontSize: 14),
+                      text: TextSpan(
+                        style: const TextStyle(color: Colors.white, fontSize: 14),
                         children: [
-                          TextSpan(text: 'I AGREE TO THE '),
-                          TextSpan(
-                            text: 'TERMS & CONDITIONS',
-                            style: TextStyle(
-                              color: Color(0xFFCCFF00),
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
+                          const TextSpan(text: 'I AGREE TO THE '),
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.baseline,
+                            baseline: TextBaseline.alphabetic,
+                            child: GestureDetector(
+                              onTap: () async {
+                                final bool? accepted = await Navigator.push<bool>(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const TermsAndConditionsScreen(),
+                                  ),
+                                );
+
+                                if (accepted == true) {
+                                  setState(() {
+                                    _isAgreed = true;
+                                  });
+                                }
+                              },
+                              child: const Text(
+                                'TERMS & CONDITIONS',
+                                style: TextStyle(
+                                  color: Color(0xFFCCFF00),
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -177,36 +136,54 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ],
               ),
+
               const SizedBox(height: 30),
+
+              // Create Account Button (Locks/Unlocks dynamically)
               SizedBox(
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: viewModel.loading ? null : () => _handleRegistration(viewModel),
+                  // 1. If _isAgreed is false, setting onPressed to null disables the button.
+                  onPressed: _isAgreed
+                      ? () {
+                    // Perform registration logic here
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Registration successful!')),
+                    );
+                  }
+                      : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFCCFF00),
+                    // 2. Swaps colors automatically to give visual feedback when disabled
+                    backgroundColor: _isAgreed ? const Color(0xFFCCFF00) : const Color(0xFF1E1E1E),
+                    disabledBackgroundColor: const Color(0xFF1E1E1E),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                   ),
-                  child: viewModel.loading
-                      ? const CircularProgressIndicator(color: Colors.black)
-                      : const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         'CREATE ACCOUNT',
                         style: TextStyle(
-                          color: Colors.black,
+                          // 3. Swaps text color dynamically based on state
+                          color: _isAgreed ? Colors.black : Colors.white24,
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
                       ),
-                      SizedBox(width: 8),
-                      Icon(Icons.arrow_forward, color: Colors.black),
+                      const SizedBox(width: 8),
+                      Icon(
+                        Icons.arrow_forward,
+                        color: _isAgreed ? Colors.black : Colors.white24,
+                      ),
                     ],
                   ),
                 ),
               ),
+
               const SizedBox(height: 24),
+
+              // Sign In Link
               Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -215,7 +192,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         style: TextStyle(color: Colors.grey, fontSize: 14)),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pop(context);
+                        Navigator.maybePop(context);
                       },
                       child: const Text(
                         'SIGN IN',
@@ -229,7 +206,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ],
                 ),
               ),
+
               const SizedBox(height: 40),
+
+              // Step Progress Indicators
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -296,7 +276,6 @@ class _CustomInput extends StatelessWidget {
   final bool isPassword;
   final bool obscure;
   final VoidCallback? onToggle;
-  final TextEditingController? controller;
 
   const _CustomInput({
     required this.hint,
@@ -304,13 +283,11 @@ class _CustomInput extends StatelessWidget {
     this.isPassword = false,
     this.obscure = false,
     this.onToggle,
-    this.controller,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: controller,
       obscureText: obscure,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
