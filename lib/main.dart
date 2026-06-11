@@ -52,7 +52,7 @@ class FitLogApp extends StatelessWidget {
           ),
         ),
 
-        home: const FitLogPremiumScreen(),
+        home: const DashboardScreen(),
         routes: {
           '/login': (context) => const FitLogLogin()
         }

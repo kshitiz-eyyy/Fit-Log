@@ -4,12 +4,19 @@ class UserModel {
   final String? contact;
   final String email;
 
+  final String bio;
+  final String fitnessGoal;
+  final String role;
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'name': name,
       'contact': contact,
       'email': email,
+      'user_bio': bio,
+      'fitness_goal': fitnessGoal,
+      'role': role,
     };
   }
 
@@ -19,6 +26,9 @@ class UserModel {
       name: map['name'] ?? '',
       contact: map['contact'],
       email: map['email'] ?? '',
+      bio: map['user_bio'] ?? 'Consistency beats talent every single day.',
+      fitnessGoal: map['fitness_goal'] ?? 'Hypertrophy Conditioning',
+      role: map['role'] ?? 'user',
     );
   }
 
@@ -27,5 +37,8 @@ class UserModel {
     required this.name,
     this.contact,
     required this.email,
+    required this.bio,
+    required this.fitnessGoal,
+    required this.role,
   });
 }

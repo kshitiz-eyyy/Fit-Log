@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'user_repo.dart';
-import '../model/user_model.dart';
+import 'user_profile_repo.dart';
+import '../model/user_profile_model.dart';
 
 class UserRepoImpl implements UserRepo {
   final FirebaseAuth auth = FirebaseAuth.instance;

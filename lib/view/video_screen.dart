@@ -20,7 +20,6 @@ class _VideoScreenState extends State<VideoScreen> {
   void initState() {
     super.initState();
 
-    // Extract video ID safely from standard or short YouTube URLs
     _videoId = YoutubePlayer.convertUrlToId(widget.videoUrl);
 
     _controller = YoutubePlayerController(
@@ -34,31 +33,37 @@ class _VideoScreenState extends State<VideoScreen> {
         forceHD: false,
         enableCaption: true,
       ),
-    )..addListener(_listener);
+    )..addListener(_videoPlayerSystemStateListener);
   }
 
-  void _listener() {
-    if (_isPlayerReady && mounted && !_controller.value.isFullScreen) {
+  void _videoPlayerSystemStateListener() {
+    if (mounted) {
       setState(() {});
     }
   }
 
   @override
   void deactivate() {
-    // Pauses video if navigation shifts away from this route
     _controller.pause();
     super.deactivate();
   }
 
   @override
   void dispose() {
-    _controller.removeListener(_listener);
+    _controller.removeListener(_videoPlayerSystemStateListener);
     _controller.dispose();
-    // Ensure system orientations are restored when leaving the video
+    _resetDeviceDeviceSystemUIProperties();
+    super.dispose();
+  }
+
+  void _resetDeviceDeviceSystemUIProperties() {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
-    super.dispose();
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
+    );
   }
 
   @override
@@ -66,83 +71,125 @@ class _VideoScreenState extends State<VideoScreen> {
     if (_videoId == null || _videoId!.isEmpty) {
       return Scaffold(
         backgroundColor: Colors.black,
-        appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
         body: const Center(
           child: Text(
-            "Invalid Video Link",
-            style: TextStyle(color: Colors.white, fontSize: 18),
+            "Invalid Tutorial Video Link",
+            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ),
       );
     }
 
-    return YoutubePlayerBuilder(
-      onExitFullScreen: () {
-        // Handle returning back to regular orientation
-        SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        _resetDeviceDeviceSystemUIProperties();
       },
-      player: YoutubePlayer(
-        controller: _controller,
-        showVideoProgressIndicator: true,
-        progressIndicatorColor: const Color(0xFFCCFF00), // Match your neon-lime theme
-        progressColors: const ProgressBarColors(
-          playedColor: Color(0xFFCCFF00),
-          handleColor: Color(0xFFCCFF00),
-        ),
-        onReady: () {
-          _isPlayerReady = true;
+      child: YoutubePlayerBuilder(
+        onExitFullScreen: () {
+          _resetDeviceDeviceSystemUIProperties();
         },
-        onEnded: (data) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Video Completed!")),
+        player: YoutubePlayer(
+          controller: _controller,
+          showVideoProgressIndicator: true,
+          progressIndicatorColor: const Color(0xFFCCFF00),
+          progressColors: const ProgressBarColors(
+            playedColor: Color(0xFFCCFF00),
+            handleColor: Color(0xFFCCFF00),
+          ),
+          onReady: () {
+            _isPlayerReady = true;
+          },
+          onEnded: (data) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Tutorial Training Completed!"),
+                  backgroundColor: Color(0xFF161616),
+                ),
+              );
+            }
+          },
+        ),
+        builder: (context, player) {
+          return Scaffold(
+            backgroundColor: Colors.black,
+            appBar: AppBar(
+              backgroundColor: const Color(0xFF0E0E0E),
+              elevation: 0,
+              title: const Text(
+                "VIDEO TUTORIAL",
+                style: TextStyle(
+                  color: Color(0xFFCCFF00),
+                  fontWeight: FontWeight.w900,
+                  fontSize: 14,
+                  letterSpacing: 1,
+                ),
+              ),
+              centerTitle: true,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () {
+                  _resetDeviceDeviceSystemUIProperties();
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+            body: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Embeds the responsive media stream directly
+                    player,
+                    const SizedBox(height: 24),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: Text(
+                        _controller.metadata.title.isNotEmpty
+                            ? _controller.metadata.title
+                            : "Fetching Video Title Data...",
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: Text(
+                        _controller.metadata.author.isNotEmpty
+                            ? "Coach/Author: ${_controller.metadata.author}"
+                            : "",
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           );
         },
       ),
-      builder: (context, player) {
-        return Scaffold(
-          backgroundColor: Colors.black,
-          appBar: AppBar(
-            backgroundColor: const Color(0xFF0E0E0E),
-            elevation: 0,
-            title: const Text(
-              "Video Tutorial",
-              style: TextStyle(
-                color: Color(0xFFCCFF00),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ),
-          body: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  player, // The actual running native player object
-                  const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(
-                      _controller.metadata.title.isNotEmpty
-                          ? _controller.metadata.title
-                          : "Loading Video Info...",
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 }
