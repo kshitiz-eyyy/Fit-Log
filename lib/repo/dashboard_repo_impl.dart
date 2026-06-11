@@ -58,9 +58,8 @@ class DashboardRepoImpl implements DashboardRepo {
   }
 
   @override
-  Future<void> updateHydrationLevel(double hydrationAmount) async {
+  Future<void> updateHydrationLevel(double newLevel) async {
     await _firestore.collection('users').doc(_currentUserId).update({
-      'hydrationAmount': hydrationAmount,
+      'hydrationAmount': newLevel,
     });
-  }
-}
+  }}
