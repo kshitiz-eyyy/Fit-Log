@@ -8,11 +8,6 @@ import 'package:fitlog/view/welcome_screen.dart';
 import 'package:fitlog/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-
-
-
-
 import 'firebase_options.dart';
 import 'view/library.dart';
 import 'view/favourite_exercise.dart';
