@@ -1,4 +1,3 @@
-import 'package:fitlog/view/fitlog_premium_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fitlog/view/features_screen.dart';
@@ -10,6 +9,7 @@ import 'package:fitlog/view/workout_timer_screen.dart';
 import 'package:fitlog/view/meal_tracking_screen.dart';
 import 'package:fitlog/view/chatbot.dart';
 import 'package:fitlog/view/water_tracker_screen.dart';
+import 'package:fitlog/view/fitlog_premium_screen.dart';
 import 'dart:math';
 
 class DashboardScreen extends StatefulWidget {

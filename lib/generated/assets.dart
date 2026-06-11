@@ -12,95 +12,132 @@ class $AssetsImagesGen {
   const $AssetsImagesGen();
 
   final AssetGenImage dumbellpress = const AssetGenImage(
-      'assets/images/Dumbellpress.png');
+    'assets/images/Dumbellpress.png',
+  );
   final AssetGenImage pecdecfly = const AssetGenImage(
-      'assets/images/Pecdecfly.png');
+    'assets/images/Pecdecfly.png',
+  );
   final AssetGenImage absdash = const AssetGenImage(
-      'assets/images/absdash.png');
+    'assets/images/absdash.png',
+  );
   final AssetGenImage backdash = const AssetGenImage(
-      'assets/images/backdash.png');
+    'assets/images/backdash.png',
+  );
   final AssetGenImage barbellrow = const AssetGenImage(
-      'assets/images/barbellrow.png');
+    'assets/images/barbellrow.png',
+  );
   final AssetGenImage benchpres = const AssetGenImage(
-      'assets/images/benchpres.png');
+    'assets/images/benchpres.png',
+  );
   final AssetGenImage bicepcurl = const AssetGenImage(
-      'assets/images/bicepcurl.png');
+    'assets/images/bicepcurl.png',
+  );
   final AssetGenImage bicepsdash = const AssetGenImage(
-      'assets/images/bicepsdash.png');
+    'assets/images/bicepsdash.png',
+  );
   final AssetGenImage cablecrossover = const AssetGenImage(
-      'assets/images/cablecrossover.png');
+    'assets/images/cablecrossover.png',
+  );
   final AssetGenImage cablecrunches = const AssetGenImage(
-      'assets/images/cablecrunches.png');
+    'assets/images/cablecrunches.png',
+  );
   final AssetGenImage cablepushdown = const AssetGenImage(
-      'assets/images/cablepushdown.png');
+    'assets/images/cablepushdown.png',
+  );
   final AssetGenImage cablereardeltfly = const AssetGenImage(
-      'assets/images/cablereardeltfly.png');
+    'assets/images/cablereardeltfly.png',
+  );
   final AssetGenImage calfraises = const AssetGenImage(
-      'assets/images/calfraises.png');
+    'assets/images/calfraises.png',
+  );
   final AssetGenImage chestdash = const AssetGenImage(
-      'assets/images/chestdash.png');
+    'assets/images/chestdash.png',
+  );
   final AssetGenImage chestdips = const AssetGenImage(
-      'assets/images/chestdips.png');
+    'assets/images/chestdips.png',
+  );
   final AssetGenImage closegripBP = const AssetGenImage(
-      'assets/images/closegripBP.png');
+    'assets/images/closegripBP.png',
+  );
   final AssetGenImage deadlift = const AssetGenImage(
-      'assets/images/deadlift.png');
+    'assets/images/deadlift.png',
+  );
   final AssetGenImage frontraise = const AssetGenImage(
-      'assets/images/frontraise.png');
+    'assets/images/frontraise.png',
+  );
   final AssetGenImage gym = const AssetGenImage('assets/images/gym.png');
   final AssetGenImage hammercurl = const AssetGenImage(
-      'assets/images/hammercurl.png');
+    'assets/images/hammercurl.png',
+  );
   final AssetGenImage hanginglegraises = const AssetGenImage(
-      'assets/images/hanginglegraises.png');
+    'assets/images/hanginglegraises.png',
+  );
   final AssetGenImage inclineddumbellcurl = const AssetGenImage(
-      'assets/images/inclineddumbellcurl.png');
+    'assets/images/inclineddumbellcurl.png',
+  );
   final AssetGenImage lateralraise = const AssetGenImage(
-      'assets/images/lateralraise.png');
+    'assets/images/lateralraise.png',
+  );
   final AssetGenImage latspulldown = const AssetGenImage(
-      'assets/images/latspulldown.png');
+    'assets/images/latspulldown.png',
+  );
   final AssetGenImage legcurl = const AssetGenImage(
-      'assets/images/legcurl.png');
+    'assets/images/legcurl.png',
+  );
   final AssetGenImage legextention = const AssetGenImage(
-      'assets/images/legextention.png');
+    'assets/images/legextention.png',
+  );
   final AssetGenImage legsdash = const AssetGenImage(
-      'assets/images/legsdash.png');
+    'assets/images/legsdash.png',
+  );
   final AssetGenImage logo = const AssetGenImage('assets/images/logo.png');
   final AssetGenImage lunges = const AssetGenImage('assets/images/lunges.png');
   final AssetGenImage machinepress = const AssetGenImage(
-      'assets/images/machinepress.png');
+    'assets/images/machinepress.png',
+  );
   final AssetGenImage mountainclimbers = const AssetGenImage(
-      'assets/images/mountainclimbers.png');
+    'assets/images/mountainclimbers.png',
+  );
   final AssetGenImage plank = const AssetGenImage('assets/images/plank.png');
   final AssetGenImage preachercurl = const AssetGenImage(
-      'assets/images/preachercurl.png');
+    'assets/images/preachercurl.png',
+  );
   final AssetGenImage pullups = const AssetGenImage(
-      'assets/images/pullups.png');
+    'assets/images/pullups.png',
+  );
   final AssetGenImage rdl = const AssetGenImage('assets/images/rdl.png');
   final AssetGenImage russiantwist = const AssetGenImage(
-      'assets/images/russiantwist.png');
+    'assets/images/russiantwist.png',
+  );
   final AssetGenImage seatedrow = const AssetGenImage(
-      'assets/images/seatedrow.png');
+    'assets/images/seatedrow.png',
+  );
   final AssetGenImage shoulderdash = const AssetGenImage(
-      'assets/images/shoulderdash.png');
+    'assets/images/shoulderdash.png',
+  );
   final AssetGenImage shoulderpress = const AssetGenImage(
-      'assets/images/shoulderpress.png');
+    'assets/images/shoulderpress.png',
+  );
   final AssetGenImage shrugs = const AssetGenImage('assets/images/shrugs.png');
   final AssetGenImage singlearmOHE = const AssetGenImage(
-      'assets/images/singlearmOHE.png');
+    'assets/images/singlearmOHE.png',
+  );
   final AssetGenImage singlearmdumbellrow = const AssetGenImage(
-      'assets/images/singlearmdumbellrow.png');
+    'assets/images/singlearmdumbellrow.png',
+  );
   final AssetGenImage squats = const AssetGenImage('assets/images/squats.png');
   final AssetGenImage tricepsdash = const AssetGenImage(
-      'assets/images/tricepsdash.png');
+    'assets/images/tricepsdash.png',
+  );
   final AssetGenImage tricepsdips = const AssetGenImage(
-      'assets/images/tricepsdips.png');
+    'assets/images/tricepsdips.png',
+  );
 }
 
 class AssetGenImage {
   const AssetGenImage(this._assetName, {this.size, this.flavors = const {}});
 
   final String _assetName;
-
 
   final Size? size;
   final Set<String> flavors;
@@ -158,15 +195,8 @@ class AssetGenImage {
     );
   }
 
-  ImageProvider provider({
-    AssetBundle? bundle,
-    String? package,
-  }) {
-    return AssetImage(
-      _assetName,
-      bundle: bundle,
-      package: package,
-    );
+  ImageProvider provider({AssetBundle? bundle, String? package}) {
+    return AssetImage(_assetName, bundle: bundle, package: package);
   }
 
   Widget custom({
@@ -183,4 +213,3 @@ class AssetGenImage {
 
   String get keyName => _assetName;
 }
-

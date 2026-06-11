@@ -30,5 +30,3 @@ class UserModel {
     required this.email,
   });
 }
-
-

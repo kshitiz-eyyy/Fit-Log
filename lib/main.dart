@@ -1,11 +1,18 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fitlog/view/admin_panel_screen.dart';
+
 import 'package:fitlog/view/contact_dietitan_screen.dart';
 import 'package:fitlog/view/contact_trainer_screen.dart';
 import 'package:fitlog/view/fitlog_login.dart';
 import 'package:fitlog/view/terms_and_conditions_screen.dart';
 import 'package:fitlog/view/welcome_screen.dart';
 import 'package:fitlog/viewmodel/user_view_model.dart';
+
+import 'package:fitlog/view/meal_tracking_screen.dart';
+import 'package:fitlog/view/user_profile.dart';
+import 'view/fitlog_login.dart';
+import 'package:fitlog/view/testing_gateway_screen.dart;.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,6 +27,10 @@ import 'view/change_password_screen.dart';
 import 'view/dashboard.dart';
 import 'view/features_screen.dart';
 import 'view/splash_screen.dart';
+
+
+import 'view/fitlog_premium_screen.dart';
+import 'view/workout_tracking_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

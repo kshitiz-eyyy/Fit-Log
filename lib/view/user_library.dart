@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'exercise_data.dart';
+import '../repo/library_repo_impl.dart';
+import '../viewmodel/library_view_model.dart';
 import 'exerciselistscreen.dart';
-import 'user_activity_screen.dart';
 
 class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key});
@@ -12,117 +11,40 @@ class LibraryScreen extends StatefulWidget {
 }
 
 class _LibraryScreenState extends State<LibraryScreen> {
-  int _selectedIndex = 2;
-
-  final List<Widget> _screens = [
-    const Center(child: Text("HOME", style: TextStyle(color: Colors.white))),
-    const Center(child: Text("FEATURES", style: TextStyle(color: Colors.white))),
-    const _LibraryContent(),
-    const ActivityScreen(),
-    const Center(child: Text("PROFILE", style: TextStyle(color: Colors.white))),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _screens[_selectedIndex],
-    );
-  }
-}
-
-class _LibraryContent extends StatefulWidget {
-  const _LibraryContent();
-
-  @override
-  State<_LibraryContent> createState() => _LibraryContentState();
-}
-
-class _LibraryContentState extends State<_LibraryContent> {
-  Map<String, List<Map<String, String>>> dynamicExerciseData = {};
-  List<String> muscleGroups = [];
-
-  final Map<String, String> muscleGroupImages = {
-    "Chest": "assets/images/chestdash.png",
-    "Back": "assets/images/backdash.png",
-    "Legs": "assets/images/legsdash.png",
-    "Biceps": "assets/images/bicepsdash.png",
-    "Triceps": "assets/images/tricepsdash.png",
-    "Shoulders": "assets/images/shoulderdash.png",
-    "Abs": "assets/images/absdash.png",
-  };
+  late final LibraryViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    _syncAdminAndStaticDatabase();
+    _viewModel = LibraryViewModel(repository: LibraryRepoImpl());
+    _viewModel.addListener(_onViewModelStateChange);
   }
 
-  Future<void> _syncAdminAndStaticDatabase() async {
-    final prefs = await SharedPreferences.getInstance();
-
-
-    Map<String, List<Map<String, String>>> synchronizedData = {};
-    exerciseData.forEach((key, value) {
-      synchronizedData[key] = List<Map<String, String>>.from(value);
-    });
-
-
-    List<String> customInjections = prefs.getStringList('admin_custom_exercises') ?? [];
-
-
-    for (String item in customInjections) {
-      var parts = item.split('|');
-      if (parts.length == 2) {
-        String exerciseName = parts[0];
-        String targetCategory = parts[1];
-
-
-        if (!synchronizedData.containsKey(targetCategory)) {
-          synchronizedData[targetCategory] = [];
-        }
-
-        synchronizedData[targetCategory]!.add({
-          "name": exerciseName,
-          "reps": "10-12",
-        });
-      }
-    }
-
-    setState(() {
-      dynamicExerciseData = synchronizedData;
-      muscleGroups = dynamicExerciseData.keys.toList();
-    });
+  @override
+  void dispose() {
+    _viewModel.removeListener(_onViewModelStateChange);
+    _viewModel.dispose();
+    super.dispose();
   }
 
-  Map<String, Map<String, List<Map<String, String>>>> get trainingSplits {
-    return {
-      "Push/Pull/Legs": {
-        "Push": (dynamicExerciseData["Chest"] ?? []) + (dynamicExerciseData["Shoulders"] ?? []) + (dynamicExerciseData["Triceps"] ?? []),
-        "Pull": (dynamicExerciseData["Back"] ?? []) + (dynamicExerciseData["Biceps"] ?? []),
-        "Legs": dynamicExerciseData["Legs"] ?? [],
-      },
-      "Bro Split": {
-        "Chest Day": dynamicExerciseData["Chest"] ?? [],
-        "Back Day": dynamicExerciseData["Back"] ?? [],
-        "Shoulder Day": dynamicExerciseData["Shoulders"] ?? [],
-        "Arm Day": (dynamicExerciseData["Biceps"] ?? []) + (dynamicExerciseData["Triceps"] ?? []),
-        "Leg Day": dynamicExerciseData["Legs"] ?? [],
-        "Abs Day": dynamicExerciseData["Abs"] ?? [],
-      },
-    };
+  void _onViewModelStateChange() {
+    if (mounted) setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    if (muscleGroups.isEmpty) {
+    if (_viewModel.isLoading) {
       return const Scaffold(
         backgroundColor: Colors.black,
         body: Center(child: CircularProgressIndicator(color: Color(0xFFCCFF00))),
       );
     }
 
+    final state = _viewModel.state;
+
     return Stack(
       children: [
+        // Background Stack Profile
         Container(
           decoration: BoxDecoration(
             image: DecorationImage(
@@ -142,21 +64,17 @@ class _LibraryContentState extends State<_LibraryContent> {
             elevation: 10,
             title: const Text(
               "Library",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2,
-                fontSize: 22,
-              ),
+              style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2, fontSize: 22),
             ),
             centerTitle: true,
           ),
           body: RefreshIndicator(
             color: const Color(0xFFCCFF00),
             backgroundColor: const Color(0xFF161616),
-            onRefresh: _syncAdminAndStaticDatabase,
+            onRefresh: _viewModel.refreshLibraryState,
             child: Column(
               children: [
-
+                // Muscle Target Grid Area
                 Expanded(
                   flex: 3,
                   child: GridView.builder(
@@ -167,10 +85,10 @@ class _LibraryContentState extends State<_LibraryContent> {
                       mainAxisSpacing: 14,
                       childAspectRatio: 0.9,
                     ),
-                    itemCount: muscleGroups.length,
+                    itemCount: state.muscleGroups.length,
                     itemBuilder: (context, index) {
-                      final group = muscleGroups[index];
-                      final imagePath = muscleGroupImages[group] ?? "assets/images/default.png";
+                      final group = state.muscleGroups[index];
+                      final imagePath = _viewModel.muscleGroupImages[group] ?? "assets/images/default.png";
 
                       return GestureDetector(
                         onTap: () {
@@ -179,10 +97,10 @@ class _LibraryContentState extends State<_LibraryContent> {
                             MaterialPageRoute(
                               builder: (_) => ExerciseListScreen(
                                 muscleGroup: group,
-                                exercises: dynamicExerciseData[group]!,
+                                exercises: state.dynamicExerciseData[group]!,
                               ),
                             ),
-                          ).then((_) => _syncAdminAndStaticDatabase());
+                          ).then((_) => _viewModel.refreshLibraryState());
                         },
                         child: Container(
                           decoration: BoxDecoration(
@@ -199,12 +117,7 @@ class _LibraryContentState extends State<_LibraryContent> {
                             children: [
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(20),
-                                child: Image.asset(
-                                  imagePath,
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                ),
+                                child: Image.asset(imagePath, fit: BoxFit.cover, width: double.infinity, height: double.infinity),
                               ),
                               Container(
                                 decoration: BoxDecoration(
@@ -233,13 +146,7 @@ class _LibraryContentState extends State<_LibraryContent> {
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                         letterSpacing: 1.5,
-                                        shadows: [
-                                          Shadow(
-                                            color: Colors.black,
-                                            blurRadius: 6,
-                                            offset: Offset(2, 2),
-                                          ),
-                                        ],
+                                        shadows: [Shadow(color: Colors.black, blurRadius: 6, offset: Offset(2, 2))],
                                       ),
                                     ),
                                   ],
@@ -253,36 +160,47 @@ class _LibraryContentState extends State<_LibraryContent> {
                   ),
                 ),
 
-                Expanded(
-                  flex: 1,
-                  child: ListView(
-                    children: trainingSplits.keys.map((splitName) {
-                      return Card(
-                        color: const Color(0xFF1E1E1E),
-                        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                        child: ListTile(
-                          title: Text(splitName,
-                              style: const TextStyle(
-                                  color: Color(0xFFCCFF00),
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18)),
-                          trailing: const Icon(Icons.chevron_right, color: Colors.white),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => SplitScreen(
-                                  splitName: splitName,
-                                  splitData: trainingSplits[splitName]!,
+                // Training Splits List Area (Conditionally visible based on Admin Flag)
+                if (state.enableTrainingSplitsFlag)
+                  Expanded(
+                    flex: 1,
+                    child: ListView(
+                      children: _viewModel.trainingSplits.keys.map((splitName) {
+                        return Card(
+                          color: const Color(0xFF1E1E1E),
+                          margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                          child: ListTile(
+                            title: Text(
+                              splitName,
+                              style: const TextStyle(color: Color(0xFFCCFF00), fontWeight: FontWeight.bold, fontSize: 18),
+                            ),
+                            trailing: const Icon(Icons.chevron_right, color: Colors.white),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => SplitScreen(
+                                    splitName: splitName,
+                                    splitData: _viewModel.trainingSplits[splitName]!,
+                                    onRefreshNeeded: _viewModel.refreshLibraryState,
+                                  ),
                                 ),
-                              ),
-                            ).then((_) => _syncAdminAndStaticDatabase());
-                          },
-                        ),
-                      );
-                    }).toList(),
+                              ).then((_) => _viewModel.refreshLibraryState());
+                            },
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  )
+                else
+                  const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text(
+                      "TRAINING SPLITS DISABLED BY SYSTEM ADMIN",
+                      style: TextStyle(color: Colors.grey, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1),
+                      textAlign:  TextAlign.center,
+                    ),
                   ),
-                ),
               ],
             ),
           ),
@@ -295,8 +213,14 @@ class _LibraryContentState extends State<_LibraryContent> {
 class SplitScreen extends StatelessWidget {
   final String splitName;
   final Map<String, List<Map<String, String>>> splitData;
+  final VoidCallback onRefreshNeeded;
 
-  const SplitScreen({super.key, required this.splitName, required this.splitData});
+  const SplitScreen({
+    super.key,
+    required this.splitName,
+    required this.splitData,
+    required this.onRefreshNeeded,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -304,8 +228,7 @@ class SplitScreen extends StatelessWidget {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: const Color(0xFF0E0707),
-        title: Text(splitName,
-            style: const TextStyle(color: Color(0xFFCCFF00), fontWeight: FontWeight.bold)),
+        title: Text(splitName, style: const TextStyle(color: Color(0xFFCCFF00), fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
       body: ListView(
@@ -316,14 +239,13 @@ class SplitScreen extends StatelessWidget {
             color: const Color(0xFF1E1E1E),
             margin: const EdgeInsets.symmetric(vertical: 10),
             child: ExpansionTile(
-              title: Text(dayName,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              iconColor: const Color(0xFFCCFF00),
+              collapsedIconColor: Colors.white,
+              title: Text(dayName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               children: exercises.map((exercise) {
                 return ListTile(
-                  title: Text(exercise["name"] ?? "",
-                      style: const TextStyle(color: Colors.white)),
-                  subtitle: Text("Sets: 3–4 • Reps: ${exercise["reps"] ?? "10"}",
-                      style: const TextStyle(color: Colors.white70)),
+                  title: Text(exercise["name"] ?? "", style: const TextStyle(color: Colors.white)),
+                  subtitle: Text("Sets: 3–4 • Reps: ${exercise["reps"] ?? "10"}", style: const TextStyle(color: Colors.white70)),
                   trailing: const Icon(Icons.fitness_center, color: Color(0xFFCCFF00)),
                   onTap: () {
                     Navigator.push(
@@ -334,7 +256,7 @@ class SplitScreen extends StatelessWidget {
                           exercises: exercises,
                         ),
                       ),
-                    );
+                    ).then((_) => onRefreshNeeded());
                   },
                 );
               }).toList(),
