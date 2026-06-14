@@ -3,7 +3,12 @@ plugins {
     id("com.google.gms.google-services")
     id("kotlin-android")
     id("org.jetbrains.kotlin.plugin.compose")
+<<<<<<< HEAD
     id("dev.flutter.flutter-gradle-plugin")
+=======
+
+    id("dev.flutter.flutter-gradle-plugin") // MUST remain at the bottom of the block
+>>>>>>> 9a7a72e6196ad528029b6f5ba74592e00fb661fd
 }
 
 android {
@@ -52,4 +57,11 @@ dependencies {
 
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+<<<<<<< HEAD
+=======
+}
+
+flutter {
+    source = "../.."
+>>>>>>> 9a7a72e6196ad528029b6f5ba74592e00fb661fd
 }

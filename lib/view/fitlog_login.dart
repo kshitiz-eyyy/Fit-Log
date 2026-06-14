@@ -1,9 +1,12 @@
-
 import 'package:fitlog/view/register_screen.dart';
+import 'package:fitlog/view/user_dashboard.dart';
 import 'package:flutter/material.dart';
-import 'dashboard.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
+import '../viewmodel/user_view_model.dart';
+import 'admin_panel_screen.dart';
 import 'forgot_password_screen.dart';
-
+import 'terms_and_conditions_screen.dart';
 
 class FitLogLogin extends StatefulWidget {
   const FitLogLogin({super.key});
@@ -13,7 +16,6 @@ class FitLogLogin extends StatefulWidget {
 }
 
 class _FitLogLoginState extends State<FitLogLogin> {
-
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -24,32 +26,60 @@ class _FitLogLoginState extends State<FitLogLogin> {
     super.dispose();
   }
 
-
-  void _handleLogin() {
+  void _handleLogin(BuildContext context) async {
     final String email = _emailController.text.trim();
     final String password = _passwordController.text.trim();
 
+    if (email.isEmpty || password.isEmpty) {
+      Fluttertoast.showToast(msg: "Please fill in all fields");
+      return;
+    }
 
-    if (email == "admin@fitlog.com" && password == "password123") {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const DashboardScreen(),
-        ),
-      );
-    } else {
+    final viewModel = context.read<UserViewModel>();
 
+    final Map<String, String> authResult = await viewModel.login(email, password);
+    final String userId = authResult["userId"] ?? "";
+    final String userRole = authResult["role"] ?? "user";
+
+    print("DEBUG userId: '$userId'");
+    print("DEBUG userRole: '$userRole'");
+
+    if (!mounted) return;
+
+    if (userId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Invalid Credentials! Use admin@fitlog.com / password123'),
+        SnackBar(
+          content: Text(viewModel.error ?? 'Login Failed!'),
           backgroundColor: Colors.redAccent,
         ),
       );
+    } else {
+      Fluttertoast.showToast(msg: "Welcome back!");
+
+      if (userRole.trim().toLowerCase() == 'admin') {
+        print("DEBUG: Navigating to AdminPanelScreen");
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const AdminPanelScreen(),
+          ),
+        );
+      } else {
+        print("DEBUG: Navigating to DashboardScreen");
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const DashboardScreen(),
+          ),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = context.select((UserViewModel vm) => vm.loading);
+
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
       body: Padding(
@@ -59,7 +89,6 @@ class _FitLogLoginState extends State<FitLogLogin> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 80),
-
               Row(
                 children: [
                   Image.asset(
@@ -95,7 +124,6 @@ class _FitLogLoginState extends State<FitLogLogin> {
                 style: TextStyle(color: Colors.grey, fontSize: 18),
               ),
               const SizedBox(height: 40),
-
               const _FieldLabel(label: 'EMAIL ADDRESS', size: 16),
               const SizedBox(height: 8),
               _CustomTextField(
@@ -103,9 +131,7 @@ class _FitLogLoginState extends State<FitLogLogin> {
                 icon: Icons.email_outlined,
                 controller: _emailController,
               ),
-
               const SizedBox(height: 24),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -132,20 +158,19 @@ class _FitLogLoginState extends State<FitLogLogin> {
                 isPassword: true,
                 controller: _passwordController,
               ),
-
               const SizedBox(height: 32),
-
-
               SizedBox(
                 width: double.infinity,
                 height: 60,
                 child: ElevatedButton(
-                  onPressed: _handleLogin,
+                  onPressed: isLoading ? null : () => _handleLogin(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFCCFF00),
                     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                   ),
-                  child: const Row(
+                  child: isLoading
+                      ? const CircularProgressIndicator(color: Colors.black)
+                      : const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
@@ -164,36 +189,8 @@ class _FitLogLoginState extends State<FitLogLogin> {
                 ),
               ),
 
-              const SizedBox(height: 40),
-              Row(
-                children: const [
-                  Expanded(child: Divider(color: Colors.white24)),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Text('OR CONNECT WITH',
-                        style: TextStyle(color: Colors.grey, fontSize: 12)),
-                  ),
-                  Expanded(child: Divider(color: Colors.white24)),
-                ],
-              ),
-              const SizedBox(height: 24),
-              OutlinedButton(
-                onPressed: () {},
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 50),
-                  side: const BorderSide(color: Colors.white12),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.g_mobiledata, color: Colors.white, size: 30),
-                    SizedBox(width: 8),
-                    Text('GOOGLE', style: TextStyle(color: Colors.white)),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 40),
 
+              const SizedBox(height: 40),
               Center(
                 child: Wrap(
                   alignment: WrapAlignment.center,
@@ -220,6 +217,8 @@ class _FitLogLoginState extends State<FitLogLogin> {
                   ],
                 ),
               ),
+
+
               const SizedBox(height: 20),
             ],
           ),
@@ -247,19 +246,18 @@ class _FieldLabel extends StatelessWidget {
   }
 }
 
-
 class _CustomTextField extends StatefulWidget {
   final String hint;
   final IconData icon;
   final bool isPassword;
-  final TextEditingController controller;
+  final TextEditingController widgetController;
 
   const _CustomTextField({
     required this.hint,
     required this.icon,
-    required this.controller,
+    required TextEditingController controller,
     this.isPassword = false,
-  });
+  }) : widgetController = controller;
 
   @override
   State<_CustomTextField> createState() => _CustomTextFieldState();
@@ -277,7 +275,7 @@ class _CustomTextFieldState extends State<_CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: widget.controller,
+      controller: widget.widgetController,
       obscureText: _obscureText,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(

@@ -1,291 +1,244 @@
 import 'package:flutter/material.dart';
-import 'bmi_brain.dart'; // <--- HERE IS WHERE WE IMPORT YOUR BRAIN FILE!
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-void main() {
-  runApp(const MaterialApp(
-    home: BMICalculatorScreen(),
-    debugShowCheckedModeBanner: false,
-  ));
-}
-
-class BMICalculatorScreen extends StatefulWidget {
-  const BMICalculatorScreen({super.key});
+class FitnessCoachChatScreen extends StatefulWidget {
+  const FitnessCoachChatScreen({super.key});
 
   @override
-  State<BMICalculatorScreen> createState() => _BMICalculatorScreenState();
+  State<FitnessCoachChatScreen> createState() => _FitnessCoachChatScreenState();
 }
 
-class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
-  final TextEditingController _heightController = TextEditingController();
-  final TextEditingController _weightController = TextEditingController();
+class _FitnessCoachChatScreenState extends State<FitnessCoachChatScreen> {
+  final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
-  // State elements to update the screen display
-  double? _bmiResult;
-  String _bmiCategory = "";
-  String _bmiFeedback = "Enter your metrics above to calculate your current score.";
-  double _progressValue = 0.0;
-
-  static const Color bgColor = Color(0xFF121212);
-  static const Color cardBgColor = Color(0xFF1E1E1E);
-  static const Color inputBgColor = Color(0xFF161616);
-  static const Color neonLime = Color(0xFFCCFF00);
-  static const Color textGray = Color(0xFF8E8E93);
-
-  // This calls your separate BMIBrain when the button is clicked
-  void _executeCalculation() {
-    final double? height = double.tryParse(_heightController.text);
-    final double? weight = double.tryParse(_weightController.text);
-
-    if (height == null || weight == null || height <= 0 || weight <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter valid height and weight values.')),
-      );
-      return;
+  final List<Map<String, dynamic>> _messages = [
+    {
+      "text": "Hello! I am your live Gemini AI Fitness Coach. Ask me absolutely anything about custom workout routines, diet macros, target recovery models, or motivation guidelines!",
+      "isUser": false,
+      "time": "8:39 AM"
     }
+  ];
+  bool _isTyping = false;
 
-    // Initialize the logic class we created in the other file
-    BMIBrain brain = BMIBrain(height: height, weight: weight);
-    double bmi = brain.calculateBMI();
+  // Your working API key from Google AI Studio
+  final String _apiKey = "AQ.Ab8RN6KyTRQF6BGDUe3AIhg5eRdSFVolqlrynkqlwXlf2Upy8w";
 
-    // Pull calculations dynamically into our UI state
+  void _sendMessage() async {
+    final String text = _messageController.text.trim();
+    if (text.isEmpty) return;
+
+    _messageController.clear();
     setState(() {
-      _bmiResult = bmi;
-      _bmiCategory = brain.getCategory(bmi);
-      _bmiFeedback = brain.getFeedback(bmi);
-      _progressValue = brain.getProgressValue(bmi);
+      _messages.add({"text": text, "isUser": true, "time": _getCurrentTime()});
+      _isTyping = true;
+    });
+    _scrollToBottom();
+
+    try {
+      // Direct production URL endpoint configuration required for Cloud wrapped keys
+      final url = Uri.parse(
+          'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=$_apiKey'
+      );
+
+      // Sending the precisely structured JSON request body matching the v1 API specifications
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          "contents": [
+            {
+              "parts": [
+                {"text": text}
+              ]
+            }
+          ],
+          "systemInstruction": {
+            "parts": [
+              {
+                "text": "You are an elite, unrestricted AI personal trainer inside the FitLog application. Answer accurately and conversationally. Keep tips practical, professional, energetic, and concise (under 4 sentences)."
+              }
+            ]
+          }
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data['candidates'] != null && data['candidates'].isNotEmpty) {
+          final String aiReply = data['candidates'][0]['content']['parts'][0]['text'].toString().trim();
+
+          if (!mounted) return;
+          setState(() {
+            _isTyping = false;
+            _messages.add({"text": aiReply, "isUser": false, "time": _getCurrentTime()});
+          });
+        } else {
+          throw Exception("No text response content generated.");
+        }
+      } else {
+        throw Exception("Server responded with code ${response.statusCode}: ${response.body}");
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isTyping = false;
+        _messages.add({
+          "text": "⚠️ Gemini Live Integration Error:\n$e",
+          "isUser": false,
+          "time": _getCurrentTime()
+        });
+      });
+    } finally {
+      _scrollToBottom();
+    }
+  }
+
+  String _getCurrentTime() {
+    final now = DateTime.now();
+    final hour = now.hour > 12 ? now.hour - 12 : (now.hour == 0 ? 12 : now.hour);
+    final minute = now.minute.toString().padLeft(2, '0');
+    final amPm = now.hour >= 12 ? 'PM' : 'AM';
+    return "$hour:$minute $amPm";
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+        );
+      }
     });
   }
 
   @override
   void dispose() {
-    _heightController.dispose();
-    _weightController.dispose();
+    _messageController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onHorizontalDragEnd: (details) {
-        if (details.primaryVelocity! > 500) {
-          Navigator.of(context).maybePop();
-        }
-      },
-      child: Scaffold(
-        backgroundColor: bgColor,
-        body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-            child: Column(
+    return Scaffold(
+      backgroundColor: const Color(0xFF0F0F0F),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF161616),
+        elevation: 1,
+        titleSpacing: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Row(
+          children: [
+            const CircleAvatar(
+                radius: 16,
+                backgroundColor: Color(0xFFCCFF00),
+                child: Icon(Icons.psychology, size: 18, color: Colors.black)
+            ),
+            const SizedBox(width: 10),
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-                      onPressed: () => Navigator.of(context).maybePop(),
-                    ),
-                    const Text(
-                      'FITLOG',
-                      style: TextStyle(
-                        color: neonLime,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                        fontStyle: FontStyle.italic,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                    const CircleAvatar(
-                      radius: 18,
-                      backgroundColor: cardBgColor,
-                      child: Icon(Icons.person, color: textGray, size: 20),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-                const Text(
-                  'PERFORMANCE METRICS',
-                  style: TextStyle(
-                    color: neonLime,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'BMI CALCULATOR',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 32,
-                    fontWeight: FontWeight.w900,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: cardBgColor,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildInputField(
-                        label: 'HEIGHT (CM)',
-                        hint: '180',
-                        suffix: 'CM',
-                        controller: _heightController,
-                      ),
-                      const SizedBox(height: 20),
-                      _buildInputField(
-                        label: 'WEIGHT (KG)',
-                        hint: '85',
-                        suffix: 'KG',
-                        controller: _weightController,
-                      ),
-                      const SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: neonLime,
-                            foregroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                          ),
-                          onPressed: _executeCalculation,
-                          child: const Text(
-                            'CALCULATE RESULT',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontStyle: FontStyle.italic,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: cardBgColor,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: _bmiResult != null ? neonLime : Colors.transparent,
-                      width: 1.5,
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      const Text(
-                        'YOUR CURRENT SCORE',
-                        style: TextStyle(
-                          color: textGray,
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        _bmiResult != null ? _bmiResult!.toStringAsFixed(1) : '--.-',
-                        style: const TextStyle(
-                          color: neonLime,
-                          fontSize: 54,
-                          fontWeight: FontWeight.w900,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                      Text(
-                        _bmiCategory.isNotEmpty ? _bmiCategory : 'AWAITING INPUT',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: LinearProgressIndicator(
-                          value: _progressValue,
-                          minHeight: 8,
-                          backgroundColor: Colors.white12,
-                          valueColor: const AlwaysStoppedAnimation<Color>(neonLime),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        _bmiFeedback,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: textGray,
-                          fontSize: 13,
-                          height: 1.4,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              children: const [
+                Text("FitLog Full AI Engine", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+                Text("Online • Direct REST Protocol", style: TextStyle(color: Colors.grey, fontSize: 11)),
               ],
             ),
-          ),
+          ],
         ),
       ),
-    );
-  }
-
-  Widget _buildInputField({
-    required String label,
-    required String hint,
-    required String suffix,
-    required TextEditingController controller
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(color: textGray, fontSize: 11, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: const TextStyle(color: Colors.white24),
-            suffixIcon: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 16.0),
-              child: Text(
-                suffix,
-                style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold, fontSize: 14),
-              ),
-            ),
-            filled: true,
-            fillColor: inputBgColor,
-            enabledBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Colors.white12, width: 1),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: neonLime, width: 1.5),
-              borderRadius: BorderRadius.circular(4),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              controller: _scrollController,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              itemCount: _messages.length,
+              itemBuilder: (context, index) {
+                final message = _messages[index];
+                final bool isUser = message["isUser"];
+                return Align(
+                  alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.80,
+                    margin: const EdgeInsets.only(bottom: 14),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: isUser ? const Color(0xFFCCFF00) : const Color(0xFF161616),
+                      borderRadius: BorderRadius.only(
+                        topLeft: const Radius.circular(12),
+                        topRight: const Radius.circular(12),
+                        bottomLeft: Radius.circular(isUser ? 12 : 2),
+                        bottomRight: Radius.circular(isUser ? 2 : 12),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          message["text"],
+                          style: TextStyle(color: isUser ? Colors.black : Colors.white, fontSize: 14, height: 1.35),
+                        ),
+                        const SizedBox(height: 6),
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: Text(message["time"], style: TextStyle(color: isUser ? Colors.black54 : Colors.grey.shade600, fontSize: 9)),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
-        ),
-      ],
+          if (_isTyping)
+            Padding(
+              padding: const EdgeInsets.only(left: 20, bottom: 12),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text("Live Gemini is crafting a response...", style: TextStyle(color: Colors.grey.shade600, fontSize: 12, fontStyle: FontStyle.italic)),
+              ),
+            ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: const BoxDecoration(color: Color(0xFF161616), border: Border(top: BorderSide(color: Colors.black45, width: 0.5))),
+            child: SafeArea(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _messageController,
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: (_) => _sendMessage(),
+                      decoration: InputDecoration(
+                        hintText: "Ask absolutely anything...",
+                        hintStyle: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: _sendMessage,
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: const BoxDecoration(color: Color(0xFFCCFF00), shape: BoxShape.circle),
+                      child: const Icon(Icons.send, color: Colors.black, size: 18),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

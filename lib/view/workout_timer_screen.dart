@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'lines_painter.dart';
 
 class WorkoutTimerScreen extends StatefulWidget {
@@ -15,12 +17,19 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
   int _secondsElapsed = 0;
   bool _isRunning = false;
 
+  String _selectedExerciseProfile = "Lower Body Hypertrophy Block";
+  final List<String> _exerciseOptions = [
+    "Lower Body Hypertrophy Block",
+    "Upper Body Push Intensity",
+    "Posterior Chain Pull Focus",
+    "Active Recovery Protocols",
+    "High Intensity Core Circuit"
+  ];
 
   static const Color bgColor = Color(0xFF121212);
   static const Color cardBgColor = Color(0xFF1E1E1E);
   static const Color neonLime = Color(0xFFCCFF00);
   static const Color textGray = Color(0xFF8E8E93);
-
 
   void _toggleTimer() {
     if (_isRunning) {
@@ -40,11 +49,44 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
     }
   }
 
-  void _stopTimer() {
+  Future<void> _stopTimer() async {
     _internalTimer?.cancel();
     setState(() {
       _isRunning = false;
     });
+
+    if (_secondsElapsed > 0) {
+      final int minutes = _secondsElapsed ~/ 60;
+      final int seconds = _secondsElapsed % 60;
+      final String durationText = minutes > 0
+          ? "Duration: $minutes Mins $seconds Secs"
+          : "Duration: $seconds Secs";
+
+      final prefs = await SharedPreferences.getInstance();
+      DateTime today = DateTime.now();
+      String dateKey = "${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}";
+
+      String existingWorkoutsJson = prefs.getString('workouts_$dateKey') ?? '{}';
+      Map<String, dynamic> decodedWorkouts = jsonDecode(existingWorkoutsJson);
+
+      String uniqueId = "train_${DateTime.now().millisecondsSinceEpoch}";
+      decodedWorkouts[uniqueId] = {
+        "title": _selectedExerciseProfile,
+        "metric": durationText,
+        "timestamp": DateTime.now().toIso8601String(),
+      };
+
+      await prefs.setString('workouts_$dateKey', jsonEncode(decodedWorkouts));
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Workout profile logged successfully!'),
+            backgroundColor: neonLime,
+          ),
+        );
+      }
+    }
   }
 
   void _resetTimer() {
@@ -87,7 +129,6 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -96,7 +137,7 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
                       onPressed: () => Navigator.of(context).maybePop(),
                     ),
                     const Text(
-                      'FITLOG',
+                      'WORKOUT',
                       style: TextStyle(
                         color: neonLime,
                         fontSize: 24,
@@ -114,6 +155,37 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
                 ),
                 const SizedBox(height: 24),
 
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: cardBgColor,
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: Colors.white10),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _selectedExerciseProfile,
+                      dropdownColor: cardBgColor,
+                      icon: const Icon(Icons.keyboard_arrow_down, color: neonLime),
+                      style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                      isExpanded: true,
+                      onChanged: (String? newValue) {
+                        if (newValue != null) {
+                          setState(() {
+                            _selectedExerciseProfile = newValue;
+                          });
+                        }
+                      },
+                      items: _exerciseOptions.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
 
                 Center(
                   child: Container(
@@ -134,8 +206,7 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
-
+                const SizedBox(height: 16),
 
                 Expanded(
                   child: Center(
@@ -144,17 +215,14 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
                       children: [
                         Positioned.fill(
                           child: CustomPaint(
-
                             painter: DiagonalLinesPainter(lineColor: neonLime.withValues(alpha: 0.4)),
                           ),
                         ),
-
                         Container(
                           width: double.infinity,
                           margin: const EdgeInsets.symmetric(horizontal: 12),
                           padding: const EdgeInsets.symmetric(vertical: 48),
                           decoration: BoxDecoration(
-
                             color: cardBgColor.withValues(alpha: 0.9),
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -189,7 +257,6 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
                 ),
                 const SizedBox(height: 24),
 
-
                 SizedBox(
                   width: double.infinity,
                   height: 60,
@@ -213,7 +280,6 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
 
                 Row(
                   children: [

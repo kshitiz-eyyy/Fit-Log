@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class FitnessCoachChatScreen extends StatefulWidget {
   const FitnessCoachChatScreen({super.key});
@@ -13,15 +15,17 @@ class _FitnessCoachChatScreenState extends State<FitnessCoachChatScreen> {
 
   final List<Map<String, dynamic>> _messages = [
     {
-      "text": "Hello! I am your AI Fitness Coach. Based on your current CNS metrics, your recovery is peaking today. Ask me anything about your training blocks, meal goals, hydration tracking, or grab some quick motivation!",
+      "text": "Hello! I am your live Gemini AI Fitness Coach. Ask me absolutely anything about custom workout routines, diet macros, target recovery models, or motivation guidelines!",
       "isUser": false,
       "time": "8:39 AM"
     }
   ];
   bool _isTyping = false;
-  String _activeIntent = "";
 
-  void _sendMessage() {
+  // Your working API key from Google AI Studio
+  final String _apiKey = "AQ.Ab8RN6KyTRQF6BGDUe3AIhg5eRdSFVolqlrynkqlwXlf2Upy8w";
+
+  void _sendMessage() async {
     final String text = _messageController.text.trim();
     if (text.isEmpty) return;
 
@@ -32,35 +36,64 @@ class _FitnessCoachChatScreenState extends State<FitnessCoachChatScreen> {
     });
     _scrollToBottom();
 
-    Future.delayed(const Duration(seconds: 1, milliseconds: 200), () {
+    try {
+      // Direct production URL endpoint configuration required for Cloud wrapped keys
+      final url = Uri.parse(
+          'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=$_apiKey'
+      );
+
+      // Sending the precisely structured JSON request body matching the v1 API specifications
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          "contents": [
+            {
+              "parts": [
+                {"text": text}
+              ]
+            }
+          ],
+          "systemInstruction": {
+            "parts": [
+              {
+                "text": "You are an elite, unrestricted AI personal trainer inside the FitLog application. Answer accurately and conversationally. Keep tips practical, professional, energetic, and concise (under 4 sentences)."
+              }
+            ]
+          }
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data['candidates'] != null && data['candidates'].isNotEmpty) {
+          final String aiReply = data['candidates'][0]['content']['parts'][0]['text'].toString().trim();
+
+          if (!mounted) return;
+          setState(() {
+            _isTyping = false;
+            _messages.add({"text": aiReply, "isUser": false, "time": _getCurrentTime()});
+          });
+        } else {
+          throw Exception("No text response content generated.");
+        }
+      } else {
+        throw Exception("Server responded with code ${response.statusCode}: ${response.body}");
+      }
+    } catch (e) {
       if (!mounted) return;
       setState(() {
         _isTyping = false;
-        _messages.add({"text": _getAIResponse(text), "isUser": false, "time": _getCurrentTime()});
+        _messages.add({
+          "text": "⚠️ Gemini Live Integration Error:\n$e",
+          "isUser": false,
+          "time": _getCurrentTime()
+        });
       });
+    } finally {
       _scrollToBottom();
-    });
-  }
-
-  String _getAIResponse(String query) {
-    final lower = query.toLowerCase();
-
-    if (lower.contains("yes") || lower.contains("sure") || lower.contains("ok") || lower.contains("guide") || lower.contains("check")) {
-      if (_activeIntent == "chest") { _activeIntent = ""; return "Go to Chest Exercise section! Head directly to the 'Library' tab in your main navigation menu to begin your routine."; }
-      if (_activeIntent == "back") { _activeIntent = ""; return "Go to Back Exercise section! Open the 'Library' or 'Features' tab to view your complete pull and back tracking metrics."; }
-      if (_activeIntent == "diet") { _activeIntent = ""; return "Go to Meal Log section! Tap back to your Home Dashboard and locate your nutrition card to log your food targets."; }
-      if (_activeIntent == "water") { _activeIntent = ""; return "Go to Hydration section! Tap back to your Home Dashboard and use the fluid tracking counter cards."; }
-      if (_activeIntent == "motivation") { _activeIntent = ""; return "Go to Motivation screen! Open your personal milestones under your profile to track your consecutive active streaks."; }
     }
-
-    if (lower.contains("chest") || lower.contains("bench") || lower.contains("push day")) { _activeIntent = "chest"; return "Since your central nervous system fatigue is tracking exceptionally low today, it's a great opportunity for high-intensity chest tracking. Would you like me to guide you to the Chest Exercise section?"; }
-    if (lower.contains("back") || lower.contains("pull up") || lower.contains("row")) { _activeIntent = "back"; return "Your posterior chain recovery looks optimal today. Would you like me to guide you directly to your customized Back Exercise section?"; }
-    if (lower.contains("diet") || lower.contains("meal") || lower.contains("eat") || lower.contains("calori")) { _activeIntent = "diet"; return "Current Metric Status: You've consumed 1,840 out of your 2,600 kcal ceiling. Would you like me to point you to the Meal Log section to manage your dynamic target macros?"; }
-    if (lower.contains("water") || lower.contains("hydrat")) { _activeIntent = "water"; return "Your current system records sit at 2.4 Liters logged. Do you want me to show you how to update your daily inputs on the Hydration section?"; }
-    if (lower.contains("quote") || lower.contains("motivat") || lower.contains("tired")) { _activeIntent = "motivation"; return "⚡️ Protocol Check: 'Discipline is the bridge between goals and accomplishment.' Do you want me to guide you straight to the Motivation screen to see your active streaks?"; }
-
-    _activeIntent = "";
-    return "Understood. Tell me explicitly: are we reviewing your target chest movements, checking back workouts, logging meal data, tracking water baselines, or pulling up motivation windows?";
   }
 
   String _getCurrentTime() {
@@ -74,7 +107,11 @@ class _FitnessCoachChatScreenState extends State<FitnessCoachChatScreen> {
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
-        _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: const Duration(milliseconds: 250), curve: Curves.easeOut);
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+        );
       }
     });
   }
@@ -100,13 +137,17 @@ class _FitnessCoachChatScreenState extends State<FitnessCoachChatScreen> {
         ),
         title: Row(
           children: [
-            const CircleAvatar(radius: 16, backgroundColor: Color(0xFFCCFF00), child: Icon(Icons.smart_toy, size: 18, color: Colors.black)),
+            const CircleAvatar(
+                radius: 16,
+                backgroundColor: Color(0xFFCCFF00),
+                child: Icon(Icons.psychology, size: 18, color: Colors.black)
+            ),
             const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
-                Text("AI Coach", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
-                Text("Online • Kinetic Protocol", style: TextStyle(color: Colors.grey, fontSize: 11)),
+                Text("FitLog Full AI Engine", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+                Text("Online • Direct REST Protocol", style: TextStyle(color: Colors.grey, fontSize: 11)),
               ],
             ),
           ],
@@ -140,9 +181,15 @@ class _FitnessCoachChatScreenState extends State<FitnessCoachChatScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(message["text"], style: TextStyle(color: isUser ? Colors.black : Colors.white, fontSize: 14, height: 1.35)),
+                        Text(
+                          message["text"],
+                          style: TextStyle(color: isUser ? Colors.black : Colors.white, fontSize: 14, height: 1.35),
+                        ),
                         const SizedBox(height: 6),
-                        Align(alignment: Alignment.bottomRight, child: Text(message["time"], style: TextStyle(color: isUser ? Colors.black54 : Colors.grey.shade600, fontSize: 9))),
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: Text(message["time"], style: TextStyle(color: isUser ? Colors.black54 : Colors.grey.shade600, fontSize: 9)),
+                        ),
                       ],
                     ),
                   ),
@@ -153,7 +200,10 @@ class _FitnessCoachChatScreenState extends State<FitnessCoachChatScreen> {
           if (_isTyping)
             Padding(
               padding: const EdgeInsets.only(left: 20, bottom: 12),
-              child: Align(alignment: Alignment.centerLeft, child: Text("Coach is analyzing metrics...", style: TextStyle(color: Colors.grey.shade600, fontSize: 12, fontStyle: FontStyle.italic))),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text("Live Gemini is crafting a response...", style: TextStyle(color: Colors.grey.shade600, fontSize: 12, fontStyle: FontStyle.italic)),
+              ),
             ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -168,7 +218,7 @@ class _FitnessCoachChatScreenState extends State<FitnessCoachChatScreen> {
                       textInputAction: TextInputAction.send,
                       onSubmitted: (_) => _sendMessage(),
                       decoration: InputDecoration(
-                        hintText: "Ask about your training, diet, motivation...",
+                        hintText: "Ask absolutely anything...",
                         hintStyle: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 8),

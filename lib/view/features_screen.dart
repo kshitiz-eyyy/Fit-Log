@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'bmi_calculator_screen.dart'; // <--- Added connection import here
+import 'bmi_calculator_screen.dart';
+import 'contact_dietitan_screen.dart';
+import 'contact_trainer_screen.dart';
 
 class AppColors {
   static const Color background = Color(0xFF121212);
@@ -13,11 +15,13 @@ class FeatureItem {
   final String title;
   final String description;
   final IconData icon;
+  final String? imagePath;
 
   FeatureItem({
     required this.title,
     required this.description,
     required this.icon,
+    this.imagePath,
   });
 }
 
@@ -29,16 +33,19 @@ class FeaturesScreen extends StatelessWidget {
       title: 'Contact Trainer',
       description: 'Get professional guidance and 1-on-1 coaching.',
       icon: Icons.fitness_center,
+      imagePath: 'assets/images/trainer.png',
     ),
     FeatureItem(
       title: 'Contact Dietitian',
       description: 'Customized meal plans tailored to your fitness goals.',
       icon: Icons.restaurant,
+      imagePath: 'assets/images/diet.png',
     ),
     FeatureItem(
-      title: 'BMI Calculator',
-      description: 'Track your body mass index progress effortlessly.',
-      icon: Icons.calculate,
+        title: 'BMI Calculator',
+        description: 'Track your body mass index progress effortlessly.',
+        icon: Icons.calculate,
+        imagePath: 'assets/images/bmi.png'
     ),
     FeatureItem(
       title: 'Calorie Tracker',
@@ -153,18 +160,43 @@ class FeaturesScreen extends StatelessWidget {
           color: Colors.white.withValues(alpha: 0.05),
           width: 1,
         ),
+
+        image: item.imagePath != null
+            ? DecorationImage(
+          image: AssetImage(item.imagePath!),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+            Colors.black.withValues(alpha: 0.35),
+            BlendMode.darken,
+          ),
+        )
+            : null,
+
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
           onTap: () {
-            // <--- CONNECTED NAVIGATION TRACKING HERE
             if (item.title == 'BMI Calculator') {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const BMICalculatorScreen(),
+                ),
+              );
+            } else if (item.title == 'Contact Trainer') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ContactTrainerScreen(),
+                ),
+              );
+            } else if (item.title == 'Contact Dietitian') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ContactDietitianScreen(),
                 ),
               );
             } else {
@@ -185,7 +217,7 @@ class FeaturesScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.background,
+                    color: AppColors.background.withValues(alpha: item.imagePath != null ? 0.8 : 1.0),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(

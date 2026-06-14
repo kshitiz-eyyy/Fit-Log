@@ -1,18 +1,18 @@
 import 'dart:math';
 
 class BMIBrain {
-  final double height; // in cm
-  final double weight; // in kg
+  final double height;
+  final double weight;
 
   BMIBrain({required this.height, required this.weight});
 
-  // Calculate the raw BMI value
+
   double calculateBMI() {
     double heightInMeters = height / 100;
     return weight / pow(heightInMeters, 2);
   }
 
-  // Determine the weight category string
+
   String getCategory(double bmi) {
     if (bmi < 18.5) return "UNDERWEIGHT";
     if (bmi >= 18.5 && bmi < 25) return "NORMAL";
@@ -20,7 +20,7 @@ class BMIBrain {
     return "OBESE";
   }
 
-  // Determine the feedback summary message
+
   String getFeedback(double bmi) {
     if (bmi < 18.5) {
       return "Based on your height and weight, you are below the standard range. Consider a nutrition plan.";
@@ -33,7 +33,7 @@ class BMIBrain {
     }
   }
 
-  // Map the BMI score to a percentage width (0.0 to 1.0) for our visual linear progress bar
+
   double getProgressValue(double bmi) {
     if (bmi < 18.5) return 0.3;
     if (bmi >= 18.5 && bmi < 25) return 0.5;
