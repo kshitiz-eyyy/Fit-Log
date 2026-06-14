@@ -4,6 +4,7 @@ import 'package:fitlog/view/admin_panel_screen.dart';
 import 'package:fitlog/view/contact_dietitan_screen.dart';
 import 'package:fitlog/view/contact_trainer_screen.dart';
 import 'package:fitlog/view/fitlog_login.dart';
+import 'package:fitlog/view/rate_screen.dart';
 import 'package:fitlog/view/terms_and_conditions_screen.dart';
 import 'package:fitlog/view/user_dashboard.dart';
 import 'package:fitlog/view/welcome_screen.dart';
@@ -11,11 +12,11 @@ import 'package:fitlog/viewmodel/user_view_model.dart';
 
 import 'package:fitlog/view/meal_tracking_screen.dart';
 import 'package:fitlog/view/user_profile.dart';
+import 'package:provider/provider.dart';
 import 'view/fitlog_login.dart';
 import 'package:fitlog/view/testing_gateway_screen.dart;.dart';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 
 
@@ -68,7 +69,7 @@ class FitLogApp extends StatelessWidget {
             ),
           ),
         ),
-        home:const DashboardScreen()
+        home:const RateScreen()
     );
   }
 }

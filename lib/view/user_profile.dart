@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:fitlog/view/fitlog_premium_screen.dart';
 import 'package:fitlog/view/change_password_screen.dart';
+import 'package:fitlog/view/rate_screen.dart';
 import '../viewmodel/user_profile_view_model.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -333,6 +334,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _buildActionTile(Icons.lock_reset_outlined, "Update Password", "Modify your performance access key", () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const ChangePasswordScreen()));
             }),
+
+            // New Rate Screen Navigation Section Included Here
+            _buildActionTile(Icons.star_rate_rounded, "App Feedback & Experience", "Rate your training journey so far", () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const RateScreen()));
+            }),
+
             const SizedBox(height: 14),
             OutlinedButton(
               onPressed: _showEditProfileDialog,

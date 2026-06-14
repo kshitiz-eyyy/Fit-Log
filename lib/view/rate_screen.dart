@@ -1,3 +1,4 @@
+import 'package:fitlog/view/user_profile.dart';
 import 'package:flutter/material.dart';
 
 class RateScreen extends StatefulWidget {
@@ -28,18 +29,35 @@ class _RateScreenState extends State<RateScreen> {
           padding: const EdgeInsets.all(18),
           child: Column(
             children: [
+              // Top Header Row
               Row(
                 children: [
+                  // Back Button that navigates to Profile Screen
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ProfileScreen(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(
+                      Icons.arrow_back_ios_new,
+                      color: Colors.white,
+                      size: 22,
+                    ),
+                  ),
                   const CircleAvatar(
-                    radius: 40,
-                    backgroundImage: const AssetImage('assets/images/logo.png'),
+                    radius: 25, // Adjusted slightly to fit nicely next to the back button
+                    backgroundImage: AssetImage('assets/images/logo.png'),
                   ),
                   const SizedBox(width: 12),
                   const Text(
                     "PERFORMANCE",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 30,
+                      fontSize: 26, // Adjusted slightly for spacing with the new back button
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -56,6 +74,7 @@ class _RateScreenState extends State<RateScreen> {
 
               const SizedBox(height: 20),
 
+              // Encouragement Container
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -75,14 +94,6 @@ class _RateScreenState extends State<RateScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "14 DAY STREAK!",
-                            style: TextStyle(
-                              color: neonGreen,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
                           SizedBox(height: 6),
                           Text(
                             "You're crushing your performance goals. Keep the momentum going!",
@@ -100,6 +111,7 @@ class _RateScreenState extends State<RateScreen> {
 
               const SizedBox(height: 25),
 
+              // Main Feedback Container
               Container(
                 padding: const EdgeInsets.all(25),
                 decoration: BoxDecoration(
@@ -131,6 +143,7 @@ class _RateScreenState extends State<RateScreen> {
 
                     const SizedBox(height: 30),
 
+                    // Star Rating Row
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(
@@ -143,12 +156,8 @@ class _RateScreenState extends State<RateScreen> {
                             });
                           },
                           icon: Icon(
-                            rating > index
-                                ? Icons.star
-                                : Icons.star_border,
-                            color: rating > index
-                                ? neonGreen
-                                : Colors.white38,
+                            rating > index ? Icons.star : Icons.star_border,
+                            color: rating > index ? neonGreen : Colors.white38,
                           ),
                         ),
                       ),
@@ -169,15 +178,14 @@ class _RateScreenState extends State<RateScreen> {
 
                     const SizedBox(height: 10),
 
+                    // Feedback TextField
                     TextField(
                       controller: feedbackController,
                       maxLines: 5,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        hintText:
-                        "Tell us what you love or how we can improve...",
-                        hintStyle:
-                        const TextStyle(color: Colors.white38),
+                        hintText: "Tell us what you love or how we can improve...",
+                        hintStyle: const TextStyle(color: Colors.white38),
                         filled: true,
                         fillColor: Colors.black,
                         border: OutlineInputBorder(
@@ -188,6 +196,7 @@ class _RateScreenState extends State<RateScreen> {
 
                     const SizedBox(height: 25),
 
+                    // Submit Button
                     SizedBox(
                       width: double.infinity,
                       height: 60,
@@ -217,8 +226,17 @@ class _RateScreenState extends State<RateScreen> {
 
                     const SizedBox(height: 15),
 
+                    // "Maybe Later" Button
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        // Also navigating back to profile if they click 'Maybe Later'
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ProfileScreen(),
+                          ),
+                        );
+                      },
                       child: const Text(
                         "MAYBE LATER",
                         style: TextStyle(
