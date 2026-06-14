@@ -1,3 +1,4 @@
+import 'package:fitlog/view/dashboard.dart';
 import 'package:fitlog/view/fitlog_login.dart';
 import 'package:fitlog/view/meal_tracking_screen.dart';
 import 'package:fitlog/view/membership_tracking_screen.dart';
@@ -32,7 +33,7 @@ class FitLogApp extends StatelessWidget {
         ),
       ),
 
-      home: const RateScreen(),
+      home: const ProfileScreen(),
     );
   }
 }
