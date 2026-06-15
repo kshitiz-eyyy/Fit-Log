@@ -1,12 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/dietitian_model.dart';
 
-class DietitianRepo {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+abstract class DietitianRepo {
 
-  Stream<List<DietitianModel>> getDietitianStream() {
-    return _firestore.collection('dietitian').snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => DietitianModel.fromSnapshot(doc)).toList();
-    });
-  }
+  Stream<List<DietitianModel>> getDietitianStream();
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'bmi_calculator_screen.dart';
+
 import 'contact_dietitan_screen.dart';
 import 'contact_trainer_screen.dart';
 
@@ -160,7 +161,6 @@ class FeaturesScreen extends StatelessWidget {
           color: Colors.white.withValues(alpha: 0.05),
           width: 1,
         ),
-
         image: item.imagePath != null
             ? DecorationImage(
           image: AssetImage(item.imagePath!),
@@ -171,7 +171,6 @@ class FeaturesScreen extends StatelessWidget {
           ),
         )
             : null,
-
       ),
       child: Material(
         color: Colors.transparent,

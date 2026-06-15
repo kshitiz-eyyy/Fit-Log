@@ -4,7 +4,8 @@ import '../model/trainer_model.dart';
 import '../repo/trainer_repo.dart';
 
 class TrainerViewModel extends ChangeNotifier {
-  final TrainerRepo _trainerRepo = TrainerRepo();
+
+  final TrainerRepo _trainerRepo;
 
   List<TrainerModel> _trainers = [];
   List<TrainerModel> get trainers => _trainers;
@@ -14,10 +15,9 @@ class TrainerViewModel extends ChangeNotifier {
 
   StreamSubscription? _trainerSubscription;
 
-  TrainerViewModel() {
+  TrainerViewModel({required TrainerRepo trainerRepo}) : _trainerRepo = trainerRepo {
     listenToTrainers();
   }
-
 
   void listenToTrainers() {
     _trainerSubscription?.cancel();

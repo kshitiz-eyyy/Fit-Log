@@ -58,7 +58,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                   const SizedBox(height: 8),
 
-                  // Industrial Athleticism Tagline
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -95,7 +95,7 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             ),
 
-            // Bottom Layout: Aesthetic Grid Icons & Version Control Text
+
             Positioned(
               left: 0,
               right: 0,

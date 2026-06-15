@@ -4,17 +4,18 @@ import '../model/dietitian_model.dart';
 import '../repo/dietitian_repo.dart';
 
 class DietitianViewModel extends ChangeNotifier {
-  final DietitianRepo _dietitianRepo = DietitianRepo();
+  final DietitianRepo _dietitianRepo;
 
   List<DietitianModel> _dietitian = [];
-  List<DietitianModel> get dietitian=> _dietitian;
+  List<DietitianModel> get dietitian => _dietitian;
 
   bool _isLoading = true;
   bool get isLoading => _isLoading;
 
   StreamSubscription? _dietitianSubscription;
 
-  DietitianViewModel() {
+
+  DietitianViewModel({required DietitianRepo dietitianRepo}) : _dietitianRepo = dietitianRepo {
     listenToDietitian();
   }
 

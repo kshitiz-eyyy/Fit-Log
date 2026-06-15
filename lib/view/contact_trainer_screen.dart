@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodel/tainer_view_model.dart';
-
+import '../repo/trainer_repo_impl.dart';
 
 class ContactTrainerScreen extends StatelessWidget {
   const ContactTrainerScreen({super.key});
@@ -9,7 +9,9 @@ class ContactTrainerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => TrainerViewModel(),
+      create: (_) => TrainerViewModel(
+        trainerRepo: TrainerRepoImpl(),
+      ),
       child: Scaffold(
         backgroundColor: const Color(0xFF121212),
         appBar: AppBar(
@@ -19,7 +21,6 @@ class ContactTrainerScreen extends StatelessWidget {
             icon: const Icon(Icons.arrow_back_ios, color: Color(0xFFCCFF00), size: 18),
             onPressed: () => Navigator.pop(context),
           ),
-
           centerTitle: true,
         ),
         extendBodyBehindAppBar: true,

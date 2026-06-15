@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../repo/terms_repo.dart';
+import '../repo/terms_repo_impl.dart';
 
 class TermsViewModel extends ChangeNotifier {
   final TermsRepo _repo = TermsRepo();
