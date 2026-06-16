@@ -43,6 +43,7 @@ dependencies:
   fl_chart: ^1.2.0
   image_picker: ^1.2.2
   local_auth: ^3.0.1
+  sensors_plus: ^7.0.0
 
 
 dev_dependencies:
