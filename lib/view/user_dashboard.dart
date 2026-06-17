@@ -12,14 +12,14 @@ import 'meal_tracking_screen.dart';
 import 'chatbot.dart';
 import 'dart:math';
 
-class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+class UserDashboardScreen extends StatefulWidget {
+  const UserDashboardScreen({super.key});
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  State<UserDashboardScreen> createState() => _UserDashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _UserDashboardScreenState extends State<UserDashboardScreen> {
   late final DashboardViewModel _viewModel;
 
   @override

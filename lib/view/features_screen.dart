@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'bmi_calculator_screen.dart';
-import 'contact_dietitan_screen.dart';
+import 'contact_dietitian_screen.dart';
 import 'contact_trainer_screen.dart';
 
 class AppColors {
