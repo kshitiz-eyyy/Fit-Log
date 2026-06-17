@@ -1,7 +1,6 @@
 // This is a generated file; do not edit or check into version control.
-FLUTTER_ROOT=/Users/dada/Documents/flutter
-FLUTTER_APPLICATION_PATH=/Users/dada/Documents/Fit-Log
-FLUTTER_FRAMEWORK_SWIFT_PACKAGE_PATH=/Users/dada/Documents/Fit-Log/macos/Flutter/ephemeral/Packages/.packages/FlutterFramework
+FLUTTER_ROOT=C:\flutter
+FLUTTER_APPLICATION_PATH=C:\Users\L E N O V O\StudioProjects\Fit-Log
 COCOAPODS_PARALLEL_CODE_SIGN=true
 FLUTTER_TARGET=/Users/dada/Documents/Fit-Log/lib/main.dart
 FLUTTER_BUILD_DIR=build

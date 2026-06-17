@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'admin_dashboard.dart';
+import 'admin_panel_screen.dart';
 import 'user_dashboard.dart';
 
 class TestingGatewayScreen extends StatelessWidget {
@@ -61,7 +61,7 @@ class TestingGatewayScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
+                    MaterialPageRoute(builder: (context) => const AdminPanelScreen()),
                   );
                 },
               ),

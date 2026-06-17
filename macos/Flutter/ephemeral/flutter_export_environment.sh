@@ -1,8 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=/Users/dada/Documents/flutter"
-export "FLUTTER_APPLICATION_PATH=/Users/dada/Documents/Fit-Log"
-export "FLUTTER_FRAMEWORK_SWIFT_PACKAGE_PATH=/Users/dada/Documents/Fit-Log/macos/Flutter/ephemeral/Packages/.packages/FlutterFramework"
+export "FLUTTER_ROOT=C:\flutter"
+export "FLUTTER_APPLICATION_PATH=C:\Users\L E N O V O\StudioProjects\Fit-Log"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_TARGET=/Users/dada/Documents/Fit-Log/lib/main.dart"
 export "FLUTTER_BUILD_DIR=build"

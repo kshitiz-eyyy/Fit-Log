@@ -1,26 +1,27 @@
 import 'package:flutter/material.dart';
 import 'bmi_calculator_screen.dart';
-import 'favourite_exercise.dart';
-import 'calorie_tracker_screen.dart';
-import 'sleep_screen.dart';
+import 'contact_dietitan_screen.dart';
+import 'contact_trainer_screen.dart';
 
 class AppColors {
-  static const Color background = Colors.black; //
-  static const Color surfaceCard = Color(0xFF0E0E0E);
-  static const Color neonAccent = Color(0xFFCCFF00);
+  static const Color background = Color(0xFF121212);
+  static const Color surfaceCard = Color(0xFF1E1E1E);
+  static const Color neonAccent = Color(0xFFD4FF00);
   static const Color textPrimary = Colors.white;
-  static const Color textSecondary = Colors.white70;
+  static const Color textSecondary = Color(0xFF8A8A8A);
 }
 
 class FeatureItem {
   final String title;
   final String description;
   final IconData icon;
+  final String? imagePath;
 
   FeatureItem({
     required this.title,
     required this.description,
     required this.icon,
+    this.imagePath,
   });
 }
 
@@ -29,24 +30,22 @@ class FeaturesScreen extends StatelessWidget {
 
   final List<FeatureItem> features = [
     FeatureItem(
-      title: 'Favourite Exercises',
-      description: 'Quickly access and manage your curated workout moves.',
-      icon: Icons.favorite,
-    ),
-    FeatureItem(
       title: 'Contact Trainer',
       description: 'Get professional guidance and 1-on-1 coaching.',
       icon: Icons.fitness_center,
+      imagePath: 'assets/images/trainer.png',
     ),
     FeatureItem(
       title: 'Contact Dietitian',
       description: 'Customized meal plans tailored to your fitness goals.',
       icon: Icons.restaurant,
+      imagePath: 'assets/images/diet.png',
     ),
     FeatureItem(
-      title: 'BMI Calculator',
-      description: 'Track your body mass index progress effortlessly.',
-      icon: Icons.calculate,
+        title: 'BMI Calculator',
+        description: 'Track your body mass index progress effortlessly.',
+        icon: Icons.calculate,
+        imagePath: 'assets/images/bmi.png'
     ),
     FeatureItem(
       title: 'Calorie Tracker',
@@ -158,48 +157,46 @@ class FeaturesScreen extends StatelessWidget {
         color: AppColors.surfaceCard,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.neonAccent.withValues(alpha: 0.3),
-          width: 1.2,
+          color: Colors.white.withValues(alpha: 0.05),
+          width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.neonAccent.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+
+        image: item.imagePath != null
+            ? DecorationImage(
+          image: AssetImage(item.imagePath!),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+            Colors.black.withValues(alpha: 0.35),
+            BlendMode.darken,
           ),
-        ],
+        )
+            : null,
+
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(12),
           onTap: () {
-            if (item.title == 'Favourite Exercises') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const FavouriteExerciseScreen(),
-                ),
-              );
-            } else if (item.title == 'BMI Calculator') {
+            if (item.title == 'BMI Calculator') {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const BMICalculatorScreen(),
                 ),
               );
-            } else if (item.title == 'Calorie Tracker') {
+            } else if (item.title == 'Contact Trainer') {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const CalorieTrackerScreen(),
+                  builder: (context) => const ContactTrainerScreen(),
                 ),
               );
-            } else if (item.title == 'Sleep Tracking') {
+            } else if (item.title == 'Contact Dietitian') {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const SleepScreen(),
+                  builder: (context) => const ContactDietitianScreen(),
                 ),
               );
             } else {
@@ -220,7 +217,7 @@ class FeaturesScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: AppColors.background.withValues(alpha: item.imagePath != null ? 0.8 : 1.0),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(

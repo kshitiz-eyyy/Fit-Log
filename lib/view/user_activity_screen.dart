@@ -1,7 +1,8 @@
 import 'dart:convert';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:fl_chart/fl_chart.dart';
+
 
 class ActivityScreen extends StatefulWidget {
   const ActivityScreen({super.key});

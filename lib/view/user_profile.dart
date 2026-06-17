@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:fitlog/view/premium_membership.dart';
+import 'package:fitlog/view/fitlog_premium_screen.dart';
 import 'package:fitlog/view/change_password_screen.dart';
+import 'package:fitlog/view/rate_screen.dart';
+import '../viewmodel/user_profile_view_model.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -13,61 +15,60 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  String athleteName = "FitLog Athlete";
-  String athleteEmail = "athlete@fitlog.com";
-  String athleteBio = "Consistency beats talent every single day.";
-  String fitnessGoal = "Hypertrophy Conditioning";
-  String? _profileImagePath;
-
-  bool biometricAuthEnabled = false;
-  bool pushNotificationsEnabled = true;
-  bool workoutRemindersEnabled = true;
-
+  final UserProfileViewModel _viewModel = UserProfileViewModel();
   final ImagePicker _picker = ImagePicker();
+  final _goalInputController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _loadUserPreferences();
+    _viewModel.addListener(_onViewModelStateUpdated);
+    _viewModel.fetchLiveProfileData();
   }
 
-  Future<void> _loadUserPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      athleteName = prefs.getString('user_name') ?? "FitLog Athlete";
-      athleteEmail = prefs.getString('user_email') ?? "athlete@fitlog.com";
-      athleteBio = prefs.getString('user_bio') ?? "Consistency beats talent every single day.";
-      fitnessGoal = prefs.getString('fitness_goal') ?? "Hypertrophy Conditioning";
-      _profileImagePath = prefs.getString('user_profile_img');
-
-      biometricAuthEnabled = prefs.getBool('setting_biometric') ?? false;
-      pushNotificationsEnabled = prefs.getBool('setting_push') ?? true;
-      workoutRemindersEnabled = prefs.getBool('setting_reminders') ?? true;
-    });
+  @override
+  void dispose() {
+    _viewModel.removeListener(_onViewModelStateUpdated);
+    _goalInputController.dispose();
+    super.dispose();
   }
 
-  Future<void> _savePreference(String key, dynamic value) async {
-    final prefs = await SharedPreferences.getInstance();
-    if (value is bool) await prefs.setBool(key, value);
-    if (value is String) await prefs.setString(key, value);
+  void _onViewModelStateUpdated() {
+    if (mounted) setState(() {});
   }
 
-  Future<void> _pickProfileImage() async {
+  Future<void> _handleImageSelectionFlow() async {
     try {
       final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
       if (pickedFile != null) {
-        setState(() => _profileImagePath = pickedFile.path);
-        await _savePreference('user_profile_img', pickedFile.path);
+        await _viewModel.updatePreferenceSetting('user_profile_img', pickedFile.path);
       }
     } catch (e) {
       _showToastSnackBar("Gallery error: $e");
     }
   }
 
+  void _executeNewGoalCommit() async {
+    final text = _goalInputController.text;
+    if (text.trim().isEmpty) return;
+
+    try {
+      await _viewModel.addNewFitnessGoal(text);
+      _goalInputController.clear();
+      FocusScope.of(context).unfocus();
+      _showToastSnackBar("New fitness parameter locked into database.");
+    } catch (e) {
+      _showDiagnosticErrorDialog(
+          "Cloud Connection Blocked",
+          "The database rejected the write request.\n\nError: $e"
+      );
+    }
+  }
+
   void _showEditProfileDialog() {
-    final nameCtrl = TextEditingController(text: athleteName);
-    final bioCtrl = TextEditingController(text: athleteBio);
-    final goalCtrl = TextEditingController(text: fitnessGoal);
+    final nameCtrl = TextEditingController(text: _viewModel.athleteName);
+    final bioCtrl = TextEditingController(text: _viewModel.athleteBio);
+    final goalCtrl = TextEditingController(text: _viewModel.fitnessGoal);
 
     showDialog(
       context: context,
@@ -86,17 +87,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL", style: TextStyle(color: Colors.grey))),
           TextButton(
             onPressed: () async {
-              setState(() {
-                athleteName = nameCtrl.text.trim();
-                athleteBio = bioCtrl.text.trim();
-                fitnessGoal = goalCtrl.text.trim();
-              });
-              await _savePreference('user_name', athleteName);
-              await _savePreference('user_bio', athleteBio);
-              await _savePreference('fitness_goal', fitnessGoal);
+              try {
+                await _viewModel.saveProfileChanges(
+                  name: nameCtrl.text.trim(),
+                  bio: bioCtrl.text.trim(),
+                  fitnessGoal: goalCtrl.text.trim(),
+                );
+                _showToastSnackBar("Cloud Database Profile synchronized successfully.");
+              } catch (e) {
+                _showToastSnackBar("Cloud push failure point: ${e.toString()}");
+              }
               if (mounted) Navigator.pop(context);
             },
             child: const Text("SAVE", style: TextStyle(color: Color(0xFFCCFF00))),
+          )
+        ],
+      ),
+    );
+  }
+
+  void _showDiagnosticErrorDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF161616),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 20),
+            const SizedBox(width: 8),
+            Text(title, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Text(message, style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.4)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK", style: TextStyle(color: Color(0xFFCCFF00), fontWeight: FontWeight.bold)),
           )
         ],
       ),
@@ -111,7 +137,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F0F),
-      body: SingleChildScrollView(
+      body: _viewModel.isDataSyncLoading
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFFCCFF00)))
+          : SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -127,25 +155,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: CircleAvatar(
                       radius: 47,
                       backgroundColor: const Color(0xFF161616),
-                      backgroundImage: _profileImagePath != null ? FileImage(File(_profileImagePath!)) : null,
-                      child: _profileImagePath == null ? const Icon(Icons.person, size: 50, color: Colors.grey) : null,
+                      backgroundImage: _viewModel.profileImagePath != null ? FileImage(File(_viewModel.profileImagePath!)) : null,
+                      child: _viewModel.profileImagePath == null ? const Icon(Icons.person, size: 50, color: Colors.grey) : null,
                     ),
                   ),
                   IconButton(
-                    style: IconButton.styleFrom(
-                      backgroundColor: const Color(0xFFCCFF00),
-                    ),
+                    style: IconButton.styleFrom(backgroundColor: const Color(0xFFCCFF00)),
                     icon: const Icon(Icons.photo_camera, size: 18, color: Colors.black),
-                    onPressed: _pickProfileImage,
+                    onPressed: _handleImageSelectionFlow,
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 12),
-            Text(athleteName, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-            Text(athleteEmail, textAlign: TextAlign.center, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+            Text(_viewModel.athleteName, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(_viewModel.athleteEmail, textAlign: TextAlign.center, style: const TextStyle(color: Colors.grey, fontSize: 12)),
             const SizedBox(height: 4),
-            Text("Goal: $fitnessGoal", textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFFCCFF00), fontSize: 11)),
+            Text("Goal: ${_viewModel.fitnessGoal}", textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFFCCFF00), fontSize: 11)),
+            const SizedBox(height: 6),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Text(_viewModel.athleteBio, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white60, fontSize: 12, fontStyle: FontStyle.italic)),
+            ),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(14),
@@ -160,12 +191,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: const Icon(Icons.workspace_premium, color: Color(0xFFCCFF00), size: 22),
                       ),
                       const SizedBox(width: 12),
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("CURRENT SERVICE PLAN", style: TextStyle(color: Colors.grey, fontSize: 9, fontWeight: FontWeight.bold)),
-                            Text("FitLog Pro Premium Access", style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+                            const Text("CURRENT SERVICE PLAN", style: TextStyle(color: Colors.grey, fontSize: 9, fontWeight: FontWeight.bold)),
+                            Text(_viewModel.membershipPlanText, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
                           ],
                         ),
                       ),
@@ -173,7 +204,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const Divider(color: Color(0xFF262626), height: 20),
                   InkWell(
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const MembershipTrackingScreen())),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const FitLogPremiumScreen())),
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                       decoration: BoxDecoration(border: Border.all(color: const Color(0xFFCCFF00).withValues(alpha: 0.3)), borderRadius: BorderRadius.circular(4)),
@@ -193,24 +224,122 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 20),
+            const Text("TARGET MILESTONES & GOALS", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1)),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _goalInputController,
+                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                      decoration: const InputDecoration(
+                        hintText: "Add customized milestone target...",
+                        hintStyle: TextStyle(color: Colors.white24, fontSize: 12),
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add_circle, color: Color(0xFFCCFF00)),
+                    onPressed: _executeNewGoalCommit,
+                  )
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(_viewModel.getCurrentUserId())
+                  .collection('fitness_goals')
+                  .orderBy('created_at', descending: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) return const SizedBox();
+                final docs = snapshot.data!.docs;
+                if (docs.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text("No custom milestones set yet.", style: TextStyle(color: Colors.white24, fontSize: 11)),
+                  );
+                }
+
+                return Column(
+                  children: docs.map((doc) {
+                    final data = doc.data() as Map<String, dynamic>;
+                    final isCompleted = data['status'] == 'completed';
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 6),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isCompleted ? Colors.black : const Color(0xFF1E1E1E),
+                        borderRadius: BorderRadius.circular(4),
+                        border: isCompleted ? null : Border.all(color: Colors.white10),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            isCompleted ? Icons.check_circle : Icons.radio_button_unchecked,
+                            color: isCompleted ? const Color(0xFFCCFF00) : Colors.grey,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              data['goal_title'] ?? '',
+                              style: TextStyle(
+                                color: isCompleted ? Colors.white30 : Colors.white,
+                                fontSize: 13,
+                                decoration: isCompleted ? TextDecoration.lineThrough : null,
+                              ),
+                            ),
+                          ),
+                          if (!isCompleted)
+                            TextButton(
+                              style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(50, 30)),
+                              onPressed: () async {
+                                try {
+                                  await _viewModel.markGoalAsCompleted(doc.id);
+                                  _showToastSnackBar("Objective achieved! Progress entry synchronized.");
+                                } catch (e) {
+                                  _showToastSnackBar("Error updating achievement status: $e");
+                                }
+                              },
+                              child: const Text("COMPLETE", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 10, fontWeight: FontWeight.bold)),
+                            )
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+            const SizedBox(height: 20),
             const Text("SECURITY & OPERATIONS", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1)),
             const SizedBox(height: 8),
-            _buildSwitchTile(Icons.fingerprint, "Biometric Lock", "Verify using facial patterns or touch sensors", biometricAuthEnabled, (val) {
-              setState(() => biometricAuthEnabled = val);
-              _savePreference('setting_biometric', val);
+            _buildSwitchTile(Icons.fingerprint, "Biometric Lock", "Verify using facial patterns or touch sensors", _viewModel.biometricAuthEnabled, (val) {
+              _viewModel.updatePreferenceSetting('setting_biometric', val);
               _showToastSnackBar(val ? "Simulated Action: Local device biometric authorization checks enabled." : "Simulated Action: Security parameters lifted.");
             }),
-            _buildSwitchTile(Icons.notifications_active_outlined, "Push Notifications", "Receive live cloud telemetry updates", pushNotificationsEnabled, (val) {
-              setState(() => pushNotificationsEnabled = val);
-              _savePreference('setting_push', val);
+            _buildSwitchTile(Icons.notifications_active_outlined, "Push Notifications", "Receive live cloud telemetry updates", _viewModel.pushNotificationsEnabled, (val) {
+              _viewModel.updatePreferenceSetting('setting_push', val);
             }),
-            _buildSwitchTile(Icons.alarm, "Workout Reminders", "Get daily reminder alerts for schedules", workoutRemindersEnabled, (val) {
-              setState(() => workoutRemindersEnabled = val);
-              _savePreference('setting_reminders', val);
+            _buildSwitchTile(Icons.alarm, "Workout Reminders", "Get daily reminder alerts for schedules", _viewModel.workoutRemindersEnabled, (val) {
+              _viewModel.updatePreferenceSetting('setting_reminders', val);
             }),
             _buildActionTile(Icons.lock_reset_outlined, "Update Password", "Modify your performance access key", () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const ChangePasswordScreen()));
             }),
+
+            // New Rate Screen Navigation Section Included Here
+            _buildActionTile(Icons.star_rate_rounded, "App Feedback & Experience", "Rate your training journey so far", () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const RateScreen()));
+            }),
+
             const SizedBox(height: 14),
             OutlinedButton(
               onPressed: _showEditProfileDialog,
