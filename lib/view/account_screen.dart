@@ -277,32 +277,6 @@ class _AccountScreenState extends State<AccountScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.black,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: accentColor,
-        unselectedItemColor: Colors.white,
-        selectedFontSize: 10,
-        unselectedFontSize: 10,
-        currentIndex: 4,
-        items: [
-          const BottomNavigationBarItem(icon: Icon(Icons.dashboard_outlined), label: 'Dash'),
-          const BottomNavigationBarItem(icon: Icon(Icons.fitness_center), label: 'Train'),
-          const BottomNavigationBarItem(icon: Icon(Icons.restaurant_menu), label: 'Fuel'),
-          const BottomNavigationBarItem(icon: Icon(Icons.analytics_outlined), label: 'Goals'),
-          BottomNavigationBarItem(
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: accentColor,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.person, color: Colors.black),
-            ),
-            label: 'Admin',
-          ),
-        ],
-      ),
     );
   }
 
@@ -375,7 +349,7 @@ class _AccountScreenState extends State<AccountScreen> {
     required Color cardColor,
     required Color accentColor,
     Widget? trailing,
-    VoidCallback? onTap, // Added onTap callback parameter
+    VoidCallback? onTap,
   }) {
     return GestureDetector(
       onTap: onTap,

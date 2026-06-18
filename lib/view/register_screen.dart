@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'terms_and_conditions_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -24,11 +25,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
             children: [
               const SizedBox(height: 20),
               // Header Logo
-              Center(
+              const Center(
                 child: Text(
                   'FITLOG',
                   style: TextStyle(
-                    color: const Color(0xFFCCFF00),
+                    color: Color(0xFFCCFF00),
                     fontSize: 24,
                     fontWeight: FontWeight.w900,
                     fontStyle: FontStyle.italic,
@@ -75,7 +76,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const _FieldLabel(label: 'CONFIRM PASSWORD'),
               _CustomInput(
                 hint: '●●●●●●●●',
-                icon: Icons.history, // Using history icon to match your design
+                icon: Icons.history,
                 isPassword: true,
                 obscure: _obscureConfirmPw,
                 onToggle: () => setState(() => _obscureConfirmPw = !_obscureConfirmPw),
@@ -83,7 +84,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
               const SizedBox(height: 20),
 
-              // Terms & Conditions
+              // Terms & Conditions Checkbox
               Row(
                 children: [
                   Theme(
@@ -97,16 +98,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   Expanded(
                     child: RichText(
-                      text: const TextSpan(
-                        style: TextStyle(color: Colors.white, fontSize: 14),
+                      text: TextSpan(
+                        style: const TextStyle(color: Colors.white, fontSize: 14),
                         children: [
-                          TextSpan(text: 'I AGREE TO THE '),
-                          TextSpan(
-                            text: 'TERMS & CONDITIONS',
-                            style: TextStyle(
-                              color: Color(0xFFCCFF00),
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
+                          const TextSpan(text: 'I AGREE TO THE '),
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.baseline,
+                            baseline: TextBaseline.alphabetic,
+                            child: GestureDetector(
+                              onTap: () async {
+                                final bool? accepted = await Navigator.push<bool>(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const TermsAndConditionsScreen(),
+                                  ),
+                                );
+
+                                if (accepted == true) {
+                                  setState(() {
+                                    _isAgreed = true;
+                                  });
+                                }
+                              },
+                              child: const Text(
+                                'TERMS & CONDITIONS',
+                                style: TextStyle(
+                                  color: Color(0xFFCCFF00),
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -118,29 +139,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
               const SizedBox(height: 30),
 
-              // Create Account Button
+              // Create Account Button (Locks/Unlocks dynamically)
               SizedBox(
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  // 1. If _isAgreed is false, setting onPressed to null disables the button.
+                  onPressed: _isAgreed
+                      ? () {
+                    // Perform registration logic here
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Registration successful!')),
+                    );
+                  }
+                      : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFCCFF00),
+                    // 2. Swaps colors automatically to give visual feedback when disabled
+                    backgroundColor: _isAgreed ? const Color(0xFFCCFF00) : const Color(0xFF1E1E1E),
+                    disabledBackgroundColor: const Color(0xFF1E1E1E),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         'CREATE ACCOUNT',
                         style: TextStyle(
-                          color: Colors.black,
+                          // 3. Swaps text color dynamically based on state
+                          color: _isAgreed ? Colors.black : Colors.white24,
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
                       ),
-                      SizedBox(width: 8),
-                      Icon(Icons.arrow_forward, color: Colors.black),
+                      const SizedBox(width: 8),
+                      Icon(
+                        Icons.arrow_forward,
+                        color: _isAgreed ? Colors.black : Colors.white24,
+                      ),
                     ],
                   ),
                 ),
@@ -157,8 +192,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         style: TextStyle(color: Colors.grey, fontSize: 14)),
                     GestureDetector(
                       onTap: () {
-                        // 3. ADD THIS TO GO BACK
-                        Navigator.pop(context);
+                        Navigator.maybePop(context);
                       },
                       child: const Text(
                         'SIGN IN',

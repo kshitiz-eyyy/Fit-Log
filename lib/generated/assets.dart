@@ -35,6 +35,7 @@ class $AssetsImagesGen {
   final AssetGenImage bicepsdash = const AssetGenImage(
     'assets/images/bicepsdash.png',
   );
+  final AssetGenImage bmi = const AssetGenImage('assets/images/bmi.png');
   final AssetGenImage cablecrossover = const AssetGenImage(
     'assets/images/cablecrossover.png',
   );
@@ -62,6 +63,7 @@ class $AssetsImagesGen {
   final AssetGenImage deadlift = const AssetGenImage(
     'assets/images/deadlift.png',
   );
+  final AssetGenImage diet = const AssetGenImage('assets/images/diet.png');
   final AssetGenImage frontraise = const AssetGenImage(
     'assets/images/frontraise.png',
   );
@@ -98,6 +100,7 @@ class $AssetsImagesGen {
   final AssetGenImage mountainclimbers = const AssetGenImage(
     'assets/images/mountainclimbers.png',
   );
+  final AssetGenImage newbmi = const AssetGenImage('assets/images/newbmi.png');
   final AssetGenImage plank = const AssetGenImage('assets/images/plank.png');
   final AssetGenImage preachercurl = const AssetGenImage(
     'assets/images/preachercurl.png',
@@ -126,6 +129,9 @@ class $AssetsImagesGen {
     'assets/images/singlearmdumbellrow.png',
   );
   final AssetGenImage squats = const AssetGenImage('assets/images/squats.png');
+  final AssetGenImage trainer = const AssetGenImage(
+    'assets/images/trainer.png',
+  );
   final AssetGenImage tricepsdash = const AssetGenImage(
     'assets/images/tricepsdash.png',
   );
