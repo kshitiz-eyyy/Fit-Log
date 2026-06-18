@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
+import '../model/water_log_model.dart';
+import '../repo/water_repository.dart';
+import '../viewmodel/water_tracker_view_model.dart';
+
+
 class WaterTrackerScreen extends StatefulWidget {
   const WaterTrackerScreen({super.key});
 
@@ -9,7 +14,17 @@ class WaterTrackerScreen extends StatefulWidget {
 }
 
 class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
-  // --- COLORS ---
+  late WaterRepository _repository;
+  late WaterTrackerViewModel _viewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    _repository = WaterRepository();
+    _viewModel = WaterTrackerViewModel(repository: _repository);
+  }
+
+  // --- PALETTE CONFIGS ---
   static const darkBackground = Color(0xFF121212);
   static const surfaceDark = Color(0xFF1E1E1E);
   static const primaryOrange = Color(0xFFFF6D00);
@@ -17,137 +32,130 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
   static const cyanBlue = Color(0xFF00E5FF);
   static const textGray = Color(0xFFBDBDBD);
 
-  // --- STATE ---
-  double _currentIntake = 2.4;
-  final double _goal = 3.5;
-  bool _remindersEnabled = true;
-  String _frequency = "Every 1 hour";
-
-  void _addWater(double amount) {
-    setState(() {
-      _currentIntake = (_currentIntake + amount).clamp(0.0, 9.9);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: darkBackground,
-      appBar: AppBar(
-        backgroundColor: darkBackground,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'FIT LOG',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 2,
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.white),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.water_drop, color: Colors.white, size: 24),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Water Tracker',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+    return ListenableBuilder(
+        listenable: _viewModel,
+        builder: (context, _) {
+          if (_viewModel.isLoading) {
+            return const Scaffold(
+              backgroundColor: darkBackground,
+              body: Center(child: CircularProgressIndicator(color: cyanBlue)),
+            );
+          }
+
+          return Scaffold(
+            backgroundColor: darkBackground,
+            appBar: AppBar(
+              backgroundColor: darkBackground,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.pop(context),
               ),
-              const SizedBox(height: 40),
-
-              // Circular Progress
-              _buildProgressCircle(),
-
-              const SizedBox(height: 20),
-              Text(
-                'GOAL: $_goal LITERS',
-                style: const TextStyle(
-                  color: textGray,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.2,
+              title: const Text(
+                'FIT LOG',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2,
                 ),
               ),
-
-              const SizedBox(height: 40),
-
-              // Quick Add Buttons
-              Row(
-                children: [
-                  _buildQuickAddButton('+ 1 Cup', Icons.local_cafe_outlined, 0.25),
-                  const SizedBox(width: 12),
-                  _buildQuickAddButton('+ 500ml', Icons.water_drop_outlined, 0.5),
-                  const SizedBox(width: 12),
-                  _buildQuickAddButton('- 250ml', Icons.remove_circle_outline, -0.25),
-                ],
-              ),
-
-              const SizedBox(height: 32),
-
-              // Reminder Settings
-              _buildReminderSettings(),
-
-              const SizedBox(height: 32),
-
-              // Hydration Log
-              _buildHydrationLog(),
-
-              const SizedBox(height: 32),
-
-              // Add Water Button
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: () => _addWater(0.25),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryOrange,
-                    foregroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(28),
+              centerTitle: true,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.notifications_none, color: Colors.white),
+                  onPressed: () {},
+                ),
+              ],
+            ),
+            body: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 10),
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.water_drop, color: Colors.white, size: 24),
+                        SizedBox(width: 8),
+                        Text(
+                          'Water Tracker',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  child: const Text(
-                    '+ Add Water',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                    const SizedBox(height: 40),
+
+                    // Circular Progress
+                    _buildProgressCircle(),
+
+                    const SizedBox(height: 20),
+                    Text(
+                      'GOAL: ${_viewModel.goal} LITERS',
+                      style: const TextStyle(
+                        color: textGray,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.2,
+                      ),
                     ),
-                  ),
+
+                    const SizedBox(height: 40),
+
+                    // Quick Add Action Area Array
+                    Row(
+                      children: [
+                        _buildQuickAddButton('+ 1 Cup', Icons.local_cafe_outlined, 0.25, 'Cup of Water'),
+                        const SizedBox(width: 12),
+                        _buildQuickAddButton('+ 500ml', Icons.water_drop_outlined, 0.5, 'Bottled Water'),
+                        const SizedBox(width: 12),
+                        _buildQuickAddButton('- 250ml', Icons.remove_circle_outline, -0.25, 'Correction adjustment'),
+                      ],
+                    ),
+
+                    const SizedBox(height: 32),
+                    _buildReminderSettings(),
+                    const SizedBox(height: 32),
+                    _buildHydrationLog(),
+                    const SizedBox(height: 32),
+
+                    // Bottom Sheet CTA Trigger
+                    SizedBox(
+                      width: double.infinity,
+                      height: 56,
+                      child: ElevatedButton(
+                        onPressed: () => _viewModel.addWater(0.25, title: 'Generic Entry'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryOrange,
+                          foregroundColor: Colors.black,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(28),
+                          ),
+                        ),
+                        child: const Text(
+                          '+ Add Water',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                  ],
                 ),
               ),
-              const SizedBox(height: 40),
-            ],
-          ),
-        ),
-      ),
-    );
+            ),
+          );
+        });
   }
 
   Widget _buildProgressCircle() {
@@ -160,7 +168,7 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
           CustomPaint(
             size: const Size(220, 220),
             painter: WaterProgressPainter(
-              progress: _currentIntake / _goal,
+              progress: _viewModel.currentIntake / _viewModel.goal,
               accentColor1: secondaryLime,
               accentColor2: cyanBlue,
             ),
@@ -169,7 +177,7 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                _currentIntake.toStringAsFixed(1),
+                _viewModel.currentIntake.toStringAsFixed(1),
                 style: const TextStyle(
                   color: secondaryLime,
                   fontSize: 56,
@@ -192,10 +200,10 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
     );
   }
 
-  Widget _buildQuickAddButton(String label, IconData icon, double amount) {
+  Widget _buildQuickAddButton(String label, IconData icon, double amount, String itemTitle) {
     return Expanded(
       child: GestureDetector(
-        onTap: () => _addWater(amount),
+        onTap: () => _viewModel.addWater(amount, title: itemTitle),
         child: Container(
           height: 100,
           decoration: BoxDecoration(
@@ -228,15 +236,15 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
       decoration: BoxDecoration(
         color: surfaceDark,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: cyanBlue.withValues(alpha: 0.3)),
+        border: Border.all(color: cyanBlue.withOpacity(0.3)),
       ),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: const [
+              const Row(
+                children: [
                   Icon(Icons.alarm, color: secondaryLime, size: 24),
                   SizedBox(width: 12),
                   Text(
@@ -250,8 +258,8 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
                 ],
               ),
               Switch(
-                value: _remindersEnabled,
-                onChanged: (val) => setState(() => _remindersEnabled = val),
+                value: _viewModel.remindersEnabled,
+                onChanged: (val) => _viewModel.toggleReminders(val),
                 activeThumbColor: Colors.white,
                 activeTrackColor: secondaryLime,
                 inactiveTrackColor: Colors.grey[800],
@@ -267,11 +275,7 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
                 style: TextStyle(color: textGray, fontSize: 16),
               ),
               PopupMenuButton<String>(
-                onSelected: (String value) {
-                  setState(() {
-                    _frequency = value;
-                  });
-                },
+                onSelected: (String value) => _viewModel.updateFrequency(value),
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
                   const PopupMenuItem<String>(
                     value: 'Every 30 min',
@@ -289,7 +293,7 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
                 child: Row(
                   children: [
                     Text(
-                      _frequency,
+                      _viewModel.frequency,
                       style: const TextStyle(
                         color: secondaryLime,
                         fontSize: 16,
@@ -322,16 +326,21 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
           ),
         ),
         const SizedBox(height: 20),
-        _buildLogItem('Bottled Water', '08:45 AM', '500ml', secondaryLime),
-        const SizedBox(height: 16),
-        _buildLogItem('Glass of Water', '10:15 AM', '250ml', cyanBlue),
-        const SizedBox(height: 16),
-        _buildLogItem('Protein Shake', '12:30 PM', '400ml', secondaryLime),
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _viewModel.logs.length,
+          separatorBuilder: (context, index) => const SizedBox(height: 16),
+          itemBuilder: (context, index) {
+            final logItem = _viewModel.logs[index];
+            return _buildLogItem(logItem);
+          },
+        ),
       ],
     );
   }
 
-  Widget _buildLogItem(String title, String time, String amount, Color accent) {
+  Widget _buildLogItem(WaterLogItem item) {
     return Container(
       height: 80,
       decoration: BoxDecoration(
@@ -343,7 +352,7 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
           Container(
             width: 4,
             decoration: BoxDecoration(
-              color: accent,
+              color: item.accentColor,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
                 bottomLeft: Radius.circular(16),
@@ -360,10 +369,10 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
                     height: 32,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: accent.withOpacity(0.1),
-                      border: Border.all(color: accent),
+                      color: item.accentColor.withOpacity(0.1),
+                      border: Border.all(color: item.accentColor),
                     ),
-                    child: Icon(Icons.check, color: accent, size: 18),
+                    child: Icon(Icons.check, color: item.accentColor, size: 18),
                   ),
                   const SizedBox(width: 16),
                   Column(
@@ -371,7 +380,7 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        title,
+                        item.title,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -379,16 +388,16 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
                         ),
                       ),
                       Text(
-                        time,
+                        item.time,
                         style: const TextStyle(color: textGray, fontSize: 14),
                       ),
                     ],
                   ),
                   const Spacer(),
                   Text(
-                    amount,
+                    item.amountString,
                     style: TextStyle(
-                      color: accent,
+                      color: item.accentColor,
                       fontSize: 20,
                       fontWeight: FontWeight.w900,
                     ),
@@ -401,9 +410,9 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
       ),
     );
   }
-
 }
 
+// Keep your existing WaterProgressPainter here as is...
 class WaterProgressPainter extends CustomPainter {
   final double progress;
   final Color accentColor1;
@@ -421,7 +430,6 @@ class WaterProgressPainter extends CustomPainter {
     final radius = (size.width / 2) - 10;
     const strokeWidth = 14.0;
 
-    // Background circle
     final trackPaint = Paint()
       ..color = Colors.grey[800]!.withOpacity(0.2)
       ..style = PaintingStyle.stroke
@@ -429,7 +437,6 @@ class WaterProgressPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
     canvas.drawCircle(center, radius, trackPaint);
 
-    // Progress arc with gradient
     final rect = Rect.fromCircle(center: center, radius: radius);
     final sweepGradient = SweepGradient(
       startAngle: -math.pi / 2,

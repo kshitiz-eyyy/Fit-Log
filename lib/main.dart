@@ -1,6 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:fitlog/view/dashboard.dart';
+import 'package:fitlog/view/account_screen.dart';
+import 'package:fitlog/view/water_tracker_screen.dart';
+import 'package:fitlog/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'package:fitlog/view/splash_screen.dart';
 
@@ -15,7 +18,12 @@ void main() async {
     debugPrint("Firebase Engine Init Error: $e");
   }
 
-  runApp(const FitLogApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => UserViewModel(),
+      child: const FitLogApp(),
+    ),
+  );
 }
 
 class FitLogApp extends StatelessWidget {
@@ -26,10 +34,8 @@ class FitLogApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'FitLog',
-
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: Colors.black,
-
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.black,
           titleTextStyle: TextStyle(
@@ -39,8 +45,7 @@ class FitLogApp extends StatelessWidget {
           ),
         ),
       ),
-
-      home: const DashboardScreen(),
+      home: const WaterTrackerScreen(),
     );
   }
 }

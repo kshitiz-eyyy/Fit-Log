@@ -9,47 +9,41 @@ class WelcomeScreen extends StatelessWidget {
       backgroundColor: const Color(0xFF0D0D0D),
       body: Stack(
         children: [
-          // Main content
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  const Spacer(flex: 3),
                   // Logo area with subtle glow
-                  SizedBox(
-                    height: 200,
-                    width: 200,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Radial glow effect
-                        Container(
-                          width: 140,
-                          height: 140,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: RadialGradient(
-                              colors: [
-                                const Color(0xFFC6FF00).withOpacity(0.2),
-                                Colors.transparent,
-                              ],
-                            ),
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Radial glow effect
+                      Container(
+                        width: 220,
+                        height: 220,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: RadialGradient(
+                            colors: [
+                              const Color(0xFFC6FF00).withOpacity(0.12),
+                              Colors.transparent,
+                            ],
                           ),
                         ),
-                        // Logo Image from assets
-                        Image.asset(
-                          'assets/images/logo.png',
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.contain,
-                        ),
-                      ],
-                    ),
+                      ),
+                      // Logo Image from assets
+                      Image.asset(
+                        'assets/images/logo.png',
+                        width: 140,
+                        height: 140,
+                        fit: BoxFit.contain,
+                      ),
+                    ],
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 32),
 
                   // Welcome Text
                   const Text(
@@ -57,55 +51,28 @@ class WelcomeScreen extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 42,
+                      fontSize: 52,
                       fontWeight: FontWeight.w900,
-                      height: 1.1,
-                      letterSpacing: -0.5,
+                      height: 0.95,
+                      letterSpacing: -1.5,
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
 
                   // Tagline
                   Text(
                     'Your journey to elite performance\nstarts here.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
+                      color: Colors.white.withOpacity(0.6),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
                       height: 1.4,
+                      letterSpacing: 0.2,
                     ),
                   ),
-
-                  const SizedBox(height: 80),
-
-                  // Get Started Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 60,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Handle Get Started
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFC6FF00),
-                        foregroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: const Text(
-                        'GET STARTED',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1.0,
-                        ),
-                      ),
-                    ),
-                  ),
+                  const Spacer(flex: 5),
                 ],
               ),
             ),
