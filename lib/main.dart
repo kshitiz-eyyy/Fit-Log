@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:fitlog/view/change_password_screen.dart';
 import 'package:fitlog/view/hydration_settings_screen.dart';
 import 'package:fitlog/view/dashboard.dart';
+import 'package:fitlog/view/sleep_screen.dart';
 import 'package:fitlog/view/water_tracker_screen.dart';
 import 'package:flutter/material.dart';
 import 'firebase_options.dart';
@@ -42,7 +43,7 @@ class FitLogApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const WaterTrackerScreen(),
+      home: const SleepScreen(),
 
     );
   }

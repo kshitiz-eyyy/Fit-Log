@@ -12,20 +12,20 @@ class SleepScreen extends StatefulWidget {
 class _SleepScreenState extends State<SleepScreen> {
   bool _sleepMode = true;
 
-  // Automation States
+
   bool _isAutoTrackingActive = true;
   bool _isCurrentlyAsleep = false;
   DateTime? _autoSleepStartTime;
   double _lastNightSleepHours = 7.2;
-  double _currentAcceleration = 0.0; // Debug field
+  double _currentAcceleration = 0.0;
 
   final List<double> _weeklySleepData = [0.75, 0.5, 0.65, 0.8, 0.55, 0.9, 0.4];
   final List<String> _days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
   StreamSubscription<AccelerometerEvent>? _accelerometerSubscription;
   
-  // Logic constants
-  static const double _movementThreshold = 0.5; // Sensitivity to movement
+
+  static const double _movementThreshold = 0.5;
   static const Duration _stillnessNeededForSleep = Duration(minutes: 10);
   
   DateTime _lastSignificantMovement = DateTime.now();
@@ -62,7 +62,6 @@ class _SleepScreenState extends State<SleepScreen> {
     _lastSignificantMovement = now;
 
     if (_isCurrentlyAsleep) {
-      // User woke up or picked up the phone
       setState(() {
         _isCurrentlyAsleep = false;
         if (_autoSleepStartTime != null) {
@@ -70,7 +69,6 @@ class _SleepScreenState extends State<SleepScreen> {
           // Convert to hours
           _lastNightSleepHours = duration.inMinutes / 60.0;
           
-          // Update history
           int todayIndex = (now.weekday - 1) % 7;
           _weeklySleepData[todayIndex] = (_lastNightSleepHours / 8.0).clamp(0.0, 1.0);
         }
@@ -115,9 +113,10 @@ class _SleepScreenState extends State<SleepScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF0D0D0D),
       appBar: AppBar(
+        centerTitle:true,
         backgroundColor: const Color(0xFF0D0D0D),
         elevation: 0,
-        title: const Text('FIT LOG AUTOMATION', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text('FitLog Sleep', style: TextStyle(color: Color(0xFFCCFF00), fontWeight: FontWeight.bold)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
