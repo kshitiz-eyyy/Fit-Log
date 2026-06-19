@@ -1,44 +1,48 @@
-import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../model/water_log_model.dart';
 
 
 class WaterRepository {
-  // Mock initial history log items
-  final List<WaterLogItem> _mockLogs = [
-    WaterLogItem(
-      id: '1',
-      title: 'Bottled Water',
-      time: '08:45 AM',
-      amountString: '500ml',
-      amountLiters: 0.5,
-      accentColor: const Color(0xFFC6FF00),
-    ),
-    WaterLogItem(
-      id: '2',
-      title: 'Glass of Water',
-      time: '10:15 AM',
-      amountString: '250ml',
-      amountLiters: 0.25,
-      accentColor: const Color(0xFF00E5FF),
-    ),
-    WaterLogItem(
-      id: '3',
-      title: 'Protein Shake',
-      time: '12:30 PM',
-      amountString: '400ml',
-      amountLiters: 0.4,
-      accentColor: const Color(0xFFC6FF00),
-    ),
-  ];
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<List<WaterLogItem>> fetchHydrationLogs() async {
-    // Simulating a minor network/database delay
-    await Future.delayed(const Duration(milliseconds: 100));
-    return List.from(_mockLogs);
+  /// Fetches unique hydration values using the live logged-in user ID
+  Future<WaterConfig> fetchUserWaterConfig(String userId) async {
+    try {
+      if (userId.isEmpty) return WaterConfig(dailyGoal: 3.5, isReminderActive: false);
+
+      DocumentSnapshot doc = await _firestore.collection('users').doc(userId).get();
+      if (doc.exists) {
+        final data = doc.data() as Map<String, dynamic>?;
+        return WaterConfig.fromFirestore(data);
+      }
+    } catch (e) {
+      print("Error fetching user water config: $e");
+    }
+    return WaterConfig(dailyGoal: 3.5, isReminderActive: false);
   }
 
-  Future<void> saveLogItem(WaterLogItem item) async {
-    _mockLogs.insert(0, item); // Add new logs to the top of the history list
+  /// Updates the reminder setting back to the unique user's document
+  Future<void> updateUserReminderSetting(String userId, bool active) async {
+    if (userId.isEmpty) return;
+    try {
+      await _firestore.collection('users').doc(userId).update({
+        'hydration_reminder_active': active,
+      });
+    } catch (e) {
+      print("Error updating reminder flag: $e");
+    }
+  }
+
+  /// Saves the specific current intake value straight into the dynamic user profile
+  Future<void> updateUserCurrentIntake(String userId, double currentIntake) async {
+    if (userId.isEmpty) return;
+    try {
+      await _firestore.collection('users').doc(userId).update({
+        'current_water_intake': currentIntake,
+      });
+    } catch (e) {
+      print("Error updating hydration amount: $e");
+    }
   }
 }

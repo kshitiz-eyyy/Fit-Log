@@ -6,64 +6,79 @@ import '../repo/water_repository.dart';
 
 class WaterTrackerViewModel extends ChangeNotifier {
   final WaterRepository _repository;
+  final String userId;
 
-  WaterTrackerViewModel({required WaterRepository repository}) : _repository = repository {
-    _loadInitialData();
+  WaterTrackerViewModel({
+    required WaterRepository repository,
+    required this.userId,
+  }) : _repository = repository {
+    loadUserConfiguration();
   }
 
-  // --- STATE VARIABLES ---
-  double _currentIntake = 2.4;
-  final double _goal = 3.5;
-  bool _remindersEnabled = true;
+  // --- LOCAL STATES ---
+  double _currentIntake = 0.0;
+  double _goal = 3.5;
+  bool _isLoadingConfig = true;
+  bool _remindersEnabled = false;
   String _frequency = "Every 1 hour";
-  List<WaterLogItem> _logs = [];
-  bool _isLoading = true;
+  final List<WaterLogItem> _logs = [];
 
   // --- GETTERS ---
   double get currentIntake => _currentIntake;
   double get goal => _goal;
+  bool get isLoadingConfig => _isLoadingConfig;
   bool get remindersEnabled => _remindersEnabled;
   String get frequency => _frequency;
   List<WaterLogItem> get logs => _logs;
-  bool get isLoading => _isLoading;
 
-  // --- ACTIONS & BUSINESS LOGIC ---
-  Future<void> _loadInitialData() async {
-    _logs = await _repository.fetchHydrationLogs();
-    _isLoading = false;
+  // --- LIFECYCLE ---
+  Future<void> loadUserConfiguration() async {
+    if (userId.isEmpty) {
+      _isLoadingConfig = false;
+      notifyListeners();
+      return;
+    }
+
+    _isLoadingConfig = true;
+    notifyListeners();
+
+    WaterConfig config = await _repository.fetchUserWaterConfig(userId);
+    _goal = config.dailyGoal;
+    _remindersEnabled = config.isReminderActive;
+
+    _isLoadingConfig = false;
     notifyListeners();
   }
 
-  void addWater(double amount, {String title = 'Water Intake'}) {
-    // 1. Update cumulative volume metrics
+  Future<void> addWater(double amount, {String title = 'Water Intake'}) async {
     _currentIntake = (_currentIntake + amount).clamp(0.0, 9.9);
 
-    // 2. Format a dynamic history log item entry based on modern device timestamp rules
     final now = DateTime.now();
     final hour = now.hour > 12 ? now.hour - 12 : (now.hour == 0 ? 12 : now.hour);
     final minute = now.minute.toString().padLeft(2, '0');
     final period = now.hour >= 12 ? 'PM' : 'AM';
-    final timestamp = "$hour:$minute $period";
 
-    final newLog = WaterLogItem(
-      id: now.millisecondsSinceEpoch.toString(),
-      title: title,
-      time: timestamp,
-      amountString: "${(amount.abs() * 1000).toInt()}ml",
-      amountLiters: amount,
-      accentColor: amount >= 0 ? const Color(0xFF00E5FF) : const Color(0xFFFF6D00),
+    _logs.insert(
+      0,
+      WaterLogItem(
+        id: now.millisecondsSinceEpoch.toString(),
+        title: title,
+        time: "$hour:$minute $period",
+        amountString: "${(amount.abs() * 1000).toInt()}ml",
+        amountLiters: amount,
+        accentColor: amount >= 0 ? const Color(0xFF00E5FF) : const Color(0xFFFF6D00),
+      ),
     );
-
-    // 3. Update the data layer and UI state tree
-    _logs.insert(0, newLog);
-    _repository.saveLogItem(newLog);
-
     notifyListeners();
+
+    // Persists target numbers up to the current authenticated user profile
+    await _repository.updateUserCurrentIntake(userId, _currentIntake);
   }
 
-  void toggleReminders(bool value) {
+  Future<void> toggleReminders(bool value) async {
     _remindersEnabled = value;
     notifyListeners();
+    await _repository.updateUserReminderSetting(userId, value);
   }
 
   void updateFrequency(String freshFrequency) {
