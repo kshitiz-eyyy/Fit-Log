@@ -6,6 +6,7 @@ import 'package:fitlog/view/fitlog_premium_screen.dart';
 import 'package:fitlog/view/change_password_screen.dart';
 import 'package:fitlog/view/rate_screen.dart';
 import '../viewmodel/user_profile_view_model.dart';
+import 'favourite_exercise.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -339,6 +340,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _buildActionTile(Icons.star_rate_rounded, "App Feedback & Experience", "Rate your training journey so far", () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const RateScreen()));
             }),
+
+            const SizedBox(height: 14),
+            _buildActionTile(
+                Icons.favorite,
+                "Favourited Exercises",
+                "View your curated workout collection",
+                    () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) =>  FavouriteExerciseScreen())
+                  );
+                }
+            ),
 
             const SizedBox(height: 14),
             OutlinedButton(
