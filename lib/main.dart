@@ -46,7 +46,7 @@ class FitLogApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const SleepScreen(),
+      home: const UserDashboardScreen(),
     );
   }
 }

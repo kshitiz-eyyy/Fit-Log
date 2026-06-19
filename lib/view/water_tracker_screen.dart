@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // <--- Handles multi-user sessions dynamically!
+import 'package:firebase_auth/firebase_auth.dart'; // Handles dynamic sessions securely!
 import 'dart:math' as math;
 
 import '../model/water_log_model.dart';
@@ -25,11 +25,9 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
 
     // 1. Detect who is signed into this device right now
     final User? currentUser = FirebaseAuth.instance.currentUser;
-
-    // 2. Safely capture their unique authentication UID string token
     final String targetUid = currentUser?.uid ?? '';
 
-    // 3. Bind the ViewModel instantly to that session token
+    // 2. Bind the ViewModel instantly to that session token
     _viewModel = WaterTrackerViewModel(
       repository: _repository,
       userId: targetUid,

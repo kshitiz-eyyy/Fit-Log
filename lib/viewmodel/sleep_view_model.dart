@@ -7,8 +7,8 @@ class SleepViewModel extends ChangeNotifier {
   final SleepRepository _repository;
 
   SleepData _data = SleepData(
-    lastNightHours: 7.2,
-    weeklyHistory: [0.75, 0.5, 0.65, 0.8, 0.55, 0.9, 0.4],
+    lastNightHours: 0.0,
+    weeklyHistory: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
     isCurrentlyAsleep: false,
     isAutoTrackingActive: true,
     sleepMode: true,
@@ -25,7 +25,7 @@ class SleepViewModel extends ChangeNotifier {
 
   // Constants
   static const double _movementThreshold = 0.5;
-  static const Duration _stillnessNeededForSleep = Duration(minutes: 10);
+  static const Duration _stillnessNeededForSleep = Duration(seconds: 10); // Reduced for testing
 
   SleepViewModel({required SleepRepository repository}) : _repository = repository {
     _init();
@@ -33,7 +33,13 @@ class SleepViewModel extends ChangeNotifier {
 
   Future<void> _init() async {
     final history = await _repository.getWeeklyHistory();
-    _data = _data.copyWith(weeklyHistory: history);
+    final lastHours = await _repository.getLastSleepSession();
+    
+    _data = _data.copyWith(
+      weeklyHistory: history,
+      lastNightHours: lastHours,
+    );
+
     if (_data.isAutoTrackingActive) {
       startTracking();
     }
@@ -66,6 +72,15 @@ class SleepViewModel extends ChangeNotifier {
 
   void toggleSleepMode(bool value) {
     _data = _data.copyWith(sleepMode: value);
+    notifyListeners();
+  }
+
+  Future<void> mockSaveSession() async {
+    // Instantly save a 8.0 hour session for testing
+    await _repository.saveSleepSession(8.0);
+    final history = await _repository.getWeeklyHistory();
+    final lastHours = await _repository.getLastSleepSession();
+    _data = _data.copyWith(weeklyHistory: history, lastNightHours: lastHours);
     notifyListeners();
   }
 

@@ -45,6 +45,7 @@ class WaterTrackerViewModel extends ChangeNotifier {
     WaterConfig config = await _repository.fetchUserWaterConfig(userId);
     _goal = config.dailyGoal;
     _remindersEnabled = config.isReminderActive;
+    _frequency = config.frequency;
 
     _isLoadingConfig = false;
     notifyListeners();
@@ -81,8 +82,11 @@ class WaterTrackerViewModel extends ChangeNotifier {
     await _repository.updateUserReminderSetting(userId, value);
   }
 
-  void updateFrequency(String freshFrequency) {
+  Future<void> updateFrequency(String freshFrequency) async {
     _frequency = freshFrequency;
     notifyListeners();
+
+    // Updates local layout and pushes the value to your Firestore document
+    await _repository.updateUserFrequencySetting(userId, freshFrequency);
   }
 }

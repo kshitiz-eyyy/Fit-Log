@@ -9,7 +9,7 @@ class WaterRepository {
   /// Fetches unique hydration values using the live logged-in user ID
   Future<WaterConfig> fetchUserWaterConfig(String userId) async {
     try {
-      if (userId.isEmpty) return WaterConfig(dailyGoal: 3.5, isReminderActive: false);
+      if (userId.isEmpty) return WaterConfig(dailyGoal: 3.5, isReminderActive: false, frequency: 'Every 1 hour');
 
       DocumentSnapshot doc = await _firestore.collection('users').doc(userId).get();
       if (doc.exists) {
@@ -19,7 +19,7 @@ class WaterRepository {
     } catch (e) {
       print("Error fetching user water config: $e");
     }
-    return WaterConfig(dailyGoal: 3.5, isReminderActive: false);
+    return WaterConfig(dailyGoal: 3.5, isReminderActive: false, frequency: 'Every 1 hour');
   }
 
   /// Updates the reminder setting back to the unique user's document
@@ -43,6 +43,19 @@ class WaterRepository {
       });
     } catch (e) {
       print("Error updating hydration amount: $e");
+    }
+  }
+
+  /// Saves the chosen notification interval text straight to Firestore
+  Future<void> updateUserFrequencySetting(String userId, String frequency) async {
+    if (userId.isEmpty) return;
+    try {
+      await _firestore.collection('users').doc(userId).update({
+        'hydration_reminder_frequency': frequency,
+      });
+      print("🟢 Firebase Updated: Saved reminder frequency ($frequency)");
+    } catch (e) {
+      print("🔴 Firebase Error updating frequency: $e");
     }
   }
 }

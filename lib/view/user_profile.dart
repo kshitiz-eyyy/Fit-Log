@@ -5,6 +5,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:fitlog/view/fitlog_premium_screen.dart';
 import 'package:fitlog/view/change_password_screen.dart';
 import 'package:fitlog/view/rate_screen.dart';
+import 'package:fitlog/view/terminate_account_screen.dart';
+import 'package:fitlog/view/welcome_screen.dart';
 import '../viewmodel/user_profile_view_model.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -340,19 +342,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const RateScreen()));
             }),
 
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
+            const Text("DANGER ZONE", style: TextStyle(color: Colors.redAccent, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1)),
+            const SizedBox(height: 8),
+            _buildActionTile(Icons.delete_forever_rounded, "Terminate Account", "Permanently purge all athlete data", () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const TerminateAccountScreen()));
+            }, iconColor: Colors.redAccent),
+
+            const SizedBox(height: 24),
             OutlinedButton(
               onPressed: _showEditProfileDialog,
               style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.grey), padding: const EdgeInsets.symmetric(vertical: 12)),
               child: const Text("EDIT METRIC BIO CHANNELS", style: TextStyle(color: Colors.white, fontSize: 12)),
-            )
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              onPressed: () async {
+                await _viewModel.signOut();
+                if (mounted) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+                        (route) => false,
+                  );
+                }
+              },
+              icon: const Icon(Icons.logout, color: Colors.black, size: 18),
+              label: const Text("SIGN OUT OF SYSTEM", style: TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFCCFF00),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+              ),
+            ),
+            const SizedBox(height: 32),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildActionTile(IconData icon, String title, String subtitle, VoidCallback onTap) {
+  Widget _buildActionTile(IconData icon, String title, String subtitle, VoidCallback onTap, {Color iconColor = const Color(0xFFCCFF00)}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -361,7 +390,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFFCCFF00), size: 18),
+            Icon(icon, color: iconColor, size: 18),
             const SizedBox(width: 12),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

@@ -49,6 +49,15 @@ class _SleepScreenContent extends StatelessWidget {
             _buildSleepHistoryChart(data.weeklyHistory),
             const SizedBox(height: 24),
             _buildTrackingSection(viewModel),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => viewModel.mockSaveSession(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white10,
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              child: const Text("DEBUG: PUSH TEST DATA TO FIREBASE", style: TextStyle(color: Colors.grey, fontSize: 12)),
+            ),
             const SizedBox(height: 32),
           ],
         ),
