@@ -6,6 +6,7 @@ import 'package:fitlog/view/contact_trainer_screen.dart';
 import 'package:fitlog/view/fitlog_login.dart';
 import 'package:fitlog/view/rate_screen.dart';
 import 'package:fitlog/view/terms_and_conditions_screen.dart';
+import 'package:fitlog/view/track_membershiscreen.dart';
 import 'package:fitlog/view/user_dashboard.dart';
 import 'package:fitlog/view/welcome_screen.dart';
 import 'package:fitlog/viewmodel/user_view_model.dart';
@@ -69,7 +70,7 @@ class FitLogApp extends StatelessWidget {
             ),
           ),
         ),
-        home:const DashboardScreen()
+        home:const TrackMembershipScreen()
     );
   }
 }
