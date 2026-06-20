@@ -2,40 +2,60 @@ A mobile fitness companion designed to track hydration, workout streaks, and pro
 
 🚀 Features
 Real-time Fitness Tracking: Track daily calorie intake and hydration levels.
+
 Workout Timers: Dedicated tools for managing training sessions.
+
 AI Health Coach: Integrated chatbot to provide fitness guidance and answer health-related questions.
+
 Streak System: Gamified daily goals to keep users engaged.
 
+
 🛠 Tech Stack
+
 Framework: Flutter
+
 Backend: Firebase (Firestore)
+
 AI Service: Google Gemini API
+
 State Management: Provider
 
+
 ⚙️ Getting Started
+
 Prerequisites
+
 Flutter SDK 
+
 Android Studio
+
 
 A Firebase Project configured for the app
 
 Installation
+
 Clone the repository:
 
+
 Bash
+
 git clone https://github.com/kshitiz-eyyy/Fit-Log.git
+
 
 
 Install dependencies:
 
+
 Bash
+
 flutter pub get
 
 Plaintext
-GEMINI_API_KEY=
-FIREBASE_API_KEY=
+
+GEMINI_API_KEY= AQ.Ab8RN6JR9mfLUpDi86uC-n3NhxEx4UFcde6WEmOWdEmrVQMdpg
 
 🔒 Security & Compliance
+
 API Security: All API keys are stored in environment variables and are excluded from version control to ensure privacy.
 
 Firebase Usage: Data is stored in Firestore with restricted read/write rules.
