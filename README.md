@@ -50,9 +50,7 @@ Bash
 
 flutter pub get
 
-Plaintext
 
-GEMINI_API_KEY= AQ.Ab8RN6JR9mfLUpDi86uC-n3NhxEx4UFcde6WEmOWdEmrVQMdpg
 
 🔒 Security & Compliance
 
