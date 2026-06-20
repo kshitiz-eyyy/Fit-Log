@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../model/exercise_model.dart';
@@ -37,20 +38,12 @@ class ExerciseListScreen extends StatelessWidget {
         itemCount: exercises.length,
         itemBuilder: (context, index) {
           final data = exercises[index];
-          // Create model instance
-          final exercise = Exercise(
-            id: data['name']!,
-            name: data['name']!,
-            image: data['image'] ?? '',
-            video: data['video'] ?? '',
-            instructions: data['instructions'] ?? '',
-            muscle: muscleGroup,
-            level: "Intermediate",
-            equipment: "N/A",
-          );
+          // Use the factory constructor to avoid manual mapping errors
+          final exercise = Exercise.fromMap(data, data['name'] ?? 'unknown');
 
           return Consumer<ExerciseViewModel>(
             builder: (context, vm, child) {
+              // Check if this specific exercise is in the favourites list
               final isFavourite = vm.favourites.any((ex) => ex.name == exercise.name);
 
               return _buildExerciseCard(context, exercise, isFavourite, vm);
@@ -80,7 +73,7 @@ class ExerciseListScreen extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: const Color(0xFF1E1E1E),
+          color: const Color(0xFF0E0E0E), // Match your theme
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: const Color(0xFFCCFF00), width: 1.5),
         ),
@@ -91,9 +84,11 @@ class ExerciseListScreen extends StatelessWidget {
               height: 80,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFCCFF00)),
               ),
-              child: Image.asset(exercise.image, fit: BoxFit.cover),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(exercise.image, fit: BoxFit.cover, errorBuilder: (_,__,___) => const Icon(Icons.error)),
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -120,8 +115,17 @@ class ExerciseListScreen extends StatelessWidget {
                       ),
                       const Spacer(),
                       IconButton(
-                        icon: Icon(isFavourite ? Icons.favorite : Icons.favorite_border, color: Colors.redAccent),
-                        onPressed: () => vm.toggleFavourite(exercise),
+                        icon: Icon(isFavourite ? Icons.favorite : Icons.favorite_border, color: Colors.redAccent),onPressed: () {
+                        // Debug line: See what's actually happening with auth
+                        print("DEBUG: Current Auth State: ${FirebaseAuth.instance.currentUser}");
+
+                        final user = FirebaseAuth.instance.currentUser;
+                        if (user != null) {
+                          vm.toggleFavourite(exercise, user.uid);
+                        } else {
+                          print("ERROR: User is null, check your Login flow.");
+                        }
+                      },
                       ),
                     ],
                   ),

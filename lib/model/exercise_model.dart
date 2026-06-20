@@ -17,7 +17,7 @@ class Exercise {
   factory Exercise.fromMap(Map<String, dynamic> map, String id) {
     return Exercise(
       id: id,
-      name: map['name'] ?? 'Unknown', // Default value
+      name: map['name'] ?? 'Unknown',
       image: map['image'] ?? '',
       video: map['video'] ?? '',
       instructions: map['instructions'] ?? '',

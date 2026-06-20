@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import '../model/exercise_model.dart';
 
 class ExerciseViewModel extends ChangeNotifier {
@@ -23,19 +23,26 @@ class ExerciseViewModel extends ChangeNotifier {
     });
   }
 
-  Future<void> toggleFavourite(Exercise ex) async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
+  Future<void> toggleFavourite(Exercise ex, String uid) async {
+    if (uid.isEmpty) {
+      print("DEBUG: No valid UID provided");
+      return;
+    }
 
-    final ref = _db.collection('users').doc(user.uid).collection('favourites').doc(ex.name);
+    final ref = _db.collection('users').doc(uid).collection('favourites').doc(ex.name);
 
-    if (_favourites.any((f) => f.name == ex.name)) {
+    final doc = await ref.get();
+    if (doc.exists) {
       await ref.delete();
     } else {
       await ref.set({
-        'name': ex.name, 'image': ex.image, 'video': ex.video,
-        'instructions': ex.instructions, 'muscle': ex.muscle,
-        'level': ex.level, 'equipment': ex.equipment
+        'name': ex.name,
+        'image': ex.image,
+        'video': ex.video,
+        'instructions': ex.instructions,
+        'muscle': ex.muscle,
+        'level': ex.level,
+        'equipment': ex.equipment,
       });
     }
   }
