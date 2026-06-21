@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../viewmodel/track_membership_view_model.dart';
+import 'features_screen.dart'; // Imported to point back cleanly
 
 class TrackMembershipScreen extends StatefulWidget {
   const TrackMembershipScreen({super.key});
@@ -21,14 +22,22 @@ class _TrackMembershipScreenState extends State<TrackMembershipScreen> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
+        centerTitle: true, // Centers the title text layout
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.maybePop(context),
+          onPressed: () {
+            // Clears stack and opens FeaturesScreen directly
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => FeaturesScreen()),
+                  (route) => false,
+            );
+          },
         ),
         title: const Text(
           "Performance Tracking",
           style: TextStyle(
-            color: Colors.white,
+            color: Color(0xFFD4FF00), // Clean layout matching green accent
             fontWeight: FontWeight.bold,
           ),
         ),

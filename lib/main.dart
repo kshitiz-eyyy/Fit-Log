@@ -70,7 +70,7 @@ class FitLogApp extends StatelessWidget {
             ),
           ),
         ),
-        home:const TrackMembershipScreen()
+        home: FeaturesScreen()
     );
   }
 }
