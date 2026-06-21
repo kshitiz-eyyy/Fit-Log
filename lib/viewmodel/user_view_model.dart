@@ -76,18 +76,32 @@ class UserViewModel extends ChangeNotifier {
   }
 
   // ── Upload avatar to Firebase Storage ─────────────────────────
-  Future<void> uploadAvatar(File image) async {
+  Future<bool> uploadAvatar(File image) async {
     isUploadingAvatar = true;
     notifyListeners();
 
     try {
       final url = await userRepo.uploadAvatarImage(image);
       avatarUrl = url;
+      return true;
     } catch (e) {
       errorMessage = "Avatar upload failed.";
+      return false;
     } finally {
       isUploadingAvatar = false;
       notifyListeners();
+    }
+  }
+
+  // ── Logout ────────────────────────────────────────────────
+  Future<bool> logout() async {
+    try {
+      await userRepo.logout();
+      return true;
+    } catch (e) {
+      errorMessage = e.toString();
+      notifyListeners();
+      return false;
     }
   }
 }
