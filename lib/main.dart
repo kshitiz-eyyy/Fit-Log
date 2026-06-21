@@ -27,7 +27,7 @@ import 'firebase_options.dart';
 import 'view/library.dart';
 import 'view/favourite_exercise.dart';
 import 'view/change_password_screen.dart';
-import 'view/features_screen.dart';
+import 'view/features_screen.dart' hide TrackMembershipScreen;
 import 'view/splash_screen.dart';
 
 
