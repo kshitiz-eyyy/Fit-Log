@@ -17,11 +17,17 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
   static const Color surface = Color(0xFF222730);
   static const Color surfaceAlt = Color(0xFF171C24);
 
-
-
   static const Color accent = Color(0xFFC8F500);
   static const Color textLight = Color(0xFFF3F3F3);
   static const Color muted = Color(0xFF9CA3AF);
+
+  // Shape & Size Constants - Easily Customizable!
+  static const double headerCardTopRadius = 32.0;
+  static const double headerCardBottomRadius = 12.0;
+  static const double avatarSize = 110.0;
+  static const double avatarRadius = 28.0;
+  static const double avatarBorderWidth = 2.0;
+  static const double sectionCardRadius = 18.0;
 
   File? _pickedImage;
 
@@ -238,11 +244,11 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
                         color: surface,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(32),
-                          topRight: Radius.circular(32),
-                          bottomLeft: Radius.circular(12),
-                          bottomRight: Radius.circular(12),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(headerCardTopRadius),
+                          topRight: Radius.circular(headerCardTopRadius),
+                          bottomLeft: Radius.circular(headerCardBottomRadius),
+                          bottomRight: Radius.circular(headerCardBottomRadius),
                         )),
                     child: Column(
                       children: [
@@ -355,13 +361,13 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
       child: Stack(
         children: [
           Container(
-            width: 110,
-            height: 110,
+            width: avatarSize,
+            height: avatarSize,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(28),
+              borderRadius: BorderRadius.circular(avatarRadius),
               border: Border.all(
                 color: accent,
-                width: 2,
+                width: avatarBorderWidth,
               ),
               color: surfaceAlt,
               image: DecorationImage(
@@ -405,7 +411,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
   }) {
     return Material(
       color: surfaceAlt,
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(sectionCardRadius),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
