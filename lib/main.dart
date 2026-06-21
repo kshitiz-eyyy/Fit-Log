@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:fitlog/view/fitlog_login.dart';
 import 'package:fitlog/view/sleep_screen.dart';
 import 'package:fitlog/view/user_dashboard.dart';
 import 'package:fitlog/view/water_tracker_screen.dart';
@@ -46,7 +47,7 @@ class FitLogApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const UserDashboardScreen(),
+      home: const FitLogLogin(),
     );
   }
 }
