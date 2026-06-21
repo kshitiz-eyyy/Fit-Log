@@ -313,39 +313,39 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                           "${vm.activeTrainers}"),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  _sectionCard(
-                    title: "Account",
-                    children: [
-                      ListTile(
-                        leading: const Icon(
-                          Icons.logout_rounded,
-                          color: Colors.redAccent,
-                        ),
-                        title: const Text(
-                          "Logout",
-                          style: TextStyle(
-                            color: Colors.redAccent,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        onTap: () async {
-                          final success =
-                              await context.read<UserViewModel>().logout();
+                  // const SizedBox(height: 20),
+                  // _sectionCard(
+                  //   title: "Account",
+                  //   children: [
+                  //     ListTile(
+                  //       leading: const Icon(
+                  //         Icons.logout_rounded,
+                  //         color: Colors.redAccent,
+                  //       ),
+                  //       title: const Text(
+                  //         "Logout",
+                  //         style: TextStyle(
+                  //           color: Colors.redAccent,
+                  //           fontWeight: FontWeight.w600,
+                  //         ),
+                  //       ),
+                  //       onTap: () async {
+                  //         final success =
+                  //             await context.read<UserViewModel>().logout();
 
-                          if (!mounted) return;
+                  //         if (!mounted) return;
 
-                          if (success) {
-                            Navigator.pushNamedAndRemoveUntil(
-                              context,
-                              '/login',
-                              (route) => false,
-                            );
-                          }
-                        },
-                      ),
-                    ],
-                  ),
+                  //         if (success) {
+                  //           Navigator.pushNamedAndRemoveUntil(
+                  //             context,
+                  //             '/login',
+                  //             (route) => false,
+                  //           );
+                  //         }
+                  //       },
+                  //     ),
+                  //   ],
+                  // ),
                 ],
               ),
             ),
