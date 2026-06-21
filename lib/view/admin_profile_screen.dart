@@ -123,8 +123,11 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
     setState(() => _pickedImage = File(picked.path));
 
     if (!mounted) return;
-    await context.read<UserViewModel>().uploadAvatar(_pickedImage!);
-    _showSnack("Avatar updated!");
+    final success = await context.read<UserViewModel>().uploadAvatar(_pickedImage!);
+    _showSnack(
+      success ? "Avatar updated" : "Avatar upload failed",
+      isError: !success,
+    );
   }
 
   // ── Full Edit Profile Dialog ───────────────────────────────────
@@ -235,7 +238,12 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
                         color: surface,
-                        borderRadius: BorderRadius.circular(20)),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(32),
+                          topRight: Radius.circular(32),
+                          bottomLeft: Radius.circular(12),
+                          bottomRight: Radius.circular(12),
+                        )),
                     child: Column(
                       children: [
                         _buildAvatarSection(vm),
@@ -299,6 +307,39 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                           "${vm.activeTrainers}"),
                     ],
                   ),
+                  const SizedBox(height: 20),
+                  _sectionCard(
+                    title: "Account",
+                    children: [
+                      ListTile(
+                        leading: const Icon(
+                          Icons.logout_rounded,
+                          color: Colors.redAccent,
+                        ),
+                        title: const Text(
+                          "Logout",
+                          style: TextStyle(
+                            color: Colors.redAccent,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        onTap: () async {
+                          final success =
+                              await context.read<UserViewModel>().logout();
+
+                          if (!mounted) return;
+
+                          if (success) {
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              '/login',
+                              (route) => false,
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -313,14 +354,27 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
       onTap: _pickAvatar,
       child: Stack(
         children: [
-          CircleAvatar(
-            radius: 50,
-            backgroundColor: surfaceAlt,
-            backgroundImage: _pickedImage != null
-                ? FileImage(_pickedImage!)
-                : (vm.avatarUrl.isNotEmpty
-                ? NetworkImage(vm.avatarUrl) as ImageProvider
-                : null),
+          Container(
+            width: 110,
+            height: 110,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: accent,
+                width: 2,
+              ),
+              color: surfaceAlt,
+              image: DecorationImage(
+                image: _pickedImage != null
+                    ? FileImage(_pickedImage!)
+                    : (vm.avatarUrl.isNotEmpty
+                        ? NetworkImage(vm.avatarUrl)
+                        : const AssetImage(
+                            "assets/images/admin.png",
+                          )) as ImageProvider,
+                fit: BoxFit.cover,
+              ),
+            ),
             child: (_pickedImage == null && vm.avatarUrl.isEmpty)
                 ? const Icon(Icons.person, size: 50, color: accent)
                 : null,
