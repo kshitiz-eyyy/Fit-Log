@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 
 
@@ -277,22 +277,57 @@ class MetricCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AdminDashboardScreen.cardLight,
+        color: AdminDashboardScreen.surface,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF3A3F2A)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon),
+              Icon(icon, color: AdminDashboardScreen.accent),
               const Spacer(),
-              Text(badge),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: badgeDark 
+                    ? const Color(0xFF343941) 
+                    : AdminDashboardScreen.accent,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  badge,
+                  style: TextStyle(
+                    color: badgeDark 
+                      ? AdminDashboardScreen.textLight 
+                      : const Color(0xFF121519),
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
-          Text(label),
-          Text(value),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Color(0xFF9CA3AF),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: const TextStyle(
+              color: AdminDashboardScreen.textLight,
+              fontSize: 32,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
         ],
       ),
     );
@@ -319,11 +354,64 @@ class ActivityTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(icon),
-      title: Text(title),
-      subtitle: Text(subtitle),
-      trailing: Text(time),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+      decoration: BoxDecoration(
+        border: showBottomBorder 
+          ? const Border(bottom: BorderSide(color: Color(0xFF2B313A))) 
+          : null,
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: highlight 
+                ? AdminDashboardScreen.accent.withOpacity(0.15) 
+                : const Color(0xFF2B313A),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              icon, 
+              color: highlight 
+                ? AdminDashboardScreen.accent 
+                : const Color(0xFF9CA3AF), 
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: AdminDashboardScreen.textLight,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    color: Color(0xFF9CA3AF),
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            time,
+            style: const TextStyle(
+              color: Color(0xFF9CA3AF),
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -334,13 +422,66 @@ class Month extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text);
+    return Text(
+      text,
+      style: const TextStyle(
+        color: Color(0xFF9CA3AF),
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+      ),
+    );
   }
 }
 
 class LineChartPainter extends CustomPainter {
   @override
-  void paint(Canvas canvas, Size size) {}
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = AdminDashboardScreen.accent
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    final points = [
+      Offset(0, size.height * 0.8),
+      Offset(size.width * 0.2, size.height * 0.6),
+      Offset(size.width * 0.4, size.height * 0.7),
+      Offset(size.width * 0.6, size.height * 0.3),
+      Offset(size.width * 0.8, size.height * 0.4),
+      Offset(size.width, size.height * 0.2),
+    ];
+
+    final path = Path();
+    path.moveTo(points[0].dx, points[0].dy);
+    for (int i = 1; i < points.length; i++) {
+      path.lineTo(points[i].dx, points[i].dy);
+    }
+    canvas.drawPath(path, paint);
+
+    final fillPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          AdminDashboardScreen.accent.withOpacity(0.3),
+          AdminDashboardScreen.accent.withOpacity(0.0),
+        ],
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+
+    final fillPath = Path.from(path);
+    fillPath.lineTo(size.width, size.height);
+    fillPath.lineTo(0, size.height);
+    fillPath.close();
+    canvas.drawPath(fillPath, fillPaint);
+
+    final dotPaint = Paint()
+      ..color = AdminDashboardScreen.accent
+      ..style = PaintingStyle.fill;
+
+    for (var point in points) {
+      canvas.drawCircle(point, 5, dotPaint);
+    }
+  }
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
