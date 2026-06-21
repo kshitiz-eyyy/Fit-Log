@@ -4,8 +4,6 @@ plugins {
     id("kotlin-android")
     id("org.jetbrains.kotlin.plugin.compose")
     id("dev.flutter.flutter-gradle-plugin")
-
-    id("dev.flutter.flutter-gradle-plugin") // MUST remain at the bottom of the block
 }
 
 android {
@@ -54,7 +52,6 @@ dependencies {
 
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-
 }
 
 flutter {
