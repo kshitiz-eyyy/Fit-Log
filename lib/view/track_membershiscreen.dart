@@ -210,18 +210,6 @@ class TrackMembershipScreen extends StatelessWidget {
 
             const SizedBox(height: 25),
 
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "PAYMENT METHOD",
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
-              ),
-            ),
-
             const SizedBox(height: 10),
 
             Container(
