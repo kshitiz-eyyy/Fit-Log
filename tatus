@@ -1,0 +1,21 @@
+[33mcommit 418733169b75a72982f1e3d5bb38e7950080a068[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mrubina[m[33m, [m[1;31morigin/rubina[m[33m)[m
+Merge: d829e6e d663108
+Author: pantrubina005 <pantrubina005@gmail.com>
+Date:   Wed Jun 10 13:18:44 2026 +0545
+
+    admin profile screen
+
+.metadata
+lib/main.dart
+lib/view/change_password_screen.dart
+lib/view/fitness_challenges_screen.dart
+linux/flutter/generated_plugin_registrant.cc
+linux/flutter/generated_plugins.cmake
+macos/Flutter/Flutter-Debug.xcconfig
+macos/Flutter/Flutter-Release.xcconfig
+macos/Flutter/GeneratedPluginRegistrant.swift
+macos/Runner.xcodeproj/project.pbxproj
+macos/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugins.cmake
+windows/runner/utils.cpp

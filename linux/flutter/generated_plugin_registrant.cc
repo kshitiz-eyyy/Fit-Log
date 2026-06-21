@@ -6,10 +6,6 @@
 
 #include "generated_plugin_registrant.h"
 
-<<<<<<< HEAD
-
-void fl_register_plugins(FlPluginRegistry* registry) {
-=======
 #include <audioplayers_linux/audioplayers_linux_plugin.h>
 #include <file_selector_linux/file_selector_plugin.h>
 
@@ -20,5 +16,4 @@ void fl_register_plugins(FlPluginRegistry* registry) {
   g_autoptr(FlPluginRegistrar) file_selector_linux_registrar =
       fl_plugin_registry_get_registrar_for_plugin(registry, "FileSelectorPlugin");
   file_selector_plugin_register_with_registrar(file_selector_linux_registrar);
->>>>>>> d6631082131c35622e13a9dd1f1a1a05390a6d49
 }

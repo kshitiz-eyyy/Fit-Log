@@ -5,15 +5,12 @@
 import FlutterMacOS
 import Foundation
 
-<<<<<<< HEAD
-
-func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
-=======
 import audioplayers_darwin
 import cloud_firestore
 import file_selector_macos
 import firebase_auth
 import firebase_core
+import firebase_storage
 import flutter_inappwebview_macos
 import local_auth_darwin
 import shared_preferences_foundation
@@ -25,9 +22,9 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   FileSelectorPlugin.register(with: registry.registrar(forPlugin: "FileSelectorPlugin"))
   FLTFirebaseAuthPlugin.register(with: registry.registrar(forPlugin: "FLTFirebaseAuthPlugin"))
   FLTFirebaseCorePlugin.register(with: registry.registrar(forPlugin: "FLTFirebaseCorePlugin"))
+  FLTFirebaseStoragePlugin.register(with: registry.registrar(forPlugin: "FLTFirebaseStoragePlugin"))
   InAppWebViewFlutterPlugin.register(with: registry.registrar(forPlugin: "InAppWebViewFlutterPlugin"))
   LocalAuthPlugin.register(with: registry.registrar(forPlugin: "LocalAuthPlugin"))
   SharedPreferencesPlugin.register(with: registry.registrar(forPlugin: "SharedPreferencesPlugin"))
   VideoPlayerPlugin.register(with: registry.registrar(forPlugin: "VideoPlayerPlugin"))
->>>>>>> d6631082131c35622e13a9dd1f1a1a05390a6d49
 }

@@ -1,43 +1,32 @@
-<<<<<<< HEAD
-﻿import 'package:fitlog/user_profile_screen.dart';
-import 'package:flutter/material.dart';
-
-import 'admin_dashboard_screen.dart';
-import 'admin_management_screen.dart';
-import 'admin_profile_screen.dart';
-
-void main() {
-=======
 import 'package:firebase_core/firebase_core.dart';
-import 'package:fitlog/view/admin_panel_screen.dart';
-import 'package:fitlog/view/meal_tracking_screen.dart';
-import 'view/fitlog_login.dart';
-import 'package:fitlog/view/testing_gateway_screen.dart;.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'firebase_options.dart';
-import 'view/user_library.dart';
-import 'view/user_activity_screen.dart';
-import 'view/favourite_exercise.dart';
-import 'view/change_password_screen.dart';
-import 'view/user_dashboard.dart';
-import 'view/features_screen.dart';
-import 'view/splash_screen.dart';
-import 'view/premium_membership.dart';
-import 'view/workout_tracking_screen.dart';
+import 'package:fitlog/repo/user_repo_impl.dart';
+import 'package:fitlog/viewmodel/user_view_model.dart';
+import 'view/admin_profile_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
   } catch (e) {
-    print("Firebase Engine Init Error: $e");
+    print("Firebase init error: $e");
   }
 
->>>>>>> d6631082131c35622e13a9dd1f1a1a05390a6d49
-  runApp(const FitLogApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => UserViewModel(userRepo: UserRepoImpl()),
+        ),
+      ],
+      child: const FitLogApp(),
+    ),
+  );
 }
 
 class FitLogApp extends StatelessWidget {
@@ -46,7 +35,6 @@ class FitLogApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-<<<<<<< HEAD
       debugShowCheckedModeBanner: false,
       title: 'FitLog',
       theme: ThemeData.dark().copyWith(
@@ -54,41 +42,16 @@ class FitLogApp extends StatelessWidget {
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.black,
           titleTextStyle: TextStyle(
-            color: Colors.lightGreenAccent,
+            color: Color(0xFFC8F500),
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
-
-      home: AdminProfileScreen(),
+      home: const AdminProfileScreen(),
+      routes: {
+        '/AdminProfileScreen': (context) => const AdminProfileScreen(),
+      },
     );
-  }
-}
-=======
-        debugShowCheckedModeBanner: false,
-        title: 'FitLog',
->>>>>>> d6631082131c35622e13a9dd1f1a1a05390a6d49
-
-        theme: ThemeData.dark().copyWith(
-          scaffoldBackgroundColor: Colors.black,
-
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.black,
-            titleTextStyle: TextStyle(
-              color: Colors.lightGreenAccent,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-
-        home: const DashboardScreen(),
-        routes: {
-          '/login': (context) => const FitLogLogin()
-        }
-    );
-
-
   }
 }

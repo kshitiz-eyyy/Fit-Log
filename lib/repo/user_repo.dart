@@ -9,5 +9,13 @@ abstract class UserRepo {
   Future<void> deleteUser(String id);
   Future<List<UserModel>> getAllUser();
   Future<UserModel> getUserByID(String id);
+  Future<UserModel> getProfile(String userid);
+  Future<void> updateProfile(UserModel userModel);
+  Future<void> deleteProfile(String id);
   Future<void> editProfile(UserModel userModel);
 }
+
+
+
+
+

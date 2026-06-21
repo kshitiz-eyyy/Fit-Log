@@ -1,87 +1,44 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'user_repo.dart';
-import '../model/user_model.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
-class UserRepoImpl implements UserRepo {
-  final FirebaseAuth auth = FirebaseAuth.instance;
-  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+class UserRepoImpl {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  @override
-  Future<void> addUser(UserModel userModel) {
-    return firestore
-        .collection("users")
-        .doc(userModel.id)
-        .set(userModel.toMap());
+  // ── Fetch admin profile from Firestore ─────────────────────────
+  Future<Map<String, dynamic>> getAdminProfile() async {
+    final uid = _auth.currentUser!.uid;
+    final doc = await _firestore
+        .collection('admins')
+        .doc(uid)
+        .get();
+    return doc.data() ?? {};
   }
 
-  @override
-  Future<void> deleteUser(String id) {
-    return firestore.collection("users").doc(id).delete();
+  // ── Save changed fields to Firestore ───────────────────────────
+  Future<void> updateAdminProfile(Map<String, dynamic> data) async {
+    final uid = _auth.currentUser!.uid;
+    await _firestore
+        .collection('admins')
+        .doc(uid)
+        .set(data, SetOptions(merge: true));
   }
 
-  @override
-  Future<void> editProfile(UserModel userModel) {
-    return firestore
-        .collection("users")
-        .doc(userModel.id)
-        .update(userModel.toMap());
-  }
+  // ── Upload avatar to Firebase Storage ──────────────────────────
+  Future<String> uploadAvatarImage(File image) async {
+    final uid = _auth.currentUser!.uid;
+    final ref = _storage.ref('avatars/$uid.jpg');
+    await ref.putFile(image);
+    final url = await ref.getDownloadURL();
 
-  @override
-  Future<void> forgetPassword(String email) {
-    return auth.sendPasswordResetEmail(email: email);
-  }
-
-  @override
-  Future<List<UserModel>> getAllUser() async {
-    final snapshot = await firestore.collection("users").get();
-    return snapshot.docs
-        .map((doc) => UserModel.fromMap(doc.data()))
-        .toList();
-  }
-
-  @override
-  Future<UserModel> getUserByID(String id) async {
-    final doc = await firestore.collection("users").doc(id).get();
-    final data = doc.data();
-
-    if (data == null) {
-      throw Exception("User not found");
-    }
-    return UserModel.fromMap(data);
-  }
-
-  @override
-  Future<String> login(String email, String password) async {
-    final userCredential = await auth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-    final userId = userCredential.user?.uid;
-
-    if (userId == null) {
-      throw Exception("Login failed");
-    }
-    return userId;
-  }
-
-  @override
-  Future<void> logout() {
-    return auth.signOut();
-  }
-
-  @override
-  Future<String> register(String email, String password) async {
-    final userCredential = await auth.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-    final userId = userCredential.user?.uid;
-
-    if (userId == null) {
-      throw Exception("Registration failed");
-    }
-    return userId;
+    // Save the URL back to Firestore
+    await _firestore
+        .collection('admins')
+        .doc(uid)
+        .update({'avatarUrl': url});
+    return url;
   }
 }
