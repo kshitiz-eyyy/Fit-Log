@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../viewmodel/quote_view_model.dart';
 import 'features_screen.dart';
 import 'user_library.dart';
 import 'user_activity_screen.dart';
@@ -9,6 +11,7 @@ import 'workout_timer_screen.dart';
 import 'meal_tracking_screen.dart';
 import 'chatbot.dart';
 import 'dart:math';
+import '../repo/quote_repository_impl.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -36,17 +39,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
-  List<Widget> get _screens => [
-    _DashboardContent(
-      onNavigateToActivity: () => _onItemTapped(3),
-      onNavigateToProfile: () => _onItemTapped(4),
-      onProfileUpdated: _loadUserProfileName,
-    ),
-    FeaturesScreen(),
-    const LibraryScreen(),
-    const ActivityScreen(),
-    const ProfileScreen(),
-  ];
+  // Helper method to resolve dynamic scope flow & context hierarchy
+  Widget _buildActiveScreen(int index) {
+    switch (index) {
+      case 0:
+        return ChangeNotifierProvider(
+          create: (_) => QuoteViewModel(quoteRepository: QuoteRepositoryImpl()),
+          child: _DashboardContent(
+            onNavigateToActivity: () => _onItemTapped(3),
+            onNavigateToProfile: () => _onItemTapped(4),
+            onProfileUpdated: _loadUserProfileName,
+          ),
+        );
+      case 1:
+        return FeaturesScreen();
+      case 2:
+        return const LibraryScreen();
+      case 3:
+        return const ActivityScreen();
+      case 4:
+        return const ProfileScreen();
+      default:
+        return const SizedBox();
+    }
+  }
 
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
@@ -150,7 +166,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
       ),
-      body: _screens[_selectedIndex],
+
+      body: _buildActiveScreen(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF0F0F0F),
         selectedItemColor: const Color(0xFFCCFF00),
@@ -206,17 +223,12 @@ class _DashboardContentState extends State<_DashboardContent> {
   bool _showSystemNoticeBanner = false;
   bool _isPremiumUser = false;
 
-  final List<String> _quotes = [
-    "The only bad workout is the one that didn't happen.",
-    "Success isn't always about greatness. It's about consistency.",
-    "Your body can stand almost anything. It's your mind that you have to convince.",
-  ];
-  late String _currentQuote;
+
+
 
   @override
   void initState() {
     super.initState();
-    _currentQuote = _quotes[Random().nextInt(_quotes.length)];
     _loadDashboardData();
   }
 
@@ -398,21 +410,40 @@ class _DashboardContentState extends State<_DashboardContent> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(
-                          color: const Color(0xFFCCFF00).withOpacity(0.08),
-                          border: Border.all(color: const Color(0xFFCCFF00), width: 0.8),
-                          borderRadius: BorderRadius.circular(4)
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.format_quote, color: Color(0xFFCCFF00), size: 24),
-                          const SizedBox(width: 12),
-                          Expanded(child: Text(_currentQuote, style: const TextStyle(color: Colors.white, fontSize: 13, fontStyle: FontStyle.italic))),
-                        ],
-                      ),
+
+                    Consumer<QuoteViewModel>(
+                      builder: (context, viewModel, child) {
+                        return Container(
+                          padding: const EdgeInsets.all(14),
+                          margin: const EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(
+                              color: const Color(0xFFCCFF00).withOpacity(0.08),
+                              border: Border.all(color: const Color(0xFFCCFF00), width: 0.8),
+                              borderRadius: BorderRadius.circular(4)
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.format_quote, color: Color(0xFFCCFF00), size: 24),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: viewModel.isLoading
+                                    ? const LinearProgressIndicator(
+                                  color: Color(0xFFCCFF00),
+                                  backgroundColor: Color(0xFF161616),
+                                )
+                                    : Text(
+                                  viewModel.currentQuote,
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 13,
+                                      fontStyle: FontStyle.italic
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                     Container(
                       padding: const EdgeInsets.all(16),
