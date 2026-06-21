@@ -94,16 +94,16 @@ class UserViewModel extends ChangeNotifier {
   }
 
   // ── Logout ────────────────────────────────────────────────
-  Future<bool> logout() async {
-    try {
-      await userRepo.logout();
-      return true;
-    } catch (e) {
-      errorMessage = e.toString();
-      notifyListeners();
-      return false;
-    }
-  }
+  // Future<bool> logout() async {
+  //   try {
+  //     await userRepo.logout();
+  //     return true;
+  //   } catch (e) {
+  //     errorMessage = e.toString();
+  //     notifyListeners();
+  //     return false;
+  //   }
+  // }
 }
 
 
