@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../viewmodel/user_view_model.dart';
+import '../model/user_model.dart';
+import 'fitlog_login.dart';
 
 class CreateProfileScreen extends StatefulWidget {
   const CreateProfileScreen({super.key});
@@ -17,12 +21,96 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   bool _termsAccepted = false;
 
   @override
+  void dispose() {
+    _handleController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _accessKeyController.dispose();
+    _verifyKeyController.dispose();
+    _bioController.dispose();
+    super.dispose();
+  }
+
+  void _handleInitializePerformance() async {
+    final handle = _handleController.text.trim();
+    final email = _emailController.text.trim();
+    final phone = _phoneController.text.trim();
+    final password = _accessKeyController.text.trim();
+    final verifyPassword = _verifyKeyController.text.trim();
+    final bio = _bioController.text.trim();
+
+    if (handle.isEmpty || email.isEmpty || phone.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all required protocol fields')),
+      );
+      return;
+    }
+
+    if (password != verifyPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Access keys do not match')),
+      );
+      return;
+    }
+
+    if (!_termsAccepted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please accept the Terms and Conditions')),
+      );
+      return;
+    }
+
+    final viewModel = context.read<UserViewModel>();
+    final userId = await viewModel.register(email, password);
+
+    if (userId.isNotEmpty) {
+      final userModel = UserModel(
+        id: userId,
+        name: handle, // Using handle as name for now
+        handle: handle,
+        contact: phone,
+        email: email,
+        bio: bio,
+      );
+
+      final success = await viewModel.addUser(userModel);
+
+      if (success) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('System Initialized! Performance profile created.')),
+          );
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const FitLogLogin()),
+            (route) => false,
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(viewModel.error ?? 'Data injection failed')),
+          );
+        }
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(viewModel.error ?? 'Authentication initialization failed')),
+        );
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     const backgroundColor = Color(0xFF0C0C0C);
     const accentColor = Color(0xFFD4FF00);
     const cardColor = Color(0xFF141414);
     const textColor = Colors.white;
     const secondaryTextColor = Color(0xFF8E8E8E);
+
+    final isLoading = context.watch<UserViewModel>().loading;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -68,7 +156,6 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                           fontSize: 32,
                           fontWeight: FontWeight.w900,
                           height: 1.1,
-                          fontFamily: 'Roboto', // Defaulting to system
                         ),
                         children: [
                           TextSpan(text: 'CREATE\n', style: TextStyle(color: textColor)),
@@ -134,6 +221,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                       hint: 'email@forge.performance',
                       controller: _emailController,
                       cardColor: cardColor,
+                      keyboardType: TextInputType.emailAddress,
                     ),
                     const SizedBox(height: 20),
                     _buildInputField(
@@ -141,6 +229,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                       hint: '+1 (555) 000-0000',
                       controller: _phoneController,
                       cardColor: cardColor,
+                      keyboardType: TextInputType.phone,
                     ),
                     const SizedBox(height: 20),
                     _buildInputField(
@@ -208,27 +297,30 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                       width: double.infinity,
                       height: 64,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: isLoading ? null : _handleInitializePerformance,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: accentColor,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           elevation: 0,
+                          disabledBackgroundColor: secondaryTextColor.withOpacity(0.3),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Text(
-                              'INITIALIZE PERFORMANCE',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w900,
+                        child: isLoading
+                            ? const CircularProgressIndicator(color: Colors.black)
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: const [
+                                  Text(
+                                    'INITIALIZE PERFORMANCE',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Icon(Icons.arrow_forward, color: Colors.black, size: 20),
+                                ],
                               ),
-                            ),
-                            SizedBox(width: 8),
-                            Icon(Icons.arrow_forward, color: Colors.black, size: 20),
-                          ],
-                        ),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -261,6 +353,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     required Color cardColor,
     bool isPassword = false,
     int maxLines = 1,
+    TextInputType keyboardType = TextInputType.text,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -284,6 +377,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
             controller: controller,
             obscureText: isPassword,
             maxLines: maxLines,
+            keyboardType: keyboardType,
             style: const TextStyle(color: Colors.white, fontSize: 14),
             decoration: InputDecoration(
               hintText: hint,

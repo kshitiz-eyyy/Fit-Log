@@ -1,4 +1,4 @@
-import 'package:fitlog/view/register_screen.dart';
+import 'package:fitlog/view/create_profile_screen.dart';
 import 'package:fitlog/view/user_dashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -201,7 +201,7 @@ class _FitLogLoginState extends State<FitLogLogin> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const RegisterScreen()),
+                          MaterialPageRoute(builder: (context) => const CreateProfileScreen()),
                         );
                       },
                       child: const Text(
