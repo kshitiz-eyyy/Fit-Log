@@ -1,10 +1,7 @@
-import 'package:fitlog/view/track_membershiscreen.dart';
 import 'package:flutter/material.dart';
 import 'bmi_calculator_screen.dart';
-
-import 'contact_dietitan_screen.dart';
+import 'contact_dietitian_screen.dart';
 import 'contact_trainer_screen.dart';
-
 
 class AppColors {
   static const Color background = Color(0xFF121212);
@@ -61,10 +58,9 @@ class FeaturesScreen extends StatelessWidget {
       icon: Icons.bedtime,
     ),
     FeatureItem(
-      title: 'Calendar',
+      title: 'Workout Analytics',
       description: 'Deep dive into your performance metrics over time.',
-      icon: Icons.calendar_month,
-      imagePath: 'assets/images/calender.png',
+      icon: Icons.analytics,
     ),
   ];
 
@@ -164,6 +160,7 @@ class FeaturesScreen extends StatelessWidget {
           color: Colors.white.withValues(alpha: 0.05),
           width: 1,
         ),
+
         image: item.imagePath != null
             ? DecorationImage(
           image: AssetImage(item.imagePath!),
@@ -174,6 +171,7 @@ class FeaturesScreen extends StatelessWidget {
           ),
         )
             : null,
+
       ),
       child: Material(
         color: Colors.transparent,
@@ -199,13 +197,6 @@ class FeaturesScreen extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const ContactDietitianScreen(),
-                ),
-              );
-            } else if (item.title == 'Calendar') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const TrackMembershipScreen(),
                 ),
               );
             } else {

@@ -83,7 +83,7 @@ class TestingGatewayScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const DashboardScreen()),
+                    MaterialPageRoute(builder: (context) => const UserDashboardScreen()),
                   );
                 },
               ),

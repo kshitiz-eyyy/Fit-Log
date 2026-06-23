@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class CreateProfileScreen extends StatefulWidget {
-  const CreateProfileScreen({super.key});
+class BineshCreateProfileScreen extends StatefulWidget {
+  const BineshCreateProfileScreen({super.key});
 
   @override
-  State<CreateProfileScreen> createState() => _CreateProfileScreenState();
+  State<BineshCreateProfileScreen> createState() => _BineshCreateProfileScreenState();
 }
 
-class _CreateProfileScreenState extends State<CreateProfileScreen> {
+class _BineshCreateProfileScreenState extends State<BineshCreateProfileScreen> {
   // Controllers
   final TextEditingController _passwordController = TextEditingController();
 

@@ -9,17 +9,18 @@ import 'user_profile.dart';
 import 'bmi_calculator_screen.dart';
 import 'workout_timer_screen.dart';
 import 'meal_tracking_screen.dart';
+import 'water_tracker_screen.dart';
 import 'chatbot.dart';
 import 'dart:math';
 
-class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+class UserDashboardScreen extends StatefulWidget {
+  const UserDashboardScreen({super.key});
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  State<UserDashboardScreen> createState() => _UserDashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _UserDashboardScreenState extends State<UserDashboardScreen> {
   late final DashboardViewModel _viewModel;
 
   @override
@@ -451,24 +452,34 @@ class _DashboardContent extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: Container(
-                            height: 120,
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Row(
-                                  children: [
-                                    Icon(Icons.water_drop, color: Color(0xFFCCFF00), size: 14),
-                                    SizedBox(width: 6),
-                                    Text("HYDRATION", style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
-                                  ],
-                                ),
-                                Text("${state.hydrationAmount} L", style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900)),
-                                const Text("Daily Target: 3.5 Liters", style: TextStyle(color: Colors.grey, fontSize: 10)),
-                              ],
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const WaterTrackerScreen()),
+                              ).then((_) {
+                                viewModel.loadDashboardState();
+                              });
+                            },
+                            child: Container(
+                              height: 120,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Row(
+                                    children: [
+                                      Icon(Icons.water_drop, color: Color(0xFFCCFF00), size: 14),
+                                      SizedBox(width: 6),
+                                      Text("HYDRATION", style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
+                                  Text("${state.hydrationAmount} L", style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900)),
+                                  const Text("Daily Target: 3.5 Liters", style: TextStyle(color: Colors.grey, fontSize: 10)),
+                                ],
+                              ),
                             ),
                           ),
                         ),

@@ -1,69 +1,63 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../viewmodel/sleep_view_model.dart';
+import '../repo/sleep_repository.dart';
 
-class SleepScreen extends StatefulWidget {
+class SleepScreen extends StatelessWidget {
   const SleepScreen({super.key});
 
   @override
-  State<SleepScreen> createState() => _SleepScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => SleepViewModel(repository: SleepRepositoryImpl()),
+      child: const _SleepScreenContent(),
+    );
+  }
 }
 
-class _SleepScreenState extends State<SleepScreen> {
-  bool _sleepMode = true;
-  bool _bedtimeAlarm = false;
+class _SleepScreenContent extends StatelessWidget {
+  const _SleepScreenContent();
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<SleepViewModel>();
+    final data = viewModel.data;
+
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: const Color(0xFF0D0D0D),
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: const Color(0xFF0D0D0D),
+        elevation: 0,
+        title: const Text('FIT LOG AUTOMATION',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
-        centerTitle: true,
-        title: const Text(
-          'FIT LOG',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 2,
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notifications_none, color: Colors.white),
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           children: [
             const SizedBox(height: 20),
-            _buildSleepProgress(),
+            _buildSleepProgress(data, viewModel.currentAcceleration),
             const SizedBox(height: 24),
-            _buildQualityBadge(),
+            _buildAutomationStatusBadge(data.isCurrentlyAsleep),
+            const SizedBox(height: 12),
+            _buildDebugSensorInfo(viewModel.currentAcceleration),
             const SizedBox(height: 32),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'SLEEP HISTORY',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ),
+            _buildSleepHistoryChart(data.weeklyHistory),
+            const SizedBox(height: 24),
+            _buildTrackingSection(viewModel),
             const SizedBox(height: 16),
-            _buildSleepHistoryChart(),
-            const SizedBox(height: 24),
-            _buildTrackingSection(),
-            const SizedBox(height: 24),
-            _buildLogSleepButton(),
+            ElevatedButton(
+              onPressed: () => viewModel.mockSaveSession(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white10,
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              child: const Text("DEBUG: PUSH TEST DATA TO FIREBASE", style: TextStyle(color: Colors.grey, fontSize: 12)),
+            ),
             const SizedBox(height: 32),
           ],
         ),
@@ -71,7 +65,50 @@ class _SleepScreenState extends State<SleepScreen> {
     );
   }
 
-  Widget _buildSleepProgress() {
+  Widget _buildDebugSensorInfo(double currentAcceleration) {
+    bool isMoving = currentAcceleration > 0.5;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text("SENSOR ACTIVITY",
+                  style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold)),
+              Text(
+                isMoving ? "MOVING" : "STILL",
+                style: TextStyle(
+                  color: isMoving ? Colors.orange : Colors.green,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          LinearProgressIndicator(
+            value: (currentAcceleration / 2.0).clamp(0.0, 1.0),
+            backgroundColor: Colors.white10,
+            valueColor: AlwaysStoppedAnimation<Color>(
+                isMoving ? Colors.orange : Colors.green),
+            minHeight: 2,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSleepProgress(dynamic data, double acceleration) {
+    double progressValue = data.lastNightHours / 8.0;
+    const Color neonLime = Color(0xFFC6FF00);
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -79,39 +116,37 @@ class _SleepScreenState extends State<SleepScreen> {
           width: 240,
           height: 240,
           child: CircularProgressIndicator(
-            value: 0.75,
+            value: data.isCurrentlyAsleep
+                ? null
+                : (progressValue > 1.0 ? 1.0 : progressValue),
             strokeWidth: 14,
-            backgroundColor: Colors.white.withValues(alpha: 0.1),
-            valueColor: const AlwaysStoppedAnimation<Color>(Colors.cyanAccent),
+            backgroundColor: Colors.white.withOpacity(0.1),
+            valueColor: const AlwaysStoppedAnimation<Color>(neonLime),
             strokeCap: StrokeCap.round,
           ),
         ),
         Column(
           mainAxisSize: MainAxisSize.min,
-          children: const [
+          children: [
             Text(
-              "LAST NIGHT'S SLEEP",
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
+              data.isCurrentlyAsleep
+                  ? "AUTO-DETECTED: ASLEEP"
+                  : "LAST NIGHT'S SLEEP",
+              style: const TextStyle(
+                  color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold),
             ),
             Text(
-              '7.5',
-              style: TextStyle(
-                color: Colors.cyanAccent,
+              data.isCurrentlyAsleep ? 'ZzZ' : '${data.lastNightHours}',
+              style: const TextStyle(
+                color: neonLime,
                 fontSize: 64,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
-              'HOURS',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              data.isCurrentlyAsleep ? 'SENSORS ACTIVE' : 'HOURS',
+              style: const TextStyle(
+                  color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -119,101 +154,104 @@ class _SleepScreenState extends State<SleepScreen> {
     );
   }
 
-  Widget _buildQualityBadge() {
+  Widget _buildAutomationStatusBadge(bool isAsleep) {
+    const Color neonLime = Color(0xFFC6FF00);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF152A2D),
+        color: neonLime.withOpacity(0.1),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFF1E3A3E)),
+        border: Border.all(color: neonLime.withOpacity(0.5)),
       ),
-      child: const Text(
-        'QUALITY: GOOD SLEEP',
-        style: TextStyle(
-          color: Colors.cyanAccent,
-          fontSize: 13,
-          fontWeight: FontWeight.bold,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.auto_awesome, size: 16, color: neonLime),
+          const SizedBox(width: 8),
+          Text(
+            isAsleep
+                ? 'AUTOMATIC TRACKING IN PROGRESS'
+                : 'SMART DETECTION READY',
+            style: const TextStyle(
+                color: neonLime, fontSize: 12, fontWeight: FontWeight.bold),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildSleepHistoryChart() {
-    final data = [0.4, 0.5, 0.45, 0.35, 0.65, 0.15, 0.85, 0.3];
-    final days = ['M', 'T', 'W', 'T', 'V', 'F', 'S', 'S'];
-
+  Widget _buildSleepHistoryChart(List<double> weeklyHistory) {
+    const Color neonLime = Color(0xFFC6FF00);
+    final days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
     return Container(
-      height: 200,
+      height: 180,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1C1C1E),
-        borderRadius: BorderRadius.circular(12),
-      ),
+          color: const Color(0xFF1C1C1E),
+          borderRadius: BorderRadius.circular(12)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.end,
-        children: List.generate(data.length, (index) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                width: 32,
-                height: 140 * data[index],
-                decoration: BoxDecoration(
-                  color: data[index] > 0.2 ? const Color(0xFF2E6B75) : const Color(0xFF1A3B40),
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(2)),
+        children: List.generate(weeklyHistory.length, (index) {
+          double heightMultiplier =
+              weeklyHistory[index] > 1.0 ? 1.0 : weeklyHistory[index];
+          return Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  width: 24,
+                  height: 100 * heightMultiplier,
+                  decoration: BoxDecoration(
+                    color: neonLime.withOpacity(0.6),
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(4)),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                days[index],
-                style: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
+                const SizedBox(height: 12),
+                Text(days[index],
+                    style: const TextStyle(color: Colors.grey, fontSize: 12)),
+              ],
+            ),
           );
         }),
       ),
     );
   }
 
-  Widget _buildTrackingSection() {
+  Widget _buildTrackingSection(SleepViewModel viewModel) {
+    final data = viewModel.data;
+    const Color neonLime = Color(0xFFC6FF00);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: const Color(0xFF1C1C1E),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF2E6B75).withOpacity(0.3)),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "TONIGHT'S TRACKING",
-            style: TextStyle(
-              color: Colors.cyanAccent,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
+          _buildTrackingRow(
+            icon: Icons.hdr_auto,
+            title: 'Auto Sleep Detection',
+            subtitle: 'Uses machine learning & hardware sensors',
+            value: data.isAutoTrackingActive,
+            onChanged: (val) {
+              if (val) {
+                viewModel.startTracking();
+              } else {
+                viewModel.stopTracking();
+              }
+            },
+            activeColor: neonLime,
           ),
-          const SizedBox(height: 24),
+          const Divider(color: Colors.white10, height: 32),
           _buildTrackingRow(
             icon: Icons.nightlight_round,
             title: 'Sleep Mode',
             subtitle: 'Automatic silencing',
-            value: _sleepMode,
-            onChanged: (val) => setState(() => _sleepMode = val),
-          ),
-          const Divider(color: Colors.white10, height: 32),
-          _buildTrackingRow(
-            icon: Icons.alarm,
-            title: 'Bedtime Alarm',
-            subtitle: 'Wake up at 06:30 AM',
-            value: _bedtimeAlarm,
-            onChanged: (val) => setState(() => _bedtimeAlarm = val),
+            value: data.sleepMode,
+            onChanged: (val) => viewModel.toggleSleepMode(val),
+            activeColor: neonLime,
           ),
         ],
       ),
@@ -226,6 +264,7 @@ class _SleepScreenState extends State<SleepScreen> {
     required String subtitle,
     required bool value,
     required ValueChanged<bool> onChanged,
+    required Color activeColor,
   }) {
     return Row(
       children: [
@@ -235,83 +274,23 @@ class _SleepScreenState extends State<SleepScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Text(
-                subtitle,
-                style: const TextStyle(color: Colors.grey, fontSize: 13),
-              ),
+              Text(title,
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600)),
+              Text(subtitle,
+                  style: const TextStyle(color: Colors.grey, fontSize: 12)),
             ],
           ),
         ),
         Switch(
           value: value,
           onChanged: onChanged,
-          activeThumbColor: Colors.white,
-          activeTrackColor: Colors.cyanAccent,
-          inactiveThumbColor: Colors.white,
-          inactiveTrackColor: Colors.grey[800],
+          activeTrackColor: activeColor.withOpacity(0.5),
+          activeColor: activeColor,
         ),
       ],
     );
   }
-
-  Widget _buildLogSleepButton() {
-    return SizedBox(
-      width: double.infinity,
-      height: 60,
-      child: ElevatedButton(
-        onPressed: () {},
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.orange[900],
-          shape: RoundedCornerShape(10),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Icon(Icons.edit_calendar, color: Colors.black, size: 24),
-            SizedBox(width: 12),
-            Text(
-              'LOG SLEEP',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// Custom shape for the button
-class RoundedCornerShape extends OutlinedBorder {
-  final double radius;
-  const RoundedCornerShape(this.radius);
-
-  @override
-  OutlinedBorder copyWith({BorderSide? side}) => RoundedCornerShape(radius);
-
-  @override
-  Path getInnerPath(Rect rect, {TextDirection? textDirection}) => getOuterPath(rect, textDirection: textDirection);
-
-  @override
-  Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
-    return Path()
-      ..addRRect(RRect.fromRectAndRadius(rect, Radius.circular(radius)));
-  }
-
-  @override
-  void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {}
-
-  @override
-  ShapeBorder scale(double t) => RoundedCornerShape(radius * t);
 }

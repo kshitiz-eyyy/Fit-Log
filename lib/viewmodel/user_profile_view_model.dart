@@ -134,4 +134,9 @@ class UserProfileViewModel extends ChangeNotifier {
       'completed_at': FieldValue.serverTimestamp(),
     });
   }
+
+  Future<void> signOut() async {
+    await _userRepo.logout();
+    notifyListeners();
+  }
 }
