@@ -1,107 +1,79 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../viewmodel/change_password_view_model.dart';
+import '../repo/password_repo_impl.dart';
 
-class ChangePasswordScreen extends StatefulWidget {
+class ChangePasswordScreen extends StatelessWidget {
   const ChangePasswordScreen({super.key});
 
   @override
-  State<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => ChangePasswordViewModel(repository: PasswordRepoImpl()),
+      child: const ChangePasswordView(),
+    );
+  }
 }
 
-class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
-  final _currentPasswordController = TextEditingController(text: 'password123');
-  final _newPasswordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
+class ChangePasswordView extends StatefulWidget {
+  const ChangePasswordView({super.key});
 
-  bool _obscureCurrent = true;
-  bool _obscureNew = true;
-  bool _obscureConfirm = true;
+  @override
+  State<ChangePasswordView> createState() => _ChangePasswordViewState();
+}
 
+class _ChangePasswordViewState extends State<ChangePasswordView> {
   @override
   void initState() {
     super.initState();
-    _newPasswordController.addListener(_updateState);
-    _confirmPasswordController.addListener(_updateState);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final viewModel = Provider.of<ChangePasswordViewModel>(context, listen: false);
+      viewModel.newPasswordController.addListener(viewModel.updateState);
+      viewModel.confirmPasswordController.addListener(viewModel.updateState);
+    });
   }
 
-  void _updateState() {
-    setState(() {});
-  }
-
-  @override
-  void dispose() {
-    _newPasswordController.removeListener(_updateState);
-    _confirmPasswordController.removeListener(_updateState);
-    _currentPasswordController.dispose();
-    _newPasswordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
-  }
-
-  bool get _hasMin10Chars => _newPasswordController.text.length >= 10;
-  bool get _hasSpecialSymbol =>
-      _newPasswordController.text.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
-  bool get _hasNumericValue =>
-      _newPasswordController.text.contains(RegExp(r'[0-9]'));
-  bool get _hasUppercase =>
-      _newPasswordController.text.contains(RegExp(r'[A-Z]'));
-
-  bool get _passwordsMatch => _newPasswordController.text == _confirmPasswordController.text;
-  bool get _showMismatchError => _confirmPasswordController.text.isNotEmpty && !_passwordsMatch;
-
-  double get _strengthProgress {
-    int count = 0;
-    if (_hasMin10Chars) count++;
-    if (_hasSpecialSymbol) count++;
-    if (_hasNumericValue) count++;
-    if (_hasUppercase) count++;
-    return count / 4;
-  }
-
-  String get _strengthText {
-    double progress = _strengthProgress;
-    if (progress >= 1.0) return 'ELITE';
-    if (progress >= 0.75) return 'STRONG';
-    if (progress >= 0.5) return 'FAIR';
-    if (progress >= 0.25) return 'WEAK';
-    return 'NONE';
-  }
-
-  void _handleAuthorizeUpdate() {
-    if (!_passwordsMatch) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          backgroundColor: const Color(0xFF1A1A1A),
-          title: const Text('Security Alert', style: TextStyle(color: Colors.white)),
-          content: const Text(
-            'The new performance key and confirmation key do not match. Please verify and try again.',
-            style: TextStyle(color: Color(0xFF8E8E8E)),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK', style: TextStyle(color: Color(0xFFD4FF00))),
+  void _handleUpdate(ChangePasswordViewModel viewModel) {
+    viewModel.handleAuthorizeUpdate(
+      onSuccess: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Updating password... Success!')),
+        );
+      },
+      onError: (message) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      },
+      onMismatch: () {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: const Color(0xFF1A1A1A),
+            title: const Text('Security Alert', style: TextStyle(color: Colors.white)),
+            content: const Text(
+              'The new performance key and confirmation key do not match. Please verify and try again.',
+              style: TextStyle(color: Color(0xFF8E8E8E)),
             ),
-          ],
-        ),
-      );
-    } else if (_strengthProgress < 1.0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please meet all security requirements.')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Updating password... Success!')),
-      );
-    }
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK', style: TextStyle(color: Color(0xFFD4FF00))),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<ChangePasswordViewModel>();
+
     const backgroundColor = Color(0xFF0C0C0C);
     const accentColor = Color(0xFFD4FF00);
     const surfaceColor = Color(0xFF1A1A1A);
-    const inputColor = Color(0xFF141414);
     const textColor = Colors.white;
     const secondaryTextColor = Color(0xFF8E8E8E);
     const dangerColor = Color(0xFFE94560);
@@ -141,9 +113,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 children: [
                   const Icon(Icons.lock_outline, color: accentColor, size: 14),
                   const SizedBox(width: 8),
-                  Text(
+                  const Text(
                     'SECURITY PROTOCOL',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: accentColor,
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
@@ -172,17 +144,17 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               // Fields
               _buildInputField(
                 label: 'CURRENT PASSWORD',
-                controller: _currentPasswordController,
-                obscureText: _obscureCurrent,
-                onToggleVisibility: () => setState(() => _obscureCurrent = !_obscureCurrent),
+                controller: viewModel.currentPasswordController,
+                obscureText: viewModel.obscureCurrent,
+                onToggleVisibility: viewModel.toggleObscureCurrent,
               ),
               const SizedBox(height: 24),
               _buildInputField(
                 label: 'NEW PERFORMANCE KEY',
-                controller: _newPasswordController,
-                obscureText: _obscureNew,
+                controller: viewModel.newPasswordController,
+                obscureText: viewModel.obscureNew,
                 borderColor: accentColor,
-                onToggleVisibility: () => setState(() => _obscureNew = !_obscureNew),
+                onToggleVisibility: viewModel.toggleObscureNew,
               ),
               const SizedBox(height: 16),
 
@@ -198,13 +170,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('KEY STRENGTH: $_strengthText', style: const TextStyle(color: accentColor, fontSize: 11, fontWeight: FontWeight.bold)),
-                        Text('${(_strengthProgress * 100).toInt()}%', style: const TextStyle(color: accentColor, fontSize: 11, fontWeight: FontWeight.bold)),
+                        Text('KEY STRENGTH: ${viewModel.strengthText}', style: const TextStyle(color: accentColor, fontSize: 11, fontWeight: FontWeight.bold)),
+                        Text('${(viewModel.strengthProgress * 100).toInt()}%', style: const TextStyle(color: accentColor, fontSize: 11, fontWeight: FontWeight.bold)),
                       ],
                     ),
                     const SizedBox(height: 8),
                     LinearProgressIndicator(
-                      value: _strengthProgress,
+                      value: viewModel.strengthProgress,
                       backgroundColor: const Color(0xFF2C2C2C),
                       color: accentColor,
                       minHeight: 4,
@@ -212,14 +184,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        Expanded(child: _buildRequirement('Min 10 characters', _hasMin10Chars, accentColor)),
-                        Expanded(child: _buildRequirement('Special symbol', _hasSpecialSymbol, accentColor)),
+                        Expanded(child: _buildRequirement('Min 10 characters', viewModel.hasMin10Chars, accentColor)),
+                        Expanded(child: _buildRequirement('Special symbol', viewModel.hasSpecialSymbol, accentColor)),
                       ],
                     ),
                     Row(
                       children: [
-                        Expanded(child: _buildRequirement('Numeric value', _hasNumericValue, accentColor)),
-                        Expanded(child: _buildRequirement('Uppercase delta', _hasUppercase, accentColor)),
+                        Expanded(child: _buildRequirement('Numeric value', viewModel.hasNumericValue, accentColor)),
+                        Expanded(child: _buildRequirement('Uppercase delta', viewModel.hasUppercase, accentColor)),
                       ],
                     ),
                   ],
@@ -227,7 +199,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               ),
               const SizedBox(height: 24),
 
-              if (_showMismatchError)
+              if (viewModel.showMismatchError)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8.0),
                   child: Text(
@@ -238,10 +210,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
               _buildInputField(
                 label: 'CONFIRM NEW KEY',
-                controller: _confirmPasswordController,
-                obscureText: _obscureConfirm,
-                borderColor: _showMismatchError ? dangerColor : null,
-                onToggleVisibility: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                controller: viewModel.confirmPasswordController,
+                obscureText: viewModel.obscureConfirm,
+                borderColor: viewModel.showMismatchError ? dangerColor : null,
+                onToggleVisibility: viewModel.toggleObscureConfirm,
               ),
               const SizedBox(height: 32),
 
@@ -250,19 +222,21 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: _handleAuthorizeUpdate,
+                  onPressed: viewModel.isLoading ? null : () => _handleUpdate(viewModel),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: accentColor,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Text('AUTHORIZE UPDATE', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900)),
-                      SizedBox(width: 8),
-                      Icon(Icons.lock, color: Colors.black, size: 16),
-                    ],
-                  ),
+                  child: viewModel.isLoading
+                      ? const CircularProgressIndicator(color: Colors.black)
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Text('AUTHORIZE UPDATE', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900)),
+                            SizedBox(width: 8),
+                            Icon(Icons.lock, color: Colors.black, size: 16),
+                          ],
+                        ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -274,10 +248,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     if (Navigator.canPop(context)) {
                       Navigator.pop(context);
                     } else {
-                      setState(() {
-                        _newPasswordController.clear();
-                        _confirmPasswordController.clear();
-                      });
+                      viewModel.newPasswordController.clear();
+                      viewModel.confirmPasswordController.clear();
                     }
                   },
                   style: OutlinedButton.styleFrom(
@@ -316,7 +288,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 32), // Extra space at bottom
+              const SizedBox(height: 32),
             ],
           ),
         ),
