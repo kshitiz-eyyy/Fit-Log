@@ -1,10 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:fitlog/binesh/create_profile_screen.dart';
-import 'package:fitlog/view/change_password_screen.dart';
 import 'package:fitlog/view/fitlog_login.dart';
-import 'package:fitlog/view/sleep_screen.dart';
-import 'package:fitlog/view/user_dashboard.dart';
-import 'package:fitlog/view/water_tracker_screen.dart';
 import 'package:fitlog/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -49,7 +44,7 @@ class FitLogApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const FitLogLogin(),
+      home: const SplashScreen(),
     );
   }
 }

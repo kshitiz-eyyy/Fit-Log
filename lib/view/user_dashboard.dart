@@ -502,7 +502,7 @@ class _DashboardContent extends StatelessWidget {
                                 ),
                                 Switch(
                                   value: state.hydrationReminderActive,
-                                  activeColor: const Color(0xFFCCFF00),
+                                  activeThumbColor: const Color(0xFFCCFF00),
                                   onChanged: viewModel.toggleHydrationRadarAlerts,
                                 ),
                                 Text(state.hydrationReminderActive ? "Hourly Alerts Active" : "Alert Pings Paused", style: const TextStyle(color: Color(0xFFCCFF00), fontSize: 10)),

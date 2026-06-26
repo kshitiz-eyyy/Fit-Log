@@ -21,7 +21,18 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   bool _termsAccepted = false;
 
   @override
+  void initState() {
+    super.initState();
+    _accessKeyController.addListener(_updateState);
+  }
+
+  void _updateState() {
+    setState(() {});
+  }
+
+  @override
   void dispose() {
+    _accessKeyController.removeListener(_updateState);
     _handleController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
@@ -29,6 +40,33 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     _verifyKeyController.dispose();
     _bioController.dispose();
     super.dispose();
+  }
+
+  // Password Strength Logic
+  bool get _hasMin10Chars => _accessKeyController.text.length >= 10;
+  bool get _hasSpecialSymbol =>
+      _accessKeyController.text.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
+  bool get _hasNumericValue =>
+      _accessKeyController.text.contains(RegExp(r'[0-9]'));
+  bool get _hasUppercase =>
+      _accessKeyController.text.contains(RegExp(r'[A-Z]'));
+
+  double get _strengthProgress {
+    int count = 0;
+    if (_hasMin10Chars) count++;
+    if (_hasSpecialSymbol) count++;
+    if (_hasNumericValue) count++;
+    if (_hasUppercase) count++;
+    return count / 4;
+  }
+
+  String get _strengthText {
+    double progress = _strengthProgress;
+    if (progress >= 1.0) return 'ELITE';
+    if (progress >= 0.75) return 'STRONG';
+    if (progress >= 0.5) return 'FAIR';
+    if (progress >= 0.25) return 'WEAK';
+    return 'NONE';
   }
 
   void _handleInitializePerformance() async {
@@ -239,6 +277,44 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                       cardColor: cardColor,
                       isPassword: true,
                     ),
+
+                    const SizedBox(height: 12),
+                    // Password strength indicator
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: cardColor,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('KEY STRENGTH: $_strengthText',
+                                  style: const TextStyle(
+                                      color: accentColor,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold)),
+                              Text('${(_strengthProgress * 100).toInt()}%',
+                                  style: const TextStyle(
+                                      color: accentColor,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          LinearProgressIndicator(
+                            value: _strengthProgress,
+                            backgroundColor: const Color(0xFF2C2C2C),
+                            color: accentColor,
+                            minHeight: 4,
+                          ),
+                        ],
+                      ),
+                    ),
+
                     const SizedBox(height: 20),
                     _buildInputField(
                       label: 'VERIFY KEY',
@@ -302,13 +378,13 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                           backgroundColor: accentColor,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           elevation: 0,
-                          disabledBackgroundColor: secondaryTextColor.withOpacity(0.3),
+                          disabledBackgroundColor: secondaryTextColor.withValues(alpha: 0.3),
                         ),
                         child: isLoading
                             ? const CircularProgressIndicator(color: Colors.black)
-                            : Row(
+                            : const Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
+                                children: [
                                   Text(
                                     'INITIALIZE PERFORMANCE',
                                     style: TextStyle(
