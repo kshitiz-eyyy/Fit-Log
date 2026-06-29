@@ -50,7 +50,7 @@ class FitLogApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const WelcomeScreen(
+      home: const SplashScreen(
       ),
     );
   }
