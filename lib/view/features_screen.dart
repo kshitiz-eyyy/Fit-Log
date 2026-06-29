@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'bmi_calculator_screen.dart';
 import 'contact_dietitian_screen.dart';
 import 'contact_trainer_screen.dart';
+import 'calorie_tracker_screen.dart';
+import 'sleep_screen.dart';
 
 class AppColors {
   static const Color background = Color(0xFF121212);
@@ -197,6 +199,20 @@ class FeaturesScreen extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const ContactDietitianScreen(),
+                ),
+              );
+            } else if (item.title == 'Calorie Tracker') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CalorieTrackerScreen(),
+                ),
+              );
+            } else if (item.title == 'Sleep Tracking') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SleepScreen(),
                 ),
               );
             } else {

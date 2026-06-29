@@ -1,4 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:fitlog/view/calorie_tracker_screen.dart';
+import 'package:fitlog/view/create_profile_screen.dart';
+import 'package:fitlog/view/edit_profile_screen.dart';
 import 'package:fitlog/view/fitlog_login.dart';
 import 'package:fitlog/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +47,7 @@ class FitLogApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const SplashScreen(),
+      home: const EditProfileScreen(),
     );
   }
 }

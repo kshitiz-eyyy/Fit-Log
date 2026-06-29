@@ -104,11 +104,13 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     if (userId.isNotEmpty) {
       final userModel = UserModel(
         id: userId,
-        name: handle, // Using handle as name for now
+        name: handle,
         handle: handle,
         contact: phone,
         email: email,
-        bio: bio,
+        bio: bio.isNotEmpty ? bio : 'Consistency beats talent every single day.',
+        fitnessGoal: 'Hypertrophy Conditioning',
+        role: 'user',
       );
 
       final success = await viewModel.addUser(userModel);
