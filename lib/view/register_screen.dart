@@ -63,6 +63,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         name: name,
         contact: contact,
         email: email,
+        handle: name.toLowerCase().replaceAll(' ', '_'),
+        bio: 'Consistency beats talent every single day.',
+        fitnessGoal: 'Hypertrophy Conditioning',
+        role: 'user',
       );
 
       final success = await viewModel.addUser(userModel);

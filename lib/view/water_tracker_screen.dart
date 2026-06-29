@@ -1,3 +1,4 @@
+import 'package:fitlog/repo/water_repository_impl.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Handles dynamic sessions securely!
 import 'dart:math' as math;
@@ -21,7 +22,7 @@ class _WaterTrackerScreenState extends State<WaterTrackerScreen> {
   @override
   void initState() {
     super.initState();
-    _repository = WaterRepository();
+    _repository = WaterRepositoryImpl();
 
     // 1. Detect who is signed into this device right now
     final User? currentUser = FirebaseAuth.instance.currentUser;

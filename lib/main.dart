@@ -1,35 +1,25 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:fitlog/view/admin_panel_screen.dart';
-import 'package:fitlog/view/contact_trainer_screen.dart';
+import 'package:fitlog/view/change_password_screen.dart';
+import 'package:fitlog/view/create_profile_screen.dart';
 import 'package:fitlog/view/fitlog_login.dart';
-import 'package:fitlog/view/rate_screen.dart';
-import 'package:fitlog/view/terms_and_conditions_screen.dart';
+import 'package:fitlog/view/sleep_screen.dart';
 import 'package:fitlog/view/user_dashboard.dart';
-import 'package:fitlog/view/welcome_screen.dart';
+import 'package:fitlog/view/water_tracker_screen.dart';
 import 'package:fitlog/viewmodel/user_view_model.dart';
-import 'package:fitlog/view/meal_tracking_screen.dart';
-import 'package:fitlog/view/user_profile.dart';
-import 'package:provider/provider.dart';
-import 'view/fitlog_login.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
-import 'view/library.dart';
-import 'view/favourite_exercise.dart';
-import 'view/change_password_screen.dart';
-import 'view/features_screen.dart';
-import 'view/splash_screen.dart';
-
-
-import 'view/fitlog_premium_screen.dart';
-import 'view/workout_tracking_screen.dart';
+import 'package:fitlog/view/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (Firebase.apps.isEmpty) {
+  try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+  } catch (e) {
+    debugPrint("Firebase Engine Init Error: $e");
   }
 
   runApp(
@@ -46,20 +36,20 @@ class FitLogApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'FitLog',
-        theme: ThemeData.dark().copyWith(
-          scaffoldBackgroundColor: Colors.black,
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.black,
-            titleTextStyle: TextStyle(
-              color: Colors.lightGreenAccent,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+      debugShowCheckedModeBanner: false,
+      title: 'FitLog',
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: Colors.black,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.black,
+          titleTextStyle: TextStyle(
+            color: Colors.lightGreenAccent,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        home:const UserDashboardScreen()
+      ),
+      home: const CreateProfileScreen(),
     );
   }
 }

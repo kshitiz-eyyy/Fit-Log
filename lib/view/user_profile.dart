@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:fitlog/view/edit_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
@@ -342,7 +343,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             const SizedBox(height: 14),
             OutlinedButton(
-              onPressed: _showEditProfileDialog,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+                ).then((_) {
+                  _viewModel.fetchLiveProfileData(); // Refresh data when returning
+                });
+              },
               style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.grey), padding: const EdgeInsets.symmetric(vertical: 12)),
               child: const Text("EDIT METRIC BIO CHANNELS", style: TextStyle(color: Colors.white, fontSize: 12)),
             )
