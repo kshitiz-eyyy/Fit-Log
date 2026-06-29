@@ -10,4 +10,5 @@ abstract class UserRepo {
   Future<List<UserModel>> getAllUser();
   Future<UserModel> getUserByID(String id);
   Future<void> editProfile(UserModel userModel);
+  Future<void> terminateAccount();
 }

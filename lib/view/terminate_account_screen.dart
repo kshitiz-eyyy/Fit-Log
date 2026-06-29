@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../viewmodel/terminate_account_viewmodel.dart';
+import 'welcome_screen.dart';
 
-class TerminateAccountScreen extends StatefulWidget {
+class TerminateAccountScreen extends StatelessWidget {
   const TerminateAccountScreen({super.key});
 
   @override
-  State<TerminateAccountScreen> createState() => _TerminateAccountScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => TerminateAccountViewModel(),
+      child: const _TerminateAccountView(),
+    );
+  }
 }
 
-class _TerminateAccountScreenState extends State<TerminateAccountScreen> {
+class _TerminateAccountView extends StatelessWidget {
+  const _TerminateAccountView();
+
   static const Color backgroundColor = Colors.black;
   static const Color cardBackgroundColor = Color(0xFF1C1C1E);
   static const Color accentColor = Color(0xFFD0FD3E);
@@ -15,11 +25,10 @@ class _TerminateAccountScreenState extends State<TerminateAccountScreen> {
   static const Color textColor = Colors.white;
   static const Color secondaryTextColor = Color(0xFF8E8E93);
 
-  bool biometricEnabled = true;
-  bool understandRisks = false;
-
   @override
   Widget build(BuildContext context) {
+    final viewModel = context.watch<TerminateAccountViewModel>();
+
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: PreferredSize(
@@ -79,106 +88,108 @@ class _TerminateAccountScreenState extends State<TerminateAccountScreen> {
         ),
       ),
       bottomNavigationBar: _buildBottomNav(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
-                      'ATHLETE PROFILE',
-                      style: TextStyle(
-                        color: accentColor,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
+      body: viewModel.isLoading && viewModel.user == null
+          ? const Center(child: CircularProgressIndicator(color: accentColor))
+          : SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            'ATHLETE PROFILE',
+                            style: TextStyle(
+                              color: accentColor,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          Text(
+                            'ACCOUNT',
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 32,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    Text(
-                      'ACCOUNT',
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 32,
-                        fontWeight: FontWeight.w900,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: const [
+                          Text(
+                            'Member Since',
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            'MAR 2023',
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: const [
-                    Text(
-                      'Member Since',
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'MAR 2023',
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 32),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'PERSONAL DETAILS',
-                  style: TextStyle(
-                    color: textColor,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
+                    ],
                   ),
-                ),
-                TextButton(
-                  onPressed: () {},
-                  child: const Text(
-                    'EDIT ALL',
-                    style: TextStyle(
-                      color: accentColor,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  const SizedBox(height: 32),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'PERSONAL DETAILS',
+                        style: TextStyle(
+                          color: textColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {},
+                        child: const Text(
+                          'EDIT ALL',
+                          style: TextStyle(
+                            color: accentColor,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 16),
+                  _buildDetailCard('FULL NAME', viewModel.user?.name ?? 'Loading...'),
+                  const SizedBox(height: 12),
+                  _buildDetailCard('EMAIL ADDRESS', viewModel.user?.email ?? 'Loading...'),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(child: _buildStatCard('HEIGHT', viewModel.user?.height ?? '--', 'cm')),
+                      const SizedBox(width: 12),
+                      Expanded(child: _buildStatCard('WEIGHT', viewModel.user?.weight ?? '--', 'kg')),
+                      const SizedBox(width: 12),
+                      Expanded(child: _buildStatCard('BODY FAT', '10.2', '%')), // Body fat not in model yet
+                    ],
+                  ),
+                  const SizedBox(height: 40),
+                  _buildTerminateSection(context, viewModel),
+                  const SizedBox(height: 40),
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
-            _buildDetailCard('FULL NAME', 'Alex Sterling'),
-            const SizedBox(height: 12),
-            _buildDetailCard('EMAIL ADDRESS', 'a.sterling.performance@forge.com'),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(child: _buildStatCard('HEIGHT', '188', 'cm')),
-                const SizedBox(width: 12),
-                Expanded(child: _buildStatCard('WEIGHT', '92.4', 'kg')),
-                const SizedBox(width: 12),
-                Expanded(child: _buildStatCard('BODY FAT', '10.2', '%')),
-              ],
-            ),
-            const SizedBox(height: 40),
-            _buildTerminateSection(),
-            const SizedBox(height: 40),
-          ],
-        ),
-      ),
     );
   }
 
@@ -263,34 +274,7 @@ class _TerminateAccountScreenState extends State<TerminateAccountScreen> {
     );
   }
 
-  Widget _buildOptionItem(IconData icon, String title, {Widget? trailing}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      decoration: BoxDecoration(
-        color: cardBackgroundColor,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: accentColor, size: 20),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(
-                color: textColor,
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          trailing ?? const Icon(Icons.chevron_right, color: textColor, size: 20),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTerminateSection() {
+  Widget _buildTerminateSection(BuildContext context, TerminateAccountViewModel viewModel) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -329,7 +313,7 @@ class _TerminateAccountScreenState extends State<TerminateAccountScreen> {
           ),
           const SizedBox(height: 24),
           GestureDetector(
-            onTap: () => setState(() => understandRisks = !understandRisks),
+            onTap: viewModel.toggleUnderstandRisks,
             child: Row(
               children: [
                 Container(
@@ -338,9 +322,9 @@ class _TerminateAccountScreenState extends State<TerminateAccountScreen> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(4),
                     border: Border.all(color: const Color(0xFF3A3A3C)),
-                    color: understandRisks ? const Color(0xFF3A3A3C) : Colors.transparent,
+                    color: viewModel.understandRisks ? const Color(0xFF3A3A3C) : Colors.transparent,
                   ),
-                  child: understandRisks
+                  child: viewModel.understandRisks
                       ? const Icon(Icons.check, color: Colors.white, size: 12)
                       : null,
                 ),
@@ -361,19 +345,36 @@ class _TerminateAccountScreenState extends State<TerminateAccountScreen> {
             width: double.infinity,
             height: 56,
             child: OutlinedButton(
-              onPressed: () {},
+              onPressed: viewModel.isLoading
+                  ? null
+                  : () async {
+                      final success = await viewModel.terminateAccount();
+                      if (success && context.mounted) {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+                          (route) => false,
+                        );
+                      } else if (viewModel.error != null && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(viewModel.error!)),
+                        );
+                      }
+                    },
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: warningColor),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text(
-                'DELETE ACCOUNT',
-                style: TextStyle(
-                  color: warningColor,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
+              child: viewModel.isLoading
+                  ? const CircularProgressIndicator(color: warningColor)
+                  : const Text(
+                      'DELETE ACCOUNT',
+                      style: TextStyle(
+                        color: warningColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
             ),
           ),
           const SizedBox(height: 12),
@@ -437,3 +438,4 @@ class _TerminateAccountScreenState extends State<TerminateAccountScreen> {
     );
   }
 }
+
