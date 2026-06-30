@@ -27,16 +27,8 @@ class ContactTrainerScreen extends StatelessWidget {
         body: Container(
           width: double.infinity,
           height: double.infinity,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: const AssetImage('assets/images/trainer.png'),
-              fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                Colors.black.withValues(alpha: 0.85),
-                BlendMode.darken,
-              ),
-            ),
-          ),
+
+
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),

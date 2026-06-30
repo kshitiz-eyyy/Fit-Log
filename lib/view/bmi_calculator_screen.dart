@@ -72,16 +72,8 @@ class _BMICalculatorScreenState extends State<BMICalculatorScreen> {
         body: Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: const AssetImage('assets/images/newbmi.png'),
-              fit: BoxFit.cover,
-              alignment: Alignment.center,
-              colorFilter: ColorFilter.mode(
-                Colors.black.withValues(alpha: 0.45),
-                BlendMode.darken,
-              ),
-            ),
+          decoration: const BoxDecoration(
+            color: bgColor, // Swapped image property out for clean solid background
           ),
           child: SafeArea(
             child: SingleChildScrollView(

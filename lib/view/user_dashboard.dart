@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:math';
+
 import '../viewmodel/quote_view_model.dart';
+import '../repo/quote_repository_impl.dart';
 import 'features_screen.dart';
 import 'user_library.dart';
 import 'user_activity_screen.dart';
@@ -10,8 +13,6 @@ import 'bmi_calculator_screen.dart';
 import 'workout_timer_screen.dart';
 import 'meal_tracking_screen.dart';
 import 'chatbot.dart';
-import 'dart:math';
-import '../repo/quote_repository_impl.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -39,17 +40,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
-  // Helper method to resolve dynamic scope flow & context hierarchy
   Widget _buildActiveScreen(int index) {
     switch (index) {
       case 0:
-        return ChangeNotifierProvider(
-          create: (_) => QuoteViewModel(quoteRepository: QuoteRepositoryImpl()),
-          child: _DashboardContent(
-            onNavigateToActivity: () => _onItemTapped(3),
-            onNavigateToProfile: () => _onItemTapped(4),
-            onProfileUpdated: _loadUserProfileName,
-          ),
+        return _DashboardContent(
+          onNavigateToActivity: () => _onItemTapped(3),
+          onNavigateToProfile: () => _onItemTapped(4),
+          onProfileUpdated: _loadUserProfileName,
         );
       case 1:
         return FeaturesScreen();
@@ -73,115 +70,119 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: Drawer(
-        backgroundColor: const Color(0xFF121212),
-        child: Column(
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(color: Color(0xFF161616)),
-              child: Row(
-                children: [
-                  const CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Color(0xFFCCFF00),
-                    child: Icon(Icons.person, color: Colors.black, size: 35),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _userName,
-                          style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          _isPremiumOverridden ? "Pro Premium Member (Global Override)" : "Regular Access Member",
-                          style: TextStyle(
-                              color: _isPremiumOverridden ? const Color(0xFFCCFF00) : Colors.grey,
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold
-                          ),
-                        ),
-                      ],
+    // Keep the provider here so the quote timer lifecycle remains alive during tab switching
+    return ChangeNotifierProvider(
+      create: (_) => QuoteViewModel(quoteRepository: QuoteRepositoryImpl()),
+      child: Scaffold(
+        drawer: Drawer(
+          backgroundColor: const Color(0xFF121212),
+          child: Column(
+            children: [
+              DrawerHeader(
+                decoration: const BoxDecoration(color: Color(0xFF161616)),
+                child: Row(
+                  children: [
+                    const CircleAvatar(
+                      radius: 30,
+                      backgroundColor: Color(0xFFCCFF00),
+                      child: Icon(Icons.person, color: Colors.black, size: 35),
                     ),
-                  )
-                ],
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _userName,
+                            style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            _isPremiumOverridden ? "Pro Premium Member (Global Override)" : "Regular Access Member",
+                            style: TextStyle(
+                                color: _isPremiumOverridden ? const Color(0xFFCCFF00) : Colors.grey,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.dashboard, color: Colors.white),
-              title: const Text("Dashboard Home", style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(context);
-                _onItemTapped(0);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.person, color: Colors.white),
-              title: const Text("My Profile & Settings", style: TextStyle(color: Colors.white)),
-              onTap: () async {
-                Navigator.pop(context);
-                _onItemTapped(4);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.calculate, color: Colors.white),
-              title: const Text("BMI Engine Analyzer", style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const BMICalculatorScreen())).then((_) => _loadUserProfileName());
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.timer, color: Colors.white),
-              title: const Text("Workout Session Timer", style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const WorkoutTimerScreen()));
-              },
-            ),
-            const Spacer(),
-            const Divider(color: Color(0xFF262626)),
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.redAccent),
-              title: const Text("Sign Out Session", style: TextStyle(color: Colors.redAccent)),
-              onTap: () async {
-                Navigator.pop(context);
-                final prefs = await SharedPreferences.getInstance();
-                await prefs.setBool('is_logged_in', false);
+              ListTile(
+                leading: const Icon(Icons.dashboard, color: Colors.white),
+                title: const Text("Dashboard Home", style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _onItemTapped(0);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.person, color: Colors.white),
+                title: const Text("My Profile & Settings", style: TextStyle(color: Colors.white)),
+                onTap: () async {
+                  Navigator.pop(context);
+                  _onItemTapped(4);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.calculate, color: Colors.white),
+                title: const Text("BMI Engine Analyzer", style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BMICalculatorScreen())).then((_) => _loadUserProfileName());
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.timer, color: Colors.white),
+                title: const Text("Workout Session Timer", style: TextStyle(color: Colors.white)),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const WorkoutTimerScreen()));
+                },
+              ),
+              const Spacer(),
+              const Divider(color: Color(0xFF262626)),
+              ListTile(
+                leading: const Icon(Icons.logout, color: Colors.redAccent),
+                title: const Text("Sign Out Session", style: TextStyle(color: Colors.redAccent)),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setBool('is_logged_in', false);
 
-                if (context.mounted) {
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    '/login',
-                        (Route<dynamic> route) => false,
-                  );
-                }
-              },
-            ),
-            const SizedBox(height: 20),
+                  if (context.mounted) {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/login',
+                          (Route<dynamic> route) => false,
+                    );
+                  }
+                },
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+
+        body: _buildActiveScreen(_selectedIndex),
+        bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: const Color(0xFF0F0F0F),
+          selectedItemColor: const Color(0xFFCCFF00),
+          unselectedItemColor: Colors.grey,
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          type: BottomNavigationBarType.fixed,
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: "Home"),
+            BottomNavigationBarItem(icon: Icon(Icons.featured_video_outlined), label: "Features"),
+            BottomNavigationBarItem(icon: Icon(Icons.library_add), label: "Library"),
+            BottomNavigationBarItem(icon: Icon(Icons.history), label: "Activity"),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
           ],
         ),
-      ),
-
-      body: _buildActiveScreen(_selectedIndex),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color(0xFF0F0F0F),
-        selectedItemColor: const Color(0xFFCCFF00),
-        unselectedItemColor: Colors.grey,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.featured_video_outlined), label: "Features"),
-          BottomNavigationBarItem(icon: Icon(Icons.library_add), label: "Library"),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: "Activity"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-        ],
       ),
     );
   }
@@ -222,9 +223,6 @@ class _DashboardContentState extends State<_DashboardContent> {
   String _systemNoticeAlertText = "";
   bool _showSystemNoticeBanner = false;
   bool _isPremiumUser = false;
-
-
-
 
   @override
   void initState() {
@@ -336,6 +334,29 @@ class _DashboardContentState extends State<_DashboardContent> {
     );
   }
 
+  Widget _buildMetricCard(String title, String val, String status, IconData icon) {
+    return Container(
+      height: 120,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: const Color(0xFFCCFF00), size: 14),
+              const SizedBox(width: 6),
+              Text(title, style: const TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          Text(val, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
+          Text(status, style: const TextStyle(color: Colors.grey, fontSize: 10)),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double caloriePercentage = (internalCaloriesEaten / currentTargetCalories).clamp(0.0, 1.0);
@@ -344,39 +365,6 @@ class _DashboardContentState extends State<_DashboardContent> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F0F),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF0F0F0F),
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.white),
-          onPressed: () {
-            _loadDashboardData();
-            Scaffold.of(context).openDrawer();
-          },
-        ),
-        title: const Text("FIT LOG", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
-        actions: [
-          IconButton(icon: const Icon(Icons.notifications_none, color: Colors.white), onPressed: _openNotificationCenterOverlay),
-          if (_isPremiumUser)
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 4.0),
-              child: Icon(Icons.workspace_premium, color: Color(0xFFCCFF00), size: 20),
-            ),
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0, left: 8.0),
-            child: GestureDetector(
-              onTap: widget.onNavigateToProfile,
-              child: const CircleAvatar(radius: 15, backgroundColor: Colors.grey, child: Icon(Icons.person, size: 18, color: Colors.black)),
-            ),
-          )
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFFCCFF00),
-        child: const Icon(Icons.chat, color: Colors.black),
-        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const FitnessCoachChatScreen())),
-      ),
       body: RefreshIndicator(
         color: const Color(0xFFCCFF00),
         backgroundColor: const Color(0xFF161616),
@@ -410,37 +398,42 @@ class _DashboardContentState extends State<_DashboardContent> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // Find this block in your code and update the margin line:
 
                     Consumer<QuoteViewModel>(
                       builder: (context, viewModel, child) {
-                        return Container(
-                          padding: const EdgeInsets.all(14),
-                          margin: const EdgeInsets.only(bottom: 12),
-                          decoration: BoxDecoration(
-                              color: const Color(0xFFCCFF00).withOpacity(0.08),
-                              border: Border.all(color: const Color(0xFFCCFF00), width: 0.8),
-                              borderRadius: BorderRadius.circular(4)
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.format_quote, color: Color(0xFFCCFF00), size: 24),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: viewModel.isLoading
-                                    ? const LinearProgressIndicator(
-                                  color: Color(0xFFCCFF00),
-                                  backgroundColor: Color(0xFF161616),
-                                )
-                                    : Text(
-                                  viewModel.currentQuote,
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 13,
-                                      fontStyle: FontStyle.italic
+                        return SafeArea( // Added SafeArea to protect against notches
+                          bottom: false, // We only care about pushing down from the top
+                          child: Container(
+                            padding: const EdgeInsets.all(14),
+                            // Update this margin below:
+                            margin: const EdgeInsets.only(top: 20, bottom: 12), // Added 'top: 20' to move it lower!
+                            decoration: BoxDecoration(
+                                color: const Color(0xFFCCFF00).withOpacity(0.08),
+                                border: Border.all(color: const Color(0xFFCCFF00), width: 0.8),
+                                borderRadius: BorderRadius.circular(4)
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.format_quote, color: Color(0xFFCCFF00), size: 24),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: viewModel.isLoading
+                                      ? const LinearProgressIndicator(
+                                    color: Color(0xFFCCFF00),
+                                    backgroundColor: Color(0xFF161616),
+                                  )
+                                      : Text(
+                                    viewModel.currentQuote,
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 13,
+                                        fontStyle: FontStyle.italic
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         );
                       },
@@ -686,52 +679,29 @@ class _DashboardContentState extends State<_DashboardContent> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Text("COMMUNITY EVENT", style: TextStyle(color: Colors.grey, fontSize: 9, fontWeight: FontWeight.bold)),
-                                Text(
-                                  _globalChallengeHeadline,
-                                  style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  _isJoinedCommunityChallenge ? "Status: Engaged & Tracking" : "Status: Open Registration",
-                                  style: TextStyle(color: _isJoinedCommunityChallenge ? const Color(0xFFCCFF00) : Colors.grey, fontSize: 10),
-                                ),
+                                const SizedBox(height: 4),
+                                Text(_globalChallengeHeadline, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ),
-                          TextButton(
+                          ElevatedButton(
                             onPressed: _toggleCommunityChallenge,
-                            style: TextButton.styleFrom(
-                              backgroundColor: _isJoinedCommunityChallenge ? Colors.transparent : const Color(0xFFCCFF00),
-                              side: _isJoinedCommunityChallenge ? BorderSide(color: Colors.grey.shade800) : BorderSide.none,
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _isJoinedCommunityChallenge ? const Color(0xFF262626) : const Color(0xFFCCFF00),
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                             ),
                             child: Text(
                               _isJoinedCommunityChallenge ? "LEAVE" : "JOIN",
-                              style: TextStyle(color: _isJoinedCommunityChallenge ? Colors.grey : Colors.black, fontSize: 10, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                color: _isJoinedCommunityChallenge ? Colors.white : Colors.black,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    ElevatedButton.icon(
-                      onPressed: () async {
-                        await Navigator.push(context, MaterialPageRoute(builder: (context) => const MealTrackingScreen()));
-                        _loadDashboardData();
-                      },
-                      icon: const Icon(Icons.restaurant, color: Colors.black, size: 18),
-                      label: const Text("OPEN MEAL DIARY LOG", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 13)),
-                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFCCFF00), padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: () async {
-                        await Navigator.push(context, MaterialPageRoute(builder: (context) => const WorkoutTimerScreen()));
-                        _loadDashboardData();
-                      },
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, foregroundColor: const Color(0xFFCCFF00), padding: const EdgeInsets.symmetric(vertical: 14), shape: const RoundedRectangleBorder(side: BorderSide(color: Color(0xFFCCFF00), width: 1))),
-                      child: const Text("START ACTIVE TRAINING TIMER", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5, fontSize: 13)),
                     ),
                   ],
                 ),
@@ -739,29 +709,6 @@ class _DashboardContentState extends State<_DashboardContent> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildMetricCard(String title, String value, String subtitle, IconData icon) {
-    return Container(
-      height: 120,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Icon(icon, color: const Color(0xFFCCFF00), size: 14),
-              const SizedBox(width: 6),
-              Text(title, style: const TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
-            ],
-          ),
-          Text(value, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
-          Text(subtitle, style: const TextStyle(color: Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.w500)),
-        ],
       ),
     );
   }

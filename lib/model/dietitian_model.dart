@@ -5,7 +5,6 @@ class DietitianModel {
   final String name;
   final String contact;
   final String experience;
-  final String specialization;
   final String location;
 
   DietitianModel({
@@ -13,7 +12,6 @@ class DietitianModel {
     required this.name,
     required this.contact,
     required this.experience,
-    required this.specialization,
     required this.location,
   });
 
@@ -24,7 +22,6 @@ class DietitianModel {
       name: data['Name']?.toString() ?? 'Unknown Dietitian',
       contact: data['Contact']?.toString() ?? 'N/A',
       experience: data['Experience']?.toString() ?? 'N/A',
-      specialization: data['Specialization']?.toString() ?? 'N/A',
       location: data['Location']?.toString() ?? 'N/A',
     );
   }
