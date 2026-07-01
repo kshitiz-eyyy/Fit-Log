@@ -9,14 +9,18 @@ class ExerciseViewModel extends ChangeNotifier {
   List<Exercise> get favourites => _favourites;
 
   ExerciseViewModel() {
-    _listenToFavourites();
+    FirebaseAuth.instance.authStateChanges().listen((user) {
+      if (user != null) {
+        _listenToFavourites(user.uid);
+      } else {
+        _favourites = [];
+        notifyListeners();
+      }
+    });
   }
 
-  void _listenToFavourites() {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
-    _db.collection('users').doc(user.uid).collection('favourites')
+  void _listenToFavourites(String uid) {
+    _db.collection('users').doc(uid).collection('favourites')
         .snapshots().listen((snapshot) {
       _favourites = snapshot.docs.map((doc) => Exercise.fromMap(doc.data(), doc.id)).toList();
       notifyListeners();
@@ -24,10 +28,7 @@ class ExerciseViewModel extends ChangeNotifier {
   }
 
   Future<void> toggleFavourite(Exercise ex, String uid) async {
-    if (uid.isEmpty) {
-      print("DEBUG: No valid UID provided");
-      return;
-    }
+    if (uid.isEmpty) return;
 
     final ref = _db.collection('users').doc(uid).collection('favourites').doc(ex.name);
 
@@ -45,5 +46,6 @@ class ExerciseViewModel extends ChangeNotifier {
         'equipment': ex.equipment,
       });
     }
+    notifyListeners();
   }
 }

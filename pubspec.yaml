@@ -30,7 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_generative_ai: ^0.4.0
+  google_generative_ai: ^0.4.7
   audioplayers: ^6.6.0
   http: ^1.6.0
   video_player: ^2.11.1
@@ -46,6 +46,7 @@ dependencies:
   fluttertoast: ^9.1.0
   flutter_markdown: ^0.7.7+1
   provider: ^6.1.5+1
+  flutter_dotenv: ^6.0.1
 
 
 
@@ -73,6 +74,7 @@ flutter:
   assets:
     - assets/
     - assets/images/
+    - .env
 
   # To add assets to your application, add an assets section, like this:
   # assets:
