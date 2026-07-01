@@ -1,8 +1,8 @@
+import 'package:fitlog/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../viewmodel/track_membership_view_model.dart';
-import 'features_screen.dart'; // Imported to point back cleanly
 
 class TrackMembershipScreen extends StatefulWidget {
   const TrackMembershipScreen({super.key});
@@ -12,47 +12,62 @@ class TrackMembershipScreen extends StatefulWidget {
 }
 
 class _TrackMembershipScreenState extends State<TrackMembershipScreen> {
-  // Instantiate the ViewModel
-  final TrackMembershipViewModel _viewModel = TrackMembershipViewModel();
+  late final TrackMembershipViewModel _viewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    _viewModel = TrackMembershipViewModel();
+  }
+
+  @override
+  void dispose() {
+    _viewModel.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppTheme.colorsOf(context);
+
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: colors.background,
         elevation: 0,
-        centerTitle: true, // Centers the title text layout
+        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            // Clears stack and opens FeaturesScreen directly
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => FeaturesScreen()),
-                  (route) => false,
-            );
-          },
+          icon: Icon(Icons.arrow_back, color: colors.textPrimary),
+          onPressed: () => Navigator.of(context).maybePop(),
         ),
-        title: const Text(
-          "Performance Tracking",
+        title: Text(
+          "Membership Tracking",
           style: TextStyle(
-            color: Color(0xFFD4FF00), // Clean layout matching green accent
+            color: colors.neonAccent,
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          IconButton(
+            onPressed: _viewModel.loadMembership,
+            icon: Icon(Icons.refresh, color: colors.textPrimary),
+          ),
+        ],
       ),
-      // Listens to ViewModel updates dynamically
-      body: AnimatedBuilder(
-        animation: _viewModel,
+      body: ListenableBuilder(
+        listenable: _viewModel,
         builder: (context, child) {
+          if (_viewModel.isLoading) {
+            return Center(
+              child: CircularProgressIndicator(color: colors.neonAccent),
+            );
+          }
+
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
                 const SizedBox(height: 10),
-
-                // Circular Progress Tracker
                 SizedBox(
                   width: 220,
                   height: 220,
@@ -65,9 +80,9 @@ class _TrackMembershipScreenState extends State<TrackMembershipScreen> {
                         child: CircularProgressIndicator(
                           value: _viewModel.progress,
                           strokeWidth: 12,
-                          backgroundColor: Colors.grey.shade900,
-                          valueColor: const AlwaysStoppedAnimation<Color>(
-                            Color(0xFFD4FF00),
+                          backgroundColor: colors.border,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            colors.neonAccent,
                           ),
                         ),
                       ),
@@ -76,16 +91,16 @@ class _TrackMembershipScreenState extends State<TrackMembershipScreen> {
                         children: [
                           Text(
                             "${_viewModel.daysRemaining}",
-                            style: const TextStyle(
-                              color: Color(0xFFD4FF00),
+                            style: TextStyle(
+                              color: colors.neonAccent,
                               fontSize: 42,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const Text(
+                          Text(
                             "DAYS REMAINING",
                             style: TextStyle(
-                              color: Colors.white70,
+                              color: colors.textSecondary,
                               fontSize: 12,
                               letterSpacing: 1,
                             ),
@@ -93,138 +108,152 @@ class _TrackMembershipScreenState extends State<TrackMembershipScreen> {
                           const SizedBox(height: 4),
                           Text(
                             "of ${_viewModel.totalDays}-day cycle",
-                            style: const TextStyle(
-                              color: Colors.white54,
-                            ),
+                            style: TextStyle(color: colors.textSecondary),
                           ),
                         ],
                       ),
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 30),
-
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF141414),
+                    color: colors.surfaceElevated,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFD4FF00),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: const Text(
-                              "ACTIVE PLAN",
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _viewModel.isActive
+                              ? colors.neonAccent
+                              : colors.textSecondary,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          _viewModel.isActive ? "ACTIVE PLAN" : "INACTIVE",
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: colors.background,
                           ),
-                        ],
+                        ),
                       ),
-
                       const SizedBox(height: 15),
-
-                      const Text(
-                        "Standard Track",
+                      Text(
+                        _viewModel.planName,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: colors.textPrimary,
                           fontSize: 18,
                         ),
                       ),
-                      const Text(
-                        "Full Access Tracker",
+                      Text(
+                        _viewModel.planSubtitle,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: colors.textPrimary,
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-
+                      const SizedBox(height: 8),
+                      Text(
+                        _viewModel.tier,
+                        style: TextStyle(
+                          color: colors.neonAccent,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       const SizedBox(height: 20),
-
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.calendar_today,
-                            color: Colors.white70,
+                            color: colors.textSecondary,
                             size: 16,
                           ),
                           const SizedBox(width: 8),
                           Text(
                             "Cycle Reset Date: ${DateFormat('MMMM dd, yyyy').format(_viewModel.cycleResetDate)}",
-                            style: const TextStyle(
-                              color: Colors.white70,
-                            ),
+                            style: TextStyle(color: colors.textSecondary),
                           ),
                         ],
                       ),
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 35),
-
-                // Primary Action Button (Refresh Cycle)
                 SizedBox(
                   width: double.infinity,
                   height: 55,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFD4FF00),
+                      backgroundColor: colors.neonAccent,
+                      foregroundColor: colors.background,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    onPressed: () {
-                      _viewModel.refreshCycle();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Cycle refreshed successfully!')),
-                      );
-                    },
-                    child: const Text(
-                      "Refresh Current Cycle",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    onPressed: _viewModel.isSaving
+                        ? null
+                        : () async {
+                            final success = await _viewModel.refreshCycle();
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  success
+                                      ? 'Cycle refreshed and saved to Firebase!'
+                                      : _viewModel.errorMessage ??
+                                            'Failed to refresh cycle.',
+                                ),
+                              ),
+                            );
+                          },
+                    child: _viewModel.isSaving
+                        ? SizedBox(
+                            height: 22,
+                            width: 22,
+                            child: CircularProgressIndicator(
+                              color: colors.background,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text(
+                            "Refresh Current Cycle",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                   ),
                 ),
-
                 const SizedBox(height: 15),
-
-                // Secondary option (Reset Data)
                 TextButton(
-                  onPressed: () {
-                    _viewModel.resetProgressData();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Tracking progress cleared.')),
-                    );
-                  },
-                  child: const Text(
+                  onPressed: _viewModel.isSaving
+                      ? null
+                      : () async {
+                          final success = await _viewModel.resetProgressData();
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                success
+                                    ? 'Membership progress reset in Firebase.'
+                                    : _viewModel.errorMessage ??
+                                          'Failed to reset progress.',
+                              ),
+                            ),
+                          );
+                        },
+                  child: Text(
                     "Reset Progress Data",
-                    style: TextStyle(
-                      color: Colors.white70,
-                    ),
+                    style: TextStyle(color: colors.textSecondary),
                   ),
                 ),
-
                 const SizedBox(height: 20),
               ],
             ),

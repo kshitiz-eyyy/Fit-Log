@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'admin_panel_screen.dart';
-import 'user_dashboard.dart';
+import 'user_dashboard.dart'; // ✅ this file defines DashboardScreen
 
 class TestingGatewayScreen extends StatelessWidget {
   const TestingGatewayScreen({super.key});
@@ -46,7 +46,6 @@ class TestingGatewayScreen extends StatelessWidget {
               ),
               const SizedBox(height: 48),
 
-
               ElevatedButton.icon(
                 icon: const Icon(Icons.admin_panel_settings, color: Colors.black, size: 20),
                 label: const Text(
@@ -67,7 +66,6 @@ class TestingGatewayScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-
               ElevatedButton.icon(
                 icon: const Icon(Icons.directions_run, color: Color(0xFFCCFF00), size: 20),
                 label: const Text(
@@ -83,7 +81,7 @@ class TestingGatewayScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const UserDashboardScreen()),
+                    MaterialPageRoute(builder: (context) => const DashboardScreen()), // ✅ fixed
                   );
                 },
               ),
@@ -97,8 +95,18 @@ class TestingGatewayScreen extends StatelessWidget {
                   border: Border.all(color: Colors.grey.shade900),
                 ),
                 child: const Text(
-                  "DIAGNOSTIC PROCESS PLAN:\n1. Open ADMIN terminal viewport.\n2. Modify the challenge text field & save it.\n3. Exit via the power icon in the top right corner.\n4. Open USER dashboard viewport.\n5. Verify that your challenge has dynamic synchronization!",
-                  style: TextStyle(color: Colors.grey, fontSize: 11, height: 1.5, fontFamily: 'monospace'),
+                  "DIAGNOSTIC PROCESS PLAN:\n"
+                      "1. Open ADMIN terminal viewport.\n"
+                      "2. Modify the challenge text field & save it.\n"
+                      "3. Exit via the power icon in the top right corner.\n"
+                      "4. Open USER dashboard viewport.\n"
+                      "5. Verify that your challenge has dynamic synchronization!",
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 11,
+                    height: 1.5,
+                    fontFamily: 'monospace',
+                  ),
                 ),
               ),
             ],

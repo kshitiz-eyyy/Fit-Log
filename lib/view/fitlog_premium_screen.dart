@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fitlog/repo/membership_repo_impl.dart';
 
 class FitLogPremiumScreen extends StatefulWidget {
   const FitLogPremiumScreen({super.key});
@@ -28,14 +29,33 @@ class _FitLogPremiumScreenState extends State<FitLogPremiumScreen> {
 
   Future<void> _loadSavedStates() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _membershipTier = prefs.getString('premium_tier') ?? "PREMIUM PRO";
-      _isPremiumActive = prefs.getBool('premium_active_state') ?? true;
-      _daysLeft = prefs.getInt('premium_days_left') ?? 24;
-      _pdfExportsRemaining = prefs.getInt('pdf_exports_count') ?? 5;
-      _cloudBackupSynced = prefs.getBool('cloud_backup_state') ?? true;
-      _lastBackupTimestamp = prefs.getString('last_backup_time') ?? "Today, 04:12 AM";
-    });
+
+    try {
+      final membership = await MembershipRepoImpl().fetchMembership();
+      if (mounted) {
+        setState(() {
+          _membershipTier = membership.tier;
+          _isPremiumActive = membership.isActive;
+          _daysLeft = membership.daysRemaining;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _membershipTier = prefs.getString('premium_tier') ?? "PREMIUM PRO";
+          _isPremiumActive = prefs.getBool('premium_active_state') ?? true;
+          _daysLeft = prefs.getInt('premium_days_left') ?? 24;
+        });
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _pdfExportsRemaining = prefs.getInt('pdf_exports_count') ?? 5;
+        _cloudBackupSynced = prefs.getBool('cloud_backup_state') ?? true;
+        _lastBackupTimestamp = prefs.getString('last_backup_time') ?? "Today, 04:12 AM";
+      });
+    }
   }
 
   Future<void> _persistState(String key, dynamic value) async {

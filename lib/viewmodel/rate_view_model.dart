@@ -1,39 +1,45 @@
 import 'package:flutter/material.dart';
+import '../repo/rate_repo.dart';
+import '../repo/rate_repo_impl.dart';
 
 class RateViewModel extends ChangeNotifier {
+  final RateRepo _repo;
+
   int _rating = 0;
   bool _isSubmitting = false;
+  String? _errorMessage;
   final TextEditingController feedbackController = TextEditingController();
 
-  // Getters
+  RateViewModel({RateRepo? repo}) : _repo = repo ?? RateRepoImpl();
+
   int get rating => _rating;
   bool get isSubmitting => _isSubmitting;
+  String? get errorMessage => _errorMessage;
 
-  // Update Rating Selection
   void setRating(int newRating) {
     if (_rating == newRating) return;
     _rating = newRating;
     notifyListeners();
   }
 
-  // Handle Review Submission Logic
   Future<bool> submitReview() async {
     if (_rating == 0) return false;
 
     _isSubmitting = true;
+    _errorMessage = null;
     notifyListeners();
 
     try {
-      // Simulate network request/database write latency
-      await Future.delayed(const Duration(milliseconds: 800));
-
-      // TODO: Connect this to your Firestore or remote backend repository if needed
-      // String feedbackText = feedbackController.text.trim();
+      await _repo.submitReview(
+        rating: _rating,
+        feedback: feedbackController.text.trim(),
+      );
 
       _isSubmitting = false;
       notifyListeners();
       return true;
     } catch (e) {
+      _errorMessage = e.toString();
       _isSubmitting = false;
       notifyListeners();
       return false;
