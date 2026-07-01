@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:fitlog/view/features_screen.dart';
 import 'package:fitlog/view/period_cycle.dart';
 import 'package:fitlog/view/user_dashboard.dart';
 import 'package:fitlog/viewmodel/theme_view_model.dart';
@@ -42,7 +43,7 @@ class FitLogApp extends StatelessWidget {
           theme: AppTheme.lightTheme(),
           darkTheme: AppTheme.darkTheme(),
           themeMode: themeViewModel.themeMode,
-          home: DashboardScreen(),
+          home: FeaturesScreen(),
         );
       },
     );

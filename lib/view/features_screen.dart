@@ -1,9 +1,10 @@
 import 'package:fitlog/theme/app_theme.dart';
 import 'package:fitlog/view/performance_screen.dart';
+import 'package:fitlog/view/period_cycle.dart';
 import 'package:fitlog/view/track_membershiscreen.dart';
+import 'package:fitlog/views/period_cycle.dart';
 import 'package:flutter/material.dart';
 import 'bmi_calculator_screen.dart';
-
 import 'contact_dietitan_screen.dart';
 import 'contact_trainer_screen.dart';
 
@@ -53,7 +54,7 @@ class FeaturesScreen extends StatelessWidget {
     FeatureItem(
       title: 'Sleep Tracking',
       description:
-          'Monitor your recovery and sleep cycles for peak performance.',
+      'Monitor your recovery and sleep cycles for peak performance.',
       icon: Icons.bedtime,
     ),
     FeatureItem(
@@ -66,6 +67,11 @@ class FeaturesScreen extends StatelessWidget {
       title: 'Membership',
       description: 'Track your subscription cycle and remaining days.',
       icon: Icons.card_membership,
+    ),
+    FeatureItem(
+      title: 'Period Cycle',
+      description: 'Track your menstrual cycle and phases day by day.',
+      icon: Icons.favorite, // you can change to a better icon
     ),
   ];
 
@@ -171,13 +177,13 @@ class FeaturesScreen extends StatelessWidget {
         border: Border.all(color: colors.border, width: 1),
         image: item.imagePath != null
             ? DecorationImage(
-                image: AssetImage(item.imagePath!),
-                fit: BoxFit.cover,
-                colorFilter: ColorFilter.mode(
-                  Colors.black.withValues(alpha: 0.35),
-                  BlendMode.darken,
-                ),
-              )
+          image: AssetImage(item.imagePath!),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+            Colors.black.withOpacity(0.35),
+            BlendMode.darken,
+          ),
+        )
             : null,
       ),
       child: Material(
@@ -220,6 +226,13 @@ class FeaturesScreen extends StatelessWidget {
                   builder: (context) => const TrackMembershipScreen(),
                 ),
               );
+            } else if (item.title == 'Period Cycle') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PeriodCycleScreen(),
+                ),
+              );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -238,8 +251,8 @@ class FeaturesScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: colors.background.withValues(
-                      alpha: item.imagePath != null ? 0.8 : 1.0,
+                    color: colors.background.withOpacity(
+                      item.imagePath != null ? 0.8 : 1.0,
                     ),
                     borderRadius: BorderRadius.circular(8),
                   ),
