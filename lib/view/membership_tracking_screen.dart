@@ -76,7 +76,7 @@ class _MembershipTrackingScreenState
                         width: 2,
                       ),
                       image: const DecorationImage(
-                        image: AssetImage("assets/images/logo.png"),
+                        image: AssetImage("assets/images/membership.jpeg"),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -129,7 +129,7 @@ class _MembershipTrackingScreenState
                       child: const CircleAvatar(
                         radius: 65,
                         backgroundImage:
-                        AssetImage("assets/images/gym.png"),
+                        AssetImage("assets/images/membership.png"),
                       ),
                     ),
 
