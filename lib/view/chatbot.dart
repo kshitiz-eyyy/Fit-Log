@@ -19,11 +19,10 @@ class _FitnessCoachChatScreenState extends State<FitnessCoachChatScreen> {
   @override
   void initState() {
     super.initState();
-    // Using gemini-1.5-flash for the best balance of speed and performance
     final apiKey = dotenv.env['GEMINI_API_KEY'] ?? '';
     _model = GenerativeModel(
       model: 'gemini-3.5-flash',
-      apiKey: 'AQ.Ab8RN6KRBFR5i2KKHGbQyUbjgj0J4pBETchJTTQhs-fHeGMPxw',
+      apiKey: 'AQ.Ab8RN6I_jGiqge62GmxWlINjSCbJvE9DeS9ilAazvb5WAQKvnQ',
     );
   }
 
