@@ -1,22 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:math';
-
-import '../viewmodel/quote_view_model.dart';
-import '../repo/quote_repository_impl.dart';
-
 import '../model/dashboard_model.dart';
 import '../repo/dashboard_repo_impl.dart';
 import '../viewmodel/dashboard_view_model.dart';
-
 import 'features_screen.dart';
 import 'user_library.dart';
 import 'user_activity_screen.dart';
 import 'user_profile.dart';
 import 'bmi_calculator_screen.dart';
 import 'workout_timer_screen.dart';
+import 'meal_tracking_screen.dart';
 import 'chatbot.dart';
+import 'dart:math';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -32,7 +26,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     _viewModel = DashboardViewModel(repository: DashboardRepoImpl());
-    _viewModel.loadDashboardState(); // Ensure state initializes
     _viewModel.addListener(_onViewModelStateUpdated);
   }
 
@@ -64,133 +57,116 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (_viewModel.isLoading) {
       return const Scaffold(
         backgroundColor: Color(0xFF0F0F0F),
-        body: Center(
-          child: CircularProgressIndicator(color: Color(0xFFCCFF00)),
-        ),
+        body: Center(child: CircularProgressIndicator(color: Color(0xFFCCFF00))),
       );
     }
 
     final state = _viewModel.state;
 
-    return ChangeNotifierProvider(
-      create: (_) => QuoteViewModel(quoteRepository: QuoteRepositoryImpl()),
-      child: Scaffold(
-        drawer: Drawer(
-          backgroundColor: const Color(0xFF121212),
-          child: Column(
-            children: [
-              DrawerHeader(
-                decoration: const BoxDecoration(color: Color(0xFF161616)),
-                child: Row(
-                  children: [
-                    const CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Color(0xFFCCFF00),
-                      child: Icon(Icons.person, color: Colors.black, size: 35),
+    return Scaffold(
+      drawer: Drawer(
+        backgroundColor: const Color(0xFF121212),
+        child: Column(
+          children: [
+            DrawerHeader(
+              decoration: const BoxDecoration(color: Color(0xFF161616)),
+              child: Row(
+                children: [
+                  const CircleAvatar(
+                    radius: 30,
+                    backgroundColor: Color(0xFFCCFF00),
+                    child: Icon(Icons.person, color: Colors.black, size: 35),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          state.userName,
+                          style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          state.isPremiumUser ? "Pro Premium Member (Global Override)" : "Regular Access Member",
+                          style: TextStyle(
+                              color: state.isPremiumUser ? const Color(0xFFCCFF00) : Colors.grey,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            state.userName,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold
-                            ),
-                          ),
-                          Text(
-                            state.isPremiumUser
-                                ? "Pro Premium Member (Global Override)"
-                                : "Regular Access Member",
-                            style: TextStyle(
-                                color: state.isPremiumUser ? const Color(0xFFCCFF00) : Colors.grey,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
+                  )
+                ],
               ),
-              ListTile(
-                leading: const Icon(Icons.dashboard, color: Colors.white),
-                title: const Text("Dashboard Home", style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  _viewModel.updateNavigationIndex(0);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.person, color: Colors.white),
-                title: const Text("My Profile & Settings", style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  _viewModel.updateNavigationIndex(4);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.calculate, color: Colors.white),
-                title: const Text("BMI Engine Analyzer", style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const BMICalculatorScreen())
-                  ).then((_) {
-                    _viewModel.loadDashboardState();
-                  });
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.timer, color: Colors.white),
-                title: const Text("Workout Session Timer", style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const WorkoutTimerScreen())
-                  );
-                },
-              ),
-              const Spacer(),
-              const Divider(color: Color(0xFF262626)),
-              ListTile(
-                leading: const Icon(Icons.logout, color: Colors.redAccent),
-                title: const Text("Sign Out Session", style: TextStyle(color: Colors.redAccent)),
-                onTap: () async {
-                  Navigator.pop(context);
-                  await _viewModel.executeSignOutSession();
-                  if (context.mounted) {
-                    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-                  }
-                },
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
-        ),
-        body: _getScreens(state)[_viewModel.currentNavigationIndex],
-        bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: const Color(0xFF0F0F0F),
-          selectedItemColor: const Color(0xFFCCFF00),
-          unselectedItemColor: Colors.grey,
-          currentIndex: _viewModel.currentNavigationIndex,
-          onTap: _viewModel.updateNavigationIndex,
-          type: BottomNavigationBarType.fixed,
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: "Home"),
-            BottomNavigationBarItem(icon: Icon(Icons.featured_video_outlined), label: "Features"),
-            BottomNavigationBarItem(icon: Icon(Icons.library_add), label: "Library"),
-            BottomNavigationBarItem(icon: Icon(Icons.history), label: "Activity"),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+            ),
+            ListTile(
+              leading: const Icon(Icons.dashboard, color: Colors.white),
+              title: const Text("Dashboard Home", style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                _viewModel.updateNavigationIndex(0);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person, color: Colors.white),
+              title: const Text("My Profile & Settings", style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                _viewModel.updateNavigationIndex(4);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.calculate, color: Colors.white),
+              title: const Text("BMI Engine Analyzer", style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const BMICalculatorScreen())).then((_) {
+                  _viewModel.loadDashboardState();
+                });
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.timer, color: Colors.white),
+              title: const Text("Workout Session Timer", style: TextStyle(color: Colors.white)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const WorkoutTimerScreen()));
+              },
+            ),
+            const Spacer(),
+            const Divider(color: Color(0xFF262626)),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.redAccent),
+              title: const Text("Sign Out Session", style: TextStyle(color: Colors.redAccent)),
+              onTap: () async {
+                Navigator.pop(context);
+                await _viewModel.executeSignOutSession();
+                if (context.mounted) {
+                  Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+                }
+              },
+            ),
+            const SizedBox(height: 20),
           ],
         ),
+      ),
+      body: _getScreens(state)[_viewModel.currentNavigationIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFF0F0F0F),
+        selectedItemColor: const Color(0xFFCCFF00),
+        unselectedItemColor: Colors.grey,
+        currentIndex: _viewModel.currentNavigationIndex,
+        onTap: _viewModel.updateNavigationIndex,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.featured_video_outlined), label: "Features"),
+          BottomNavigationBarItem(icon: Icon(Icons.library_add), label: "Library"),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: "Activity"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+        ],
       ),
     );
   }
@@ -274,15 +250,13 @@ class _DashboardContent extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.menu, color: Colors.white),
           onPressed: () {
+            viewModel.loadDashboardState();
             Scaffold.of(context).openDrawer();
           },
         ),
         title: const Text("FIT LOG", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
         actions: [
-          IconButton(
-              icon: const Icon(Icons.notifications_none, color: Colors.white),
-              onPressed: () => _openNotificationCenterOverlay(context, state)
-          ),
+          IconButton(icon: const Icon(Icons.notifications_none, color: Colors.white), onPressed: () => _openNotificationCenterOverlay(context, state)),
           if (state.isPremiumUser)
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 4.0),
@@ -329,47 +303,27 @@ class _DashboardContent extends StatelessWidget {
                     ],
                   ),
                 ),
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Consumer<QuoteViewModel>(
-                      builder: (context, quoteVM, child) {
-                        return SafeArea(
-                          bottom: false,
-                          child: Container(
-                            padding: const EdgeInsets.all(14),
-                            margin: const EdgeInsets.only(top: 10, bottom: 12),
-                            decoration: BoxDecoration(
-                                color: const Color(0xFFCCFF00).withOpacity(0.08),
-                                border: Border.all(color: const Color(0xFFCCFF00), width: 0.8),
-                                borderRadius: BorderRadius.circular(4)
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.format_quote, color: Color(0xFFCCFF00), size: 24),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: quoteVM.isLoading
-                                      ? const LinearProgressIndicator(
-                                    color: Color(0xFFCCFF00),
-                                    backgroundColor: Color(0xFF161616),
-                                  )
-                                      : Text(
-                                    quoteVM.currentQuote,
-                                    style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 13,
-                                        fontStyle: FontStyle.italic
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                          color: const Color(0xFFCCFF00).withValues(alpha: 0.08),
+                          border: Border.all(color: const Color(0xFFCCFF00), width: 0.8),
+                          borderRadius: BorderRadius.circular(4)
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.format_quote, color: Color(0xFFCCFF00), size: 24),
+                          const SizedBox(width: 12),
+                          Expanded(child: Text(viewModel.currentQuote, style: const TextStyle(color: Colors.white, fontSize: 13, fontStyle: FontStyle.italic))),
+                        ],
+                      ),
                     ),
                     Container(
                       padding: const EdgeInsets.all(16),
@@ -395,7 +349,7 @@ class _DashboardContent extends StatelessWidget {
                             onPressed: viewModel.toggleDailyStreakLog,
                             style: OutlinedButton.styleFrom(
                               side: BorderSide(color: state.loggedToday ? Colors.grey : const Color(0xFFCCFF00)),
-                              backgroundColor: state.loggedToday ? Colors.transparent : const Color(0xFFCCFF00).withOpacity(0.1),
+                              backgroundColor: state.loggedToday ? Colors.transparent : const Color(0xFFCCFF00).withValues(alpha: 0.1),
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                             ),
                             child: Text(
@@ -475,12 +429,222 @@ class _DashboardContent extends StatelessWidget {
                         ],
                       ),
                     ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => const BMICalculatorScreen())).then((_) {
+                                viewModel.loadDashboardState();
+                              });
+                            },
+                            child: _buildMetricCard("BODY MASS INDEX", "${state.displayBmiValue}", state.bmiStatusText, Icons.scale),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: _buildMetricCard("DAILY METABOLIC", "${state.internalCaloriesEaten} / ${state.currentTargetCalories}", "Target Floor Window", Icons.local_fire_department),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            height: 120,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Row(
+                                  children: [
+                                    Icon(Icons.water_drop, color: Color(0xFFCCFF00), size: 14),
+                                    SizedBox(width: 6),
+                                    Text("HYDRATION", style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
+                                Text("${state.hydrationAmount} L", style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900)),
+                                const Text("Daily Target: 3.5 Liters", style: TextStyle(color: Colors.grey, fontSize: 10)),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Container(
+                            height: 120,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Row(
+                                  children: [
+                                    Icon(Icons.notifications_active_outlined, color: Color(0xFFCCFF00), size: 14),
+                                    SizedBox(width: 6),
+                                    Text("HYDRO RADAR", style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
+                                Switch(
+                                  value: state.hydrationReminderActive,
+                                  activeColor: const Color(0xFFCCFF00),
+                                  onChanged: viewModel.toggleHydrationRadarAlerts,
+                                ),
+                                Text(state.hydrationReminderActive ? "Hourly Alerts Active" : "Alert Pings Paused", style: const TextStyle(color: Color(0xFFCCFF00), fontSize: 10)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "ACTIVE GOALS & CHALLENGES",
+                      style: TextStyle(color: Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      margin: const EdgeInsets.only(bottom: 10),
+                      decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.fitness_center, color: Color(0xFFCCFF00), size: 14),
+                              const SizedBox(width: 8),
+                              const Expanded(
+                                child: Text("Iron Warrior Volume Target", style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                              ),
+                              Text(
+                                "${((state.volumeProgress / state.volumeTarget) * 100).toInt()}%",
+                                style: const TextStyle(color: Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Text("${state.volumeProgress.toInt()}kg / ${state.volumeTarget.toInt()}kg Lifted", style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                          const SizedBox(height: 10),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(2),
+                            child: LinearProgressIndicator(
+                              value: state.volumeProgress / state.volumeTarget,
+                              backgroundColor: const Color(0xFF262626),
+                              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFCCFF00)),
+                              minHeight: 4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF161616),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: const Color(0xFFCCFF00).withValues(alpha: 0.15)),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFCCFF00).withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Icon(Icons.emoji_events_outlined, color: Color(0xFFCCFF00), size: 22),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text("COMMUNITY EVENT", style: TextStyle(color: Colors.grey, fontSize: 9, fontWeight: FontWeight.bold)),
+                                Text(
+                                  state.globalChallengeHeadline,
+                                  style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  state.isJoinedCommunityChallenge ? "Status: Engaged & Tracking" : "Status: Open Registration",
+                                  style: TextStyle(color: state.isJoinedCommunityChallenge ? const Color(0xFFCCFF00) : Colors.grey, fontSize: 10),
+                                ),
+                              ],
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: viewModel.toggleCommunityChallengeParticipation,
+                            style: TextButton.styleFrom(
+                              backgroundColor: state.isJoinedCommunityChallenge ? Colors.transparent : const Color(0xFFCCFF00),
+                              side: state.isJoinedCommunityChallenge ? BorderSide(color: Colors.grey.shade800) : BorderSide.none,
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                            ),
+                            child: Text(
+                              state.isJoinedCommunityChallenge ? "LEAVE" : "JOIN",
+                              style: TextStyle(color: state.isJoinedCommunityChallenge ? Colors.grey : Colors.black, fontSize: 10, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const MealTrackingScreen())).then((_) {
+                          viewModel.loadDashboardState();
+                        });
+                      },
+                      icon: const Icon(Icons.restaurant, color: Colors.black, size: 18),
+                      label: const Text("OPEN MEAL DIARY LOG", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 13)),
+                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFCCFF00), padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4))),
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const WorkoutTimerScreen())).then((_) {
+                          viewModel.loadDashboardState();
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, foregroundColor: const Color(0xFFCCFF00), padding: const EdgeInsets.symmetric(vertical: 14), shape: const RoundedRectangleBorder(side: BorderSide(color: Color(0xFFCCFF00), width: 1))),
+                      child: const Text("START ACTIVE TRAINING TIMER", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5, fontSize: 13)),
+                    ),
                   ],
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildMetricCard(String title, String value, String subtitle, IconData icon) {
+    return Container(
+      height: 120,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: const Color(0xFFCCFF00), size: 14),
+              const SizedBox(width: 6),
+              Text(title, style: const TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          Text(value, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
+          Text(subtitle, style: const TextStyle(color: Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.w500)),
+        ],
       ),
     );
   }
