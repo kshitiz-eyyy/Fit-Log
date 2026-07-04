@@ -1,16 +1,15 @@
+import 'package:fitlog/theme/app_theme.dart';
+import 'package:fitlog/view/performance_screen.dart';
+import 'package:fitlog/view/period_cycle.dart';
+import 'package:fitlog/view/track_membershiscreen.dart';
 import 'package:flutter/material.dart';
+
+// ✅ Added the missing imports
 import 'bmi_calculator_screen.dart';
-
-import 'contact_dietitan_screen.dart';
+import 'contact_dietitian_screen.dart';
 import 'contact_trainer_screen.dart';
-
-class AppColors {
-  static const Color background = Color(0xFF121212);
-  static const Color surfaceCard = Color(0xFF1E1E1E);
-  static const Color neonAccent = Color(0xFFD4FF00);
-  static const Color textPrimary = Colors.white;
-  static const Color textSecondary = Color(0xFF8A8A8A);
-}
+import 'calorie_tracker_screen.dart';
+import 'sleep_screen.dart';
 
 class FeatureItem {
   final String title;
@@ -27,7 +26,9 @@ class FeatureItem {
 }
 
 class FeaturesScreen extends StatelessWidget {
-  FeaturesScreen({super.key});
+  FeaturesScreen({super.key, this.onBack});
+
+  final VoidCallback? onBack;
 
   final List<FeatureItem> features = [
     FeatureItem(
@@ -43,10 +44,10 @@ class FeaturesScreen extends StatelessWidget {
       imagePath: 'assets/images/diet.png',
     ),
     FeatureItem(
-        title: 'BMI Calculator',
-        description: 'Track your body mass index progress effortlessly.',
-        icon: Icons.calculate,
-        imagePath: 'assets/images/bmi.png'
+      title: 'BMI Calculator',
+      description: 'Track your body mass index progress effortlessly.',
+      icon: Icons.calculate,
+      imagePath: 'assets/images/bmi.png',
     ),
     FeatureItem(
       title: 'Calorie Tracker',
@@ -55,49 +56,69 @@ class FeaturesScreen extends StatelessWidget {
     ),
     FeatureItem(
       title: 'Sleep Tracking',
-      description: 'Monitor your recovery and sleep cycles for peak performance.',
+      description:
+      'Monitor your recovery and sleep cycles for peak performance.',
       icon: Icons.bedtime,
     ),
     FeatureItem(
-      title: 'Workout Analytics',
+      title: 'Performance',
       description: 'Deep dive into your performance metrics over time.',
-      icon: Icons.analytics,
+      icon: Icons.calendar_month,
+      imagePath: 'assets/images/calender.png',
+    ),
+    FeatureItem(
+      title: 'Membership',
+      description: 'Track your subscription cycle and remaining days.',
+      icon: Icons.card_membership,
+    ),
+    FeatureItem(
+      title: 'Period Cycle',
+      description: 'Track your menstrual cycle and phases day by day.',
+      icon: Icons.favorite,
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppTheme.colorsOf(context);
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
+        backgroundColor: colors.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
-          onPressed: () => Navigator.maybePop(context),
+          icon: Icon(Icons.arrow_back, color: colors.textPrimary),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+              return;
+            }
+            onBack?.call();
+          },
         ),
         title: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: AppColors.neonAccent,
+                color: colors.neonAccent,
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: const Text(
+              child: Text(
                 'F',
                 style: TextStyle(
-                  color: Colors.black,
+                  color: colors.background,
                   fontWeight: FontWeight.w900,
                   fontSize: 14,
                 ),
               ),
             ),
             const SizedBox(width: 8),
-            const Text(
+            Text(
               'FITLOG',
               style: TextStyle(
-                color: AppColors.textPrimary,
+                color: colors.textPrimary,
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
                 letterSpacing: 1.2,
@@ -112,22 +133,19 @@ class FeaturesScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'FEATURES',
                 style: TextStyle(
-                  color: AppColors.textPrimary,
+                  color: colors.textPrimary,
                   fontSize: 32,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 1.0,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Select a tool to enhance your training regimen.',
-                style: TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: colors.textSecondary, fontSize: 14),
               ),
               const SizedBox(height: 24),
               Expanded(
@@ -153,20 +171,19 @@ class FeaturesScreen extends StatelessWidget {
   }
 
   Widget _buildFeatureCard(FeatureItem item, BuildContext context) {
+    final colors = AppTheme.colorsOf(context);
+
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surfaceCard,
+        color: colors.surfaceCard,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.05),
-          width: 1,
-        ),
+        border: Border.all(color: colors.border, width: 1),
         image: item.imagePath != null
             ? DecorationImage(
           image: AssetImage(item.imagePath!),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(
-            Colors.black.withValues(alpha: 0.35),
+            Colors.black.withOpacity(0.35),
             BlendMode.darken,
           ),
         )
@@ -198,6 +215,43 @@ class FeaturesScreen extends StatelessWidget {
                   builder: (context) => const ContactDietitianScreen(),
                 ),
               );
+            } else if (item.title == 'Performance') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PerformanceScreen(),
+                ),
+              );
+            } else if (item.title == 'Membership') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const TrackMembershipScreen(),
+                ),
+              );
+            } else if (item.title == 'Period Cycle') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PeriodCycleScreen(),
+                ),
+              );
+              // ✅ Added routing for Calorie Tracker
+            } else if (item.title == 'Calorie Tracker') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CalorieTrackerScreen(),
+                ),
+              );
+              // ✅ Added routing for Sleep Tracking
+            } else if (item.title == 'Sleep Tracking') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SleepScreen(),
+                ),
+              );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -216,22 +270,20 @@ class FeaturesScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppColors.background.withValues(alpha: item.imagePath != null ? 0.8 : 1.0),
+                    color: colors.background.withOpacity(
+                      item.imagePath != null ? 0.8 : 1.0,
+                    ),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
-                    item.icon,
-                    color: AppColors.neonAccent,
-                    size: 28,
-                  ),
+                  child: Icon(item.icon, color: colors.neonAccent, size: 28),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       item.title,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
+                      style: TextStyle(
+                        color: colors.textPrimary,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -241,8 +293,8 @@ class FeaturesScreen extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       item.description,
-                      style: const TextStyle(
-                        color: AppColors.textSecondary,
+                      style: TextStyle(
+                        color: colors.textSecondary,
                         fontSize: 11,
                         height: 1.3,
                       ),

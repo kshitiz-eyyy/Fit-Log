@@ -1,20 +1,23 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fitlog/view/admin_panel_screen.dart';
-import 'package:fitlog/view/bmi_calculator_screen.dart';
 import 'package:fitlog/view/contact_dietitan_screen.dart';
 import 'package:fitlog/view/contact_trainer_screen.dart';
 import 'package:fitlog/view/fitlog_login.dart';
-import 'package:fitlog/view/register_screen.dart';
 import 'package:fitlog/view/terms_and_conditions_screen.dart';
-import 'package:fitlog/view/user_dashboard.dart';
 import 'package:fitlog/view/welcome_screen.dart';
 import 'package:fitlog/viewmodel/user_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+
+
+
+
 import 'firebase_options.dart';
 import 'view/library.dart';
 import 'view/favourite_exercise.dart';
 import 'view/change_password_screen.dart';
+
 import 'view/features_screen.dart';
 import 'view/splash_screen.dart';
 
@@ -54,7 +57,7 @@ class FitLogApp extends StatelessWidget {
             ),
           ),
         ),
-        home:const ContactTrainerScreen(),
+        home:const FitLogLogin()
     );
   }
 }

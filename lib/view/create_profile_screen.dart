@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../viewmodel/user_view_model.dart';
+import '../model/user_model.dart';
+import 'fitlog_login.dart';
 
 class CreateProfileScreen extends StatefulWidget {
   const CreateProfileScreen({super.key});
@@ -17,12 +21,136 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   bool _termsAccepted = false;
 
   @override
+  void initState() {
+    super.initState();
+    _accessKeyController.addListener(_updateState);
+  }
+
+  void _updateState() {
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _accessKeyController.removeListener(_updateState);
+    _handleController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _accessKeyController.dispose();
+    _verifyKeyController.dispose();
+    _bioController.dispose();
+    super.dispose();
+  }
+
+  // Password Strength Logic
+  bool get _hasMin10Chars => _accessKeyController.text.length >= 10;
+  bool get _hasSpecialSymbol =>
+      _accessKeyController.text.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
+  bool get _hasNumericValue =>
+      _accessKeyController.text.contains(RegExp(r'[0-9]'));
+  bool get _hasUppercase =>
+      _accessKeyController.text.contains(RegExp(r'[A-Z]'));
+
+  double get _strengthProgress {
+    int count = 0;
+    if (_hasMin10Chars) count++;
+    if (_hasSpecialSymbol) count++;
+    if (_hasNumericValue) count++;
+    if (_hasUppercase) count++;
+    return count / 4;
+  }
+
+  String get _strengthText {
+    double progress = _strengthProgress;
+    if (progress >= 1.0) return 'ELITE';
+    if (progress >= 0.75) return 'STRONG';
+    if (progress >= 0.5) return 'FAIR';
+    if (progress >= 0.25) return 'WEAK';
+    return 'NONE';
+  }
+
+  void _handleInitializePerformance() async {
+    final handle = _handleController.text.trim();
+    final email = _emailController.text.trim();
+    final phone = _phoneController.text.trim();
+    final password = _accessKeyController.text.trim();
+    final verifyPassword = _verifyKeyController.text.trim();
+    final bio = _bioController.text.trim();
+
+    if (handle.isEmpty || email.isEmpty || phone.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all required protocol fields')),
+      );
+      return;
+    }
+
+    if (password != verifyPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Access keys do not match')),
+      );
+      return;
+    }
+
+    if (!_termsAccepted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please accept the Terms and Conditions')),
+      );
+      return;
+    }
+
+    final viewModel = context.read<UserViewModel>();
+    final userId = await viewModel.register(email, password);
+
+    if (userId.isNotEmpty) {
+      final userModel = UserModel(
+        id: userId,
+        name: handle,
+        handle: handle,
+        contact: phone,
+        email: email,
+        bio: bio.isNotEmpty ? bio : 'Consistency beats talent every single day.',
+        fitnessGoal: 'Hypertrophy Conditioning',
+        role: 'user',
+      );
+
+      final success = await viewModel.addUser(userModel);
+
+      if (success) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('System Initialized! Performance profile created.')),
+          );
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const FitLogLogin()),
+            (route) => false,
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(viewModel.error ?? 'Data injection failed')),
+          );
+        }
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(viewModel.error ?? 'Authentication initialization failed')),
+        );
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     const backgroundColor = Color(0xFF0C0C0C);
     const accentColor = Color(0xFFD4FF00);
     const cardColor = Color(0xFF141414);
     const textColor = Colors.white;
     const secondaryTextColor = Color(0xFF8E8E8E);
+
+    final isLoading = context.watch<UserViewModel>().loading;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -68,7 +196,6 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                           fontSize: 32,
                           fontWeight: FontWeight.w900,
                           height: 1.1,
-                          fontFamily: 'Roboto', // Defaulting to system
                         ),
                         children: [
                           TextSpan(text: 'CREATE\n', style: TextStyle(color: textColor)),
@@ -134,6 +261,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                       hint: 'email@forge.performance',
                       controller: _emailController,
                       cardColor: cardColor,
+                      keyboardType: TextInputType.emailAddress,
                     ),
                     const SizedBox(height: 20),
                     _buildInputField(
@@ -141,6 +269,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                       hint: '+1 (555) 000-0000',
                       controller: _phoneController,
                       cardColor: cardColor,
+                      keyboardType: TextInputType.phone,
                     ),
                     const SizedBox(height: 20),
                     _buildInputField(
@@ -150,6 +279,44 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                       cardColor: cardColor,
                       isPassword: true,
                     ),
+
+                    const SizedBox(height: 12),
+                    // Password strength indicator
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: cardColor,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('KEY STRENGTH: $_strengthText',
+                                  style: const TextStyle(
+                                      color: accentColor,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold)),
+                              Text('${(_strengthProgress * 100).toInt()}%',
+                                  style: const TextStyle(
+                                      color: accentColor,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          LinearProgressIndicator(
+                            value: _strengthProgress,
+                            backgroundColor: const Color(0xFF2C2C2C),
+                            color: accentColor,
+                            minHeight: 4,
+                          ),
+                        ],
+                      ),
+                    ),
+
                     const SizedBox(height: 20),
                     _buildInputField(
                       label: 'VERIFY KEY',
@@ -208,27 +375,30 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                       width: double.infinity,
                       height: 64,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: isLoading ? null : _handleInitializePerformance,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: accentColor,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           elevation: 0,
+                          disabledBackgroundColor: secondaryTextColor.withValues(alpha: 0.3),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Text(
-                              'INITIALIZE PERFORMANCE',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w900,
+                        child: isLoading
+                            ? const CircularProgressIndicator(color: Colors.black)
+                            : const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'INITIALIZE PERFORMANCE',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Icon(Icons.arrow_forward, color: Colors.black, size: 20),
+                                ],
                               ),
-                            ),
-                            SizedBox(width: 8),
-                            Icon(Icons.arrow_forward, color: Colors.black, size: 20),
-                          ],
-                        ),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -261,6 +431,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     required Color cardColor,
     bool isPassword = false,
     int maxLines = 1,
+    TextInputType keyboardType = TextInputType.text,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -284,6 +455,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
             controller: controller,
             obscureText: isPassword,
             maxLines: maxLines,
+            keyboardType: keyboardType,
             style: const TextStyle(color: Colors.white, fontSize: 14),
             decoration: InputDecoration(
               hintText: hint,

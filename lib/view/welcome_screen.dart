@@ -1,112 +1,146 @@
 import 'package:flutter/material.dart';
-import 'package:fitlog/view/create_profile_screen.dart';
+
+import 'fitlog_login.dart';
+
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    const Color darkBackground = Color(0xFF000000);
-    const Color secondaryLime = Color(0xFFCCFF00);
-    const Color primaryOrange = Color(0xFFFF6D00);
-    const Color textGray = Color(0xFFBDBDBD);
-
     return Scaffold(
-      backgroundColor: darkBackground,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Spacer(),
-              // Logo
-              Image.asset(
-                'assets/images/logo.png',
-                height: 120,
-                fit: BoxFit.contain,
-              ),
-              const SizedBox(height: 64),
-              // Headline
-              const Text(
-                'YOUR PERSONAL\nFITNESS COMPANION',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w800,
-                  height: 1.2,
-                ),
-              ),
-              const SizedBox(height: 32),
-              // Description
-              const Text(
-                'Track every move, analyze every set, and\nconquer your goals with precision data.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: textGray,
-                  fontSize: 16,
-                  height: 1.4,
-                ),
-              ),
-              const Spacer(),
-              // Buttons
-              SizedBox(
-                width: double.infinity,
-                height: 60,
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: secondaryLime,
-                    foregroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+      backgroundColor: const Color(0xFF0D0D0D),
+      body: Stack(
+        children: [
+          SafeArea(
+            child: SizedBox(
+              width: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Logo area with subtle glow
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Radial glow effect
+                        Container(
+                          width: 220,
+                          height: 220,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: RadialGradient(
+                              colors: [
+                                const Color(0xFFC6FF00).withValues(alpha: 0.12),
+                                Colors.transparent,
+                              ],
+                            ),
+                          ),
+                        ),
+                        // Logo Image from assets
+                        Image.asset(
+                          'assets/images/logo.png',
+                          width: 140,
+                          height: 140,
+                          fit: BoxFit.contain,
+                        ),
+                      ],
                     ),
-                    elevation: 0,
-                  ),
-                  child: const Text(
-                    'LOGIN',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                height: 60,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CreateProfileScreen(),
+
+                    const SizedBox(height: 32),
+
+                    // Welcome Text
+                    const Text(
+                      'WELCOME TO\nFITLOG',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 52,
+                        fontWeight: FontWeight.w900,
+                        height: 0.95,
+                        letterSpacing: -1.5,
                       ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryOrange,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
                     ),
-                    elevation: 0,
-                  ),
-                  child: const Text(
-                    'CREATE PROFILE',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+
+                    const SizedBox(height: 12),
+
+                    // Tagline
+                    Text(
+                      'Your journey to elite performance\nstarts here.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.6),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        height: 1.4,
+                        letterSpacing: 0.2,
+                      ),
                     ),
-                  ),
+
+                    const SizedBox(height: 48),
+
+                    // ✅ Added: Action Button to Navigate to Login
+                    SizedBox(
+                      width: double.infinity,
+                      height: 60,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const FitLogLogin(),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFCCFF00), // Matches your login button
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.zero, // Fits your hard-edged grid theme
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'ENTER TRAINING GRID',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 18,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Icon(Icons.bolt, color: Colors.black),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const Spacer(),
-            ],
+            ),
           ),
-        ),
+
+          // Version Footer
+          Positioned(
+            bottom: 32,
+            left: 0,
+            right: 0,
+            child: Text(
+              'v2.0.0 • SYSTEM ACTIVE',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.2),
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1.5,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

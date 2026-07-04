@@ -170,4 +170,11 @@
     <string name="vol_250ml">250ml</string>
     <string name="vol_400ml">400ml</string>
 
+    <!-- Landing Screen Strings -->
+    <string name="get_started">GET STARTED</string>
+    <string name="landing_tagline">Your journey to elite performance\nstarts here.</string>
+    <string name="login_caps">LOGIN</string>
+    <string name="version_footer">v2.0.0 • SYSTEM ACTIVE</string>
+    <string name="welcome_to_fitlog_caps">WELCOME TO FITLOG</string>
+
 </resources>

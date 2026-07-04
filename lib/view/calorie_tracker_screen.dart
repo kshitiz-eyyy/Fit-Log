@@ -1,33 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../viewmodel/calorie_tracker_viewmodel.dart';
+import '../repo/calorie_repository.dart';
+import '../model/meal_model.dart';
 
-class CalorieTrackerScreen extends StatefulWidget {
+class CalorieTrackerScreen extends StatelessWidget {
   const CalorieTrackerScreen({super.key});
 
   @override
-  State<CalorieTrackerScreen> createState() => _CalorieTrackerScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => CalorieTrackerViewModel(CalorieRepositoryImpl()),
+      child: const _CalorieTrackerView(),
+    );
+  }
 }
 
-class _CalorieTrackerScreenState extends State<CalorieTrackerScreen> {
-  final Map<String, int> _mealCalories = {
-    'Breakfast': 450,
-    'Lunch': 620,
-    'Dinner': 0,
-    'Snack': 150,
-  };
+class _CalorieTrackerView extends StatelessWidget {
+  const _CalorieTrackerView();
 
-  int get _totalCalories => _mealCalories.values.fold(0, (sum, val) => sum + val);
-  final int _goalCalories = 2000;
-
-  void _showEditCaloriesDialog(String mealName) {
+  void _showEditCaloriesDialog(BuildContext context, Meal meal) {
+    final viewModel = context.read<CalorieTrackerViewModel>();
     final TextEditingController controller = TextEditingController(
-      text: _mealCalories[mealName].toString(),
+      text: meal.calories.toString(),
     );
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1C1C1E),
-        title: Text('Edit $mealName Calories', style: const TextStyle(color: Colors.white)),
+        title: Text('Edit ${meal.name} Calories', style: const TextStyle(color: Colors.white)),
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.number,
@@ -45,9 +47,64 @@ class _CalorieTrackerScreenState extends State<CalorieTrackerScreen> {
           ),
           TextButton(
             onPressed: () {
-              setState(() {
-                _mealCalories[mealName] = int.tryParse(controller.text) ?? 0;
-              });
+              viewModel.updateMealCalories(meal.name, int.tryParse(controller.text) ?? 0);
+              Navigator.pop(context);
+            },
+            child: const Text('SAVE', style: TextStyle(color: Color(0xFFD0FD3E))),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddMealDialog(BuildContext context) {
+    final viewModel = context.read<CalorieTrackerViewModel>();
+    final nameController = TextEditingController();
+    final caloriesController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1C1C1E),
+        title: const Text('Log New Meal', style: TextStyle(color: Colors.white)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                labelText: 'Meal Name (e.g., Afternoon Snack)',
+                labelStyle: TextStyle(color: Color(0xFF8E8E93)),
+                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFFD0FD3E))),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: caloriesController,
+              keyboardType: TextInputType.number,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                labelText: 'Calories',
+                labelStyle: TextStyle(color: Color(0xFF8E8E93)),
+                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFFD0FD3E))),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('CANCEL', style: TextStyle(color: Colors.white)),
+          ),
+          TextButton(
+            onPressed: () {
+              if (nameController.text.isNotEmpty) {
+                viewModel.updateMealCalories(
+                  nameController.text,
+                  int.tryParse(caloriesController.text) ?? 0,
+                );
+              }
               Navigator.pop(context);
             },
             child: const Text('SAVE', style: TextStyle(color: Color(0xFFD0FD3E))),
@@ -63,6 +120,8 @@ class _CalorieTrackerScreenState extends State<CalorieTrackerScreen> {
     const cardBackgroundColor = Color(0xFF1C1C1E);
     const accentColor = Color(0xFFD0FD3E);
     const orangeColor = Color(0xFFFF5A1F);
+
+    final viewModel = context.watch<CalorieTrackerViewModel>();
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -110,138 +169,143 @@ class _CalorieTrackerScreenState extends State<CalorieTrackerScreen> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 24),
-            // Calorie Ring
-            Center(
-              child: SizedBox(
-                width: 220,
-                height: 220,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    SizedBox(
-                      width: 220,
-                      height: 220,
-                      child: CircularProgressIndicator(
-                        value: _totalCalories / _goalCalories,
-                        strokeWidth: 12,
-                        backgroundColor: const Color(0xFF333333),
-                        valueColor: AlwaysStoppedAnimation<Color>(accentColor),
+      body: viewModel.isLoading
+          ? const Center(child: CircularProgressIndicator(color: accentColor))
+          : RefreshIndicator(
+        onRefresh: viewModel.fetchMeals,
+        color: accentColor,
+        backgroundColor: cardBackgroundColor,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            children: [
+              const SizedBox(height: 24),
+              // Calorie Ring
+              Center(
+                child: SizedBox(
+                  width: 220,
+                  height: 220,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox(
+                        width: 220,
+                        height: 220,
+                        child: CircularProgressIndicator(
+                          value: (viewModel.totalCalories / viewModel.goalCalories).clamp(0.0, 1.0),
+                          strokeWidth: 12,
+                          backgroundColor: const Color(0xFF333333),
+                          valueColor: AlwaysStoppedAnimation<Color>(accentColor),
+                        ),
                       ),
-                    ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          '$_totalCalories',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 48,
-                            fontWeight: FontWeight.w900,
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '${viewModel.totalCalories}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 48,
+                              fontWeight: FontWeight.w900,
+                            ),
                           ),
-                        ),
-                        Text(
-                          '/ $_goalCalories KCAL',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.6),
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
+                          Text(
+                            '/ ${viewModel.goalCalories} KCAL',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.6),
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          "Today's Total",
-                          style: TextStyle(
-                            color: accentColor,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
+                          const SizedBox(height: 4),
+                          const Text(
+                            "Today's Total",
+                            style: TextStyle(
+                              color: accentColor,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 32),
-            // Meals Section
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'MEALS TODAY',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                Text(
-                  '${_mealCalories.length} ENTRIES',
-                  style: const TextStyle(
-                    color: Color(0xFF8E8E93),
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
+              ),
+              const SizedBox(height: 32),
+              // Meals Section
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'MEALS TODAY',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  Text(
+                    '${viewModel.meals.length} ENTRIES',
+                    style: const TextStyle(
+                      color: Color(0xFF8E8E93),
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              ...viewModel.meals.map((meal) => Padding(
+                padding: const EdgeInsets.only(bottom: 12.0),
+                child: _buildMealItem(context, meal, cardBackgroundColor),
+              )),
+              const SizedBox(height: 32),
+              // Log Meal Button
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: () => _showAddMealDialog(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: orangeColor,
+                    shape: RoundedCornerShape(12),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.add_circle_outline, color: Colors.white, size: 20),
+                      SizedBox(width: 8),
+                      Text(
+                        'LOG MEAL',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildMealItem('Breakfast', _mealCalories['Breakfast']!, cardBackgroundColor),
-            const SizedBox(height: 12),
-            _buildMealItem('Lunch', _mealCalories['Lunch']!, cardBackgroundColor),
-            const SizedBox(height: 12),
-            _buildMealItem('Dinner', _mealCalories['Dinner']!, cardBackgroundColor),
-            const SizedBox(height: 12),
-            _buildMealItem('Snack', _mealCalories['Snack']!, cardBackgroundColor),
-            const SizedBox(height: 32),
-            // Log Meal Button
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: orangeColor,
-                  shape: RoundedCornerShape(12),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.add_circle_outline, color: Colors.white, size: 20),
-                    SizedBox(width: 8),
-                    Text(
-                      'LOG MEAL',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                  ],
-                ),
               ),
-            ),
-            const SizedBox(height: 32),
-          ],
+              const SizedBox(height: 32),
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () => _showAddMealDialog(context),
         backgroundColor: accentColor,
         child: const Icon(Icons.add, color: Colors.black),
       ),
     );
   }
 
-  Widget _buildMealItem(String name, int calories, Color backgroundColor) {
+  Widget _buildMealItem(BuildContext context, Meal meal, Color backgroundColor) {
     return GestureDetector(
-      onTap: () => _showEditCaloriesDialog(name),
+      onTap: () => _showEditCaloriesDialog(context, meal),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -264,7 +328,7 @@ class _CalorieTrackerScreenState extends State<CalorieTrackerScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  name,
+                  meal.name,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
@@ -272,7 +336,7 @@ class _CalorieTrackerScreenState extends State<CalorieTrackerScreen> {
                   ),
                 ),
                 Text(
-                  '$calories kcal',
+                  '${meal.calories} kcal',
                   style: const TextStyle(
                     color: Color(0xFF8E8E93),
                     fontSize: 12,

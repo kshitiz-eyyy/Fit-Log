@@ -1,13 +1,16 @@
 import 'dart:io';
+import 'package:fitlog/view/edit_profile_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:fitlog/theme/app_theme.dart';
+import 'package:fitlog/view/fitlog_premium_screen.dart';
 import 'package:fitlog/view/change_password_screen.dart';
-
-import 'fitlog_premium_screen.dart';
+import 'package:fitlog/view/rate_screen.dart';
+import 'package:fitlog/view/track_membershiscreen.dart';
+import '../viewmodel/theme_view_model.dart';
+import '../viewmodel/user_profile_view_model.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -17,136 +20,95 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  String athleteName = "Loading Athlete...";
-  String athleteEmail = "athlete@fitlog.com";
-  String athleteBio = "Consistency beats talent every single day.";
-  String fitnessGoal = "Hypertrophy Conditioning";
-  String membershipPlanText = "FitLog Regular Member";
-  String? _profileImagePath;
-
-  bool biometricAuthEnabled = false;
-  bool pushNotificationsEnabled = true;
-  bool workoutRemindersEnabled = true;
-  bool _isDataSyncLoading = true;
-
+  final UserProfileViewModel _viewModel = UserProfileViewModel();
   final ImagePicker _picker = ImagePicker();
-
-  // Controller to handle the text input for new objectives
   final _goalInputController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _fetchLiveFirebaseProfileData();
+    _viewModel.addListener(_onViewModelStateUpdated);
+    _viewModel.fetchLiveProfileData();
   }
 
   @override
   void dispose() {
+    _viewModel.removeListener(_onViewModelStateUpdated);
     _goalInputController.dispose();
     super.dispose();
   }
 
-  // Helper method to reliably get the current user ID
-  String _getCurrentUserId() {
-    User? liveFirebaseUser = FirebaseAuth.instance.currentUser;
-    if (liveFirebaseUser != null) {
-      return liveFirebaseUser.uid;
-    }
-    return "Eb3LsmAGcqNpd5pfwO28TpPyFWL2";
+  void _onViewModelStateUpdated() {
+    if (mounted) setState(() {});
   }
 
-  Future<void> _fetchLiveFirebaseProfileData() async {
+  Future<void> _handleImageSelectionFlow() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      setState(() {
-        _profileImagePath = prefs.getString('user_profile_img');
-        biometricAuthEnabled = prefs.getBool('setting_biometric') ?? false;
-        pushNotificationsEnabled = prefs.getBool('setting_push') ?? true;
-        workoutRemindersEnabled = prefs.getBool('setting_reminders') ?? true;
-      });
-
-      String targetUid = _getCurrentUserId();
-      User? liveFirebaseUser = FirebaseAuth.instance.currentUser;
-
-      setState(() {
-        athleteEmail = liveFirebaseUser?.email ?? "kritikatripathi0094@gmail.com";
-      });
-
-      DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(targetUid)
-          .get();
-
-      if (userDoc.exists && userDoc.data() != null) {
-        Map<String, dynamic> data = userDoc.data() as Map<String, dynamic>;
-        setState(() {
-          athleteName = data['name'] ?? "Kritika Tripathi";
-          athleteBio = data['user_bio'] ?? "Consistency beats talent every single day.";
-          fitnessGoal = data['fitness_goal'] ?? "Hypertrophy Conditioning";
-
-          String systemRole = data['role'] ?? 'user';
-          membershipPlanText = systemRole == 'admin'
-              ? "FitLog System Administrator"
-              : "FitLog Pro Premium Access";
-        });
+      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+      if (pickedFile != null) {
+        await _viewModel.updatePreferenceSetting('user_profile_img', pickedFile.path);
       }
     } catch (e) {
-      debugPrint("Profile data pipeline sync telemetry failure: $e");
-    } finally {
-      setState(() => _isDataSyncLoading = false);
+      _showToastSnackBar("Gallery error: $e");
     }
   }
 
-  // --- SAVE DYNAMIC FITNESS GOAL DATA COLLECTION ---
-  Future<void> _addNewFitnessGoal(String goalTitle) async {
-    if (goalTitle.trim().isEmpty) return;
-
-    // Use reliable target ID fallback mapping
-    String targetUid = _getCurrentUserId();
+  void _executeNewGoalCommit() async {
+    final text = _goalInputController.text;
+    if (text.trim().isEmpty) return;
 
     try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(targetUid)
-          .collection('fitness_goals')
-          .add({
-        'goal_title': goalTitle.trim(),
-        'status': 'active',
-        'created_at': FieldValue.serverTimestamp(),
-        'completed_at': null,
-      });
-
+      await _viewModel.addNewFitnessGoal(text);
       _goalInputController.clear();
-
-      // Close software keyboard out of view automatically
       FocusScope.of(context).unfocus();
       _showToastSnackBar("New fitness parameter locked into database.");
     } catch (e) {
-      debugPrint("FIRESTORE SUBCOLLECTION ERROR: $e");
       _showDiagnosticErrorDialog(
           "Cloud Connection Blocked",
-          "The database rejected the write request.\n\nError: $e\n\nFix: Check your Cloud Firestore 'Rules' tab and ensure they allow reads and writes."
+          "The database rejected the write request.\n\nError: $e"
       );
     }
   }
 
-  Future<void> _markGoalAsCompleted(String docId) async {
-    String targetUid = _getCurrentUserId();
+  void _showEditProfileDialog() {
+    final nameCtrl = TextEditingController(text: _viewModel.athleteName);
+    final bioCtrl = TextEditingController(text: _viewModel.athleteBio);
+    final goalCtrl = TextEditingController(text: _viewModel.fitnessGoal);
 
-    try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(targetUid)
-          .collection('fitness_goals')
-          .doc(docId)
-          .update({
-        'status': 'completed',
-        'completed_at': FieldValue.serverTimestamp(),
-      });
-      _showToastSnackBar("Objective achieved! Progress entry synchronized.");
-    } catch (e) {
-      _showToastSnackBar("Error updating achievement status: $e");
-    }
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF161616),
+        title: const Text("UPDATE ATHLETE PROFILE", style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(controller: nameCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Name")),
+            TextField(controller: goalCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Fitness Goal")),
+            TextField(controller: bioCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Bio Statement")),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL", style: TextStyle(color: Colors.grey))),
+          TextButton(
+            onPressed: () async {
+              try {
+                await _viewModel.saveProfileChanges(
+                  name: nameCtrl.text.trim(),
+                  bio: bioCtrl.text.trim(),
+                  fitnessGoal: goalCtrl.text.trim(),
+                );
+                _showToastSnackBar("Cloud Database Profile synchronized successfully.");
+              } catch (e) {
+                _showToastSnackBar("Cloud push failure point: ${e.toString()}");
+              }
+              if (mounted) Navigator.pop(context);
+            },
+            child: const Text("SAVE", style: TextStyle(color: Color(0xFFCCFF00))),
+          )
+        ],
+      ),
+    );
   }
 
   void _showDiagnosticErrorDialog(String title, String message) {
@@ -172,100 +134,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Future<void> _savePreference(String key, dynamic value) async {
-    final prefs = await SharedPreferences.getInstance();
-    if (value is bool) await prefs.setBool(key, value);
-    if (value is String) await prefs.setString(key, value);
-  }
-
-  Future<void> _pickProfileImage() async {
-    try {
-      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
-      if (pickedFile != null) {
-        setState(() => _profileImagePath = pickedFile.path);
-        await _savePreference('user_profile_img', pickedFile.path);
-      }
-    } catch (e) {
-      _showToastSnackBar("Gallery error: $e");
-    }
-  }
-
-  void _showEditProfileDialog() {
-    final nameCtrl = TextEditingController(text: athleteName);
-    final bioCtrl = TextEditingController(text: athleteBio);
-    final goalCtrl = TextEditingController(text: fitnessGoal);
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: const Color(0xFF161616),
-        title: const Text("UPDATE ATHLETE PROFILE", style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: nameCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Name")),
-            TextField(controller: goalCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Fitness Goal")),
-            TextField(controller: bioCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Bio Statement")),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL", style: TextStyle(color: Colors.grey))),
-          TextButton(
-            onPressed: () async {
-              final newName = nameCtrl.text.trim();
-              final newBio = bioCtrl.text.trim();
-              final newGoal = goalCtrl.text.trim();
-
-              setState(() {
-                athleteName = newName;
-                athleteBio = newBio;
-                fitnessGoal = newGoal;
-                _isDataSyncLoading = true;
-              });
-
-              try {
-                String targetUid = _getCurrentUserId();
-                await FirebaseFirestore.instance
-                    .collection('users')
-                    .doc(targetUid)
-                    .update({
-                  'name': newName,
-                  'user_bio': newBio,
-                  'fitness_goal': newGoal,
-                });
-
-                await _savePreference('user_name', newName);
-                await _savePreference('user_bio', newBio);
-                await _savePreference('fitness_goal', newGoal);
-
-                _showToastSnackBar("Cloud Database Profile synchronized successfully.");
-              } catch (e) {
-                _showToastSnackBar("Cloud push failure point: ${e.toString()}");
-              } finally {
-                setState(() => _isDataSyncLoading = false);
-              }
-
-              if (mounted) Navigator.pop(context);
-            },
-            child: const Text("SAVE", style: TextStyle(color: Color(0xFFCCFF00))),
-          )
-        ],
-      ),
-    );
-  }
-
   void _showToastSnackBar(String contextText) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: const Color(0xFF161616), content: Text(contextText, style: const TextStyle(color: Color(0xFFCCFF00)))));
   }
 
   @override
   Widget build(BuildContext context) {
-    String currentUserId = _getCurrentUserId();
+    final colors = AppTheme.colorsOf(context);
+    final themeViewModel = context.watch<ThemeViewModel>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F0F),
-      body: _isDataSyncLoading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFFCCFF00)))
+      backgroundColor: colors.background,
+      body: _viewModel.isDataSyncLoading
+          ? Center(child: CircularProgressIndicator(color: colors.neonAccent))
           : SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -282,29 +163,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: CircleAvatar(
                       radius: 47,
                       backgroundColor: const Color(0xFF161616),
-                      backgroundImage: _profileImagePath != null ? FileImage(File(_profileImagePath!)) : null,
-                      child: _profileImagePath == null ? const Icon(Icons.person, size: 50, color: Colors.grey) : null,
+                      backgroundImage: _viewModel.profileImagePath != null ? FileImage(File(_viewModel.profileImagePath!)) : null,
+                      child: _viewModel.profileImagePath == null ? const Icon(Icons.person, size: 50, color: Colors.grey) : null,
                     ),
                   ),
                   IconButton(
-                    style: IconButton.styleFrom(
-                      backgroundColor: const Color(0xFFCCFF00),
-                    ),
+                    style: IconButton.styleFrom(backgroundColor: const Color(0xFFCCFF00)),
                     icon: const Icon(Icons.photo_camera, size: 18, color: Colors.black),
-                    onPressed: _pickProfileImage,
+                    onPressed: _handleImageSelectionFlow,
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 12),
-            Text(athleteName, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-            Text(athleteEmail, textAlign: TextAlign.center, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+            Text(_viewModel.athleteName, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(_viewModel.athleteEmail, textAlign: TextAlign.center, style: const TextStyle(color: Colors.grey, fontSize: 12)),
             const SizedBox(height: 4),
-            Text("Goal: $fitnessGoal", textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFFCCFF00), fontSize: 11)),
+            Text("Goal: ${_viewModel.fitnessGoal}", textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFFCCFF00), fontSize: 11)),
             const SizedBox(height: 6),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Text(athleteBio, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white60, fontSize: 12, fontStyle: FontStyle.italic)),
+              child: Text(_viewModel.athleteBio, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white60, fontSize: 12, fontStyle: FontStyle.italic)),
             ),
             const SizedBox(height: 16),
             Container(
@@ -325,7 +204,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text("CURRENT SERVICE PLAN", style: TextStyle(color: Colors.grey, fontSize: 9, fontWeight: FontWeight.bold)),
-                            Text(membershipPlanText, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+                            Text(_viewModel.membershipPlanText, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
                           ],
                         ),
                       ),
@@ -352,11 +231,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
             ),
-
             const SizedBox(height: 20),
             const Text("TARGET MILESTONES & GOALS", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1)),
             const SizedBox(height: 8),
-
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(color: const Color(0xFF161616), borderRadius: BorderRadius.circular(4)),
@@ -375,17 +252,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.add_circle, color: Color(0xFFCCFF00)),
-                    onPressed: () => _addNewFitnessGoal(_goalInputController.text),
+                    onPressed: _executeNewGoalCommit,
                   )
                 ],
               ),
             ),
             const SizedBox(height: 10),
-
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('users')
-                  .doc(currentUserId)
+                  .doc(_viewModel.getCurrentUserId())
                   .collection('fitness_goals')
                   .orderBy('created_at', descending: true)
                   .snapshots(),
@@ -433,7 +309,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           if (!isCompleted)
                             TextButton(
                               style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(50, 30)),
-                              onPressed: () => _markGoalAsCompleted(doc.id),
+                              onPressed: () async {
+                                try {
+                                  await _viewModel.markGoalAsCompleted(doc.id);
+                                  _showToastSnackBar("Objective achieved! Progress entry synchronized.");
+                                } catch (e) {
+                                  _showToastSnackBar("Error updating achievement status: $e");
+                                }
+                              },
                               child: const Text("COMPLETE", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 10, fontWeight: FontWeight.bold)),
                             )
                         ],
@@ -443,29 +326,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 );
               },
             ),
-
             const SizedBox(height: 20),
+            Text("APPEARANCE", style: TextStyle(color: colors.neonAccent, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1)),
+            const SizedBox(height: 8),
+            _buildSwitchTile(Icons.dark_mode_outlined, "Dark Theme", "Default dark mode with neon accents", themeViewModel.isDarkMode, (val) {
+              themeViewModel.setDarkMode(val);
+              _showToastSnackBar(val ? "Dark theme enabled." : "Light theme enabled.");
+            }),
+            const SizedBox(height: 12),
             const Text("SECURITY & OPERATIONS", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1)),
             const SizedBox(height: 8),
-            _buildSwitchTile(Icons.fingerprint, "Biometric Lock", "Verify using facial patterns or touch sensors", biometricAuthEnabled, (val) {
-              setState(() => biometricAuthEnabled = val);
-              _savePreference('setting_biometric', val);
+            _buildSwitchTile(Icons.fingerprint, "Biometric Lock", "Verify using facial patterns or touch sensors", _viewModel.biometricAuthEnabled, (val) {
+              _viewModel.updatePreferenceSetting('setting_biometric', val);
               _showToastSnackBar(val ? "Simulated Action: Local device biometric authorization checks enabled." : "Simulated Action: Security parameters lifted.");
             }),
-            _buildSwitchTile(Icons.notifications_active_outlined, "Push Notifications", "Receive live cloud telemetry updates", pushNotificationsEnabled, (val) {
-              setState(() => pushNotificationsEnabled = val);
-              _savePreference('setting_push', val);
+            _buildSwitchTile(Icons.notifications_active_outlined, "Push Notifications", "Receive live cloud telemetry updates", _viewModel.pushNotificationsEnabled, (val) {
+              _viewModel.updatePreferenceSetting('setting_push', val);
             }),
-            _buildSwitchTile(Icons.alarm, "Workout Reminders", "Get daily reminder alerts for schedules", workoutRemindersEnabled, (val) {
-              setState(() => workoutRemindersEnabled = val);
-              _savePreference('setting_reminders', val);
+            _buildSwitchTile(Icons.alarm, "Workout Reminders", "Get daily reminder alerts for schedules", _viewModel.workoutRemindersEnabled, (val) {
+              _viewModel.updatePreferenceSetting('setting_reminders', val);
             }),
             _buildActionTile(Icons.lock_reset_outlined, "Update Password", "Modify your performance access key", () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const ChangePasswordScreen()));
             }),
+
+            // New Rate Screen Navigation Section Included Here
+            _buildActionTile(Icons.star_rate_rounded, "App Feedback & Experience", "Rate your training journey so far", () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const RateScreen()));
+            }),
+            _buildActionTile(Icons.card_membership, "Membership Tracking", "View cycle days and subscription status", () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const TrackMembershipScreen()));
+            }),
+
             const SizedBox(height: 14),
             OutlinedButton(
-              onPressed: _showEditProfileDialog,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+                ).then((_) {
+                  _viewModel.fetchLiveProfileData(); // Refresh data when returning
+                });
+              },
               style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.grey), padding: const EdgeInsets.symmetric(vertical: 12)),
               child: const Text("EDIT METRIC BIO CHANNELS", style: TextStyle(color: Colors.white, fontSize: 12)),
             )
