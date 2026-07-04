@@ -194,7 +194,7 @@ class _SleepScreenContent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: List.generate(weeklyHistory.length, (index) {
           double heightMultiplier =
-              weeklyHistory[index] > 1.0 ? 1.0 : weeklyHistory[index];
+          weeklyHistory[index] > 1.0 ? 1.0 : weeklyHistory[index];
           return Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -205,7 +205,7 @@ class _SleepScreenContent extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: neonLime.withOpacity(0.6),
                     borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(4)),
+                    const BorderRadius.vertical(top: Radius.circular(4)),
                   ),
                 ),
                 const SizedBox(height: 12),

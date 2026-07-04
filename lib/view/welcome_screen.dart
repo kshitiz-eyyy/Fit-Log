@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'fitlog_login.dart';
+
+
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
@@ -75,7 +78,46 @@ class WelcomeScreen extends StatelessWidget {
                         letterSpacing: 0.2,
                       ),
                     ),
+
                     const SizedBox(height: 48),
+
+                    // ✅ Added: Action Button to Navigate to Login
+                    SizedBox(
+                      width: double.infinity,
+                      height: 60,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const FitLogLogin(),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFCCFF00), // Matches your login button
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.zero, // Fits your hard-edged grid theme
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'ENTER TRAINING GRID',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 18,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Icon(Icons.bolt, color: Colors.black),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

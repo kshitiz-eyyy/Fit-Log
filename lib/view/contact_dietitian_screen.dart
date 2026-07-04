@@ -25,16 +25,7 @@ class ContactDietitianScreen extends StatelessWidget {
         body: Container(
           width: double.infinity,
           height: double.infinity,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: const AssetImage('assets/images/diet.png'),
-              fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                Colors.black.withValues(alpha: 0.85),
-                BlendMode.darken,
-              ),
-            ),
-          ),
+
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -80,7 +71,6 @@ class ContactDietitianScreen extends StatelessWidget {
                                   const SizedBox(height: 6),
                                   _buildDataRow("CONTACT NO:", dietitian.contact),
                                   _buildDataRow("EXPERIENCE:", dietitian.experience),
-                                  _buildDataRow("SPECIALIZATION:", dietitian.specialization),
                                   _buildDataRow("LOCATION:", dietitian.location),
                                 ],
                               ),

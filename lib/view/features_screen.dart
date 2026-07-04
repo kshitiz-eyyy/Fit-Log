@@ -2,11 +2,14 @@ import 'package:fitlog/theme/app_theme.dart';
 import 'package:fitlog/view/performance_screen.dart';
 import 'package:fitlog/view/period_cycle.dart';
 import 'package:fitlog/view/track_membershiscreen.dart';
-import 'package:fitlog/views/period_cycle.dart';
 import 'package:flutter/material.dart';
+
+// ✅ Added the missing imports
 import 'bmi_calculator_screen.dart';
 import 'contact_dietitian_screen.dart';
 import 'contact_trainer_screen.dart';
+import 'calorie_tracker_screen.dart';
+import 'sleep_screen.dart';
 
 class FeatureItem {
   final String title;
@@ -71,7 +74,7 @@ class FeaturesScreen extends StatelessWidget {
     FeatureItem(
       title: 'Period Cycle',
       description: 'Track your menstrual cycle and phases day by day.',
-      icon: Icons.favorite, // you can change to a better icon
+      icon: Icons.favorite,
     ),
   ];
 
@@ -231,6 +234,22 @@ class FeaturesScreen extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const PeriodCycleScreen(),
+                ),
+              );
+              // ✅ Added routing for Calorie Tracker
+            } else if (item.title == 'Calorie Tracker') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CalorieTrackerScreen(),
+                ),
+              );
+              // ✅ Added routing for Sleep Tracking
+            } else if (item.title == 'Sleep Tracking') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SleepScreen(),
                 ),
               );
             } else {

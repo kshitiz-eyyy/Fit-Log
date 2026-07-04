@@ -58,12 +58,12 @@ class SleepRepositoryImpl implements SleepRepository {
 
       // Initialize with 0.0 for 7 days
       List<double> history = List.filled(7, 0.0);
-      
+
       for (var doc in snapshot.docs) {
         final data = doc.data();
         final timestamp = (data['timestamp'] as Timestamp).toDate();
         final hours = (data['hours'] as num).toDouble();
-        
+
         // Find the index (0 for today, 1 for yesterday, etc.)
         int difference = now.difference(timestamp).inDays;
         if (difference >= 0 && difference < 7) {
