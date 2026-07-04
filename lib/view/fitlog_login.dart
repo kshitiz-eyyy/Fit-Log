@@ -1,5 +1,5 @@
 import 'package:fitlog/view/register_screen.dart';
-import 'package:fitlog/view/user_dashboard.dart';
+import 'package:fitlog/view/user_dashboard.dart'; // ✅ this file defines DashboardScreen
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
@@ -7,7 +7,6 @@ import '../viewmodel/user_view_model.dart';
 import 'admin_panel_screen.dart';
 import 'forgot_password_screen.dart';
 import 'terms_and_conditions_screen.dart';
-import 'user_dashboard.dart';
 
 class FitLogLogin extends StatefulWidget {
   const FitLogLogin({super.key});
@@ -70,8 +69,7 @@ class _FitLogLoginState extends State<FitLogLogin> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const DashboardScreen(),
-          ),
+              builder: (context) => const DashboardScreen()), // ✅ fixed
         );
       }
     }
@@ -189,8 +187,6 @@ class _FitLogLoginState extends State<FitLogLogin> {
                   ),
                 ),
               ),
-
-
               const SizedBox(height: 40),
               Center(
                 child: Wrap(
@@ -218,8 +214,6 @@ class _FitLogLoginState extends State<FitLogLogin> {
                   ],
                 ),
               ),
-
-
               const SizedBox(height: 20),
             ],
           ),

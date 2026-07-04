@@ -108,7 +108,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                       const Text("Broadcast Live Alert Notice", style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
                       Switch(
                         value: state.showSystemNoticeAlert,
-                        activeColor: const Color(0xFFCCFF00),
+                        activeThumbColor: const Color(0xFFCCFF00),
                         onChanged: _viewModel.toggleShowNotice,
                       ),
                     ],
@@ -142,7 +142,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                       const Text("Enable Video Media Pipeline", style: TextStyle(color: Colors.white, fontSize: 15)),
                       Switch(
                         value: state.enableVideoTutorials,
-                        activeColor: const Color(0xFFCCFF00),
+                        activeThumbColor: const Color(0xFFCCFF00),
                         onChanged: _viewModel.toggleVideoTutorials,
                       ),
                     ],
@@ -153,7 +153,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                       const Text("Enable Routine Training Splits", style: TextStyle(color: Colors.white, fontSize: 15)),
                       Switch(
                         value: state.enableTrainingSplits,
-                        activeColor: const Color(0xFFCCFF00),
+                        activeThumbColor: const Color(0xFFCCFF00),
                         onChanged: _viewModel.toggleTrainingSplits,
                       ),
                     ],
@@ -265,7 +265,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                   ),
                   Switch(
                     value: state.forcePremiumToAll,
-                    activeColor: const Color(0xFFCCFF00),
+                    activeThumbColor: const Color(0xFFCCFF00),
                     onChanged: _viewModel.toggleForcePremium,
                   ),
                 ],

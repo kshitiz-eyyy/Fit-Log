@@ -8,15 +8,19 @@ class DashboardViewModel extends ChangeNotifier {
   DashboardStateModel _state = DashboardStateModel.initial();
   bool _isLoading = true;
   int _currentNavigationIndex = 0;
-  String _currentQuote = "Consistency guarantees elite performance output.";
+  int _previousNavigationIndex = 0;
+  final String _currentQuote =
+      "Consistency guarantees elite performance output.";
 
-  DashboardViewModel({required DashboardRepo repository}) : _repository = repository {
+  DashboardViewModel({required DashboardRepo repository})
+    : _repository = repository {
     loadDashboardState();
   }
 
   DashboardStateModel get state => _state;
   bool get isLoading => _isLoading;
   int get currentNavigationIndex => _currentNavigationIndex;
+  int get previousNavigationIndex => _previousNavigationIndex;
   String get currentQuote => _currentQuote;
 
   Future<void> loadDashboardState() async {
@@ -31,8 +35,17 @@ class DashboardViewModel extends ChangeNotifier {
   }
 
   void updateNavigationIndex(int index) {
+    if (index == _currentNavigationIndex) return;
+    _previousNavigationIndex = _currentNavigationIndex;
     _currentNavigationIndex = index;
     notifyListeners();
+  }
+
+  void returnToPreviousNavigationIndex() {
+    final targetIndex = _previousNavigationIndex == _currentNavigationIndex
+        ? 0
+        : _previousNavigationIndex;
+    updateNavigationIndex(targetIndex);
   }
 
   Future<void> toggleDailyStreakLog() async {

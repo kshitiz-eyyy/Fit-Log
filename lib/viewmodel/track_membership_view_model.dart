@@ -1,38 +1,83 @@
 import 'package:flutter/material.dart';
-
-import '../model/track_membership_model.dart';
+import '../model/membership_model.dart';
+import '../repo/membership_repo.dart';
+import '../repo/membership_repo_impl.dart';
 
 class TrackMembershipViewModel extends ChangeNotifier {
-  late TrackMembershipModel _model;
+  final MembershipRepo _repo;
 
-  TrackMembershipViewModel() {
-    _model = TrackMembershipModel(
-      daysRemaining: 24,
-      totalDays: 30,
-      cycleResetDate: DateTime.now().add(const Duration(days: 24)),
-    );
+  MembershipModel? _membership;
+  bool _isLoading = true;
+  bool _isSaving = false;
+  String? _errorMessage;
+
+  TrackMembershipViewModel({MembershipRepo? repo})
+      : _repo = repo ?? MembershipRepoImpl() {
+    loadMembership();
   }
 
-  // Getters to expose data safely to the View
-  int get daysRemaining => _model.daysRemaining;
-  int get totalDays => _model.totalDays;
-  double get progress => _model.progress;
-  DateTime get cycleResetDate => _model.cycleResetDate;
+  bool get isLoading => _isLoading;
+  bool get isSaving => _isSaving;
+  String? get errorMessage => _errorMessage;
 
-  // Button Action 1: Simulates refreshing or starting a brand new cycle
-  void refreshCycle() {
-    _model.daysRemaining = _model.totalDays;
-    _model.cycleResetDate = DateTime.now().add(Duration(days: _model.totalDays));
+  int get daysRemaining => _membership?.daysRemaining ?? 0;
+  int get totalDays => _membership?.totalDays ?? 30;
+  double get progress => _membership?.progress ?? 0;
+  DateTime get cycleResetDate =>
+      _membership?.cycleResetDate ?? DateTime.now();
+  String get planName => _membership?.planName ?? 'Standard Track';
+  String get planSubtitle =>
+      _membership?.planSubtitle ?? 'Full Access Tracker';
+  String get tier => _membership?.tier ?? 'PREMIUM PRO';
+  bool get isActive => _membership?.isActive ?? false;
 
-    // Notifies the UI to rebuild with the new values
+  Future<void> loadMembership() async {
+    _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
+
+    try {
+      _membership = await _repo.fetchMembership();
+    } catch (e) {
+      _errorMessage = e.toString();
+      _membership = MembershipModel.defaults();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
-  // Button Action 2: Resets progress back to zero
-  void resetProgressData() {
-    _model.daysRemaining = 0;
-    _model.cycleResetDate = DateTime.now();
-
+  Future<bool> refreshCycle() async {
+    _isSaving = true;
     notifyListeners();
+
+    try {
+      await _repo.refreshCycle();
+      _membership = await _repo.fetchMembership();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      return false;
+    } finally {
+      _isSaving = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> resetProgressData() async {
+    _isSaving = true;
+    notifyListeners();
+
+    try {
+      await _repo.resetProgress();
+      _membership = await _repo.fetchMembership();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString();
+      return false;
+    } finally {
+      _isSaving = false;
+      notifyListeners();
+    }
   }
 }

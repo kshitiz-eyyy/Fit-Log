@@ -139,7 +139,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        color: const Color(0xFFCCFF00).withOpacity(0.1),
+                        color: const Color(0xFFCCFF00).withValues(alpha: 0.1),
                         child: const Text("+8.4% VS LAST WEEK", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 9, fontWeight: FontWeight.bold)),
                       )
                     ],
@@ -277,7 +277,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
           width: 24,
           alignment: Alignment.bottomCenter,
           decoration: BoxDecoration(
-            color: Colors.grey.shade900.withOpacity(0.4),
+            color: Colors.grey.shade900.withValues(alpha: 0.4),
             borderRadius: BorderRadius.circular(1),
           ),
           child: Container(
@@ -383,7 +383,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                     },
                     child: Icon(
                       Icons.delete_outline,
-                      color: Colors.redAccent.withOpacity(0.8),
+                      color: Colors.redAccent.withValues(alpha: 0.8),
                       size: 18,
                     ),
                   ),

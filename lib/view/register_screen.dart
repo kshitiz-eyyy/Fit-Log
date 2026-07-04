@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../viewmodel/user_view_model.dart';
+import '../model/user_model.dart';
 import 'terms_and_conditions_screen.dart';
+import 'fitlog_login.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -9,12 +13,94 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _contactController = TextEditingController();
+
   bool _isAgreed = false;
   bool _obscurePw = true;
   bool _obscureConfirmPw = true;
 
   @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _contactController.dispose();
+    super.dispose();
+  }
+
+  void _handleRegister() async {
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
+    final contact = _contactController.text.trim();
+
+    if (name.isEmpty || email.isEmpty || password.isEmpty || contact.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all fields')),
+      );
+      return;
+    }
+
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
+
+    final viewModel = context.read<UserViewModel>();
+    final userId = await viewModel.register(email, password);
+
+    if (userId.isNotEmpty) {
+      final userModel = UserModel(
+        id: userId,
+        name: name,
+        contact: contact,
+        email: email,
+        handle: name.toLowerCase().replaceAll(' ', '_'),
+        bio: 'Consistency beats talent every single day.',
+        fitnessGoal: 'Hypertrophy Conditioning',
+        role: 'user',
+      );
+
+      final success = await viewModel.addUser(userModel);
+
+      if (success) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Registration successful!')),
+          );
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const FitLogLogin()),
+            (route) => false,
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(viewModel.error ?? 'Failed to save user data')),
+          );
+        }
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(viewModel.error ?? 'Registration failed')),
+        );
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isLoading = context.watch<UserViewModel>().loading;
     return Scaffold(
       backgroundColor: const Color(0xFF121212),
       body: SafeArea(
@@ -56,11 +142,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
               // Full Name
               const _FieldLabel(label: 'FULL NAME'),
-              const _CustomInput(hint: 'ENTER NAME', icon: Icons.person_outline),
+              _CustomInput(
+                hint: 'ENTER NAME',
+                icon: Icons.person_outline,
+                controller: _nameController,
+              ),
 
               // Email Address
               const _FieldLabel(label: 'EMAIL ADDRESS'),
-              const _CustomInput(hint: 'ENTER EMAIL', icon: Icons.email_outlined),
+              _CustomInput(
+                hint: 'ENTER EMAIL',
+                icon: Icons.email_outlined,
+                controller: _emailController,
+              ),
+
+              // Contact Number
+              const _FieldLabel(label: 'CONTACT NUMBER'),
+              _CustomInput(
+                hint: 'ENTER CONTACT',
+                icon: Icons.phone_outlined,
+                controller: _contactController,
+              ),
 
               // Password
               const _FieldLabel(label: 'PASSWORD'),
@@ -69,6 +171,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 icon: Icons.lock_outline,
                 isPassword: true,
                 obscure: _obscurePw,
+                controller: _passwordController,
                 onToggle: () => setState(() => _obscurePw = !_obscurePw),
               ),
 
@@ -76,9 +179,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
               const _FieldLabel(label: 'CONFIRM PASSWORD'),
               _CustomInput(
                 hint: '●●●●●●●●',
-                icon: Icons.history,
+                icon: Icons.lock_outline,
                 isPassword: true,
                 obscure: _obscureConfirmPw,
+                controller: _confirmPasswordController,
                 onToggle: () => setState(() => _obscureConfirmPw = !_obscureConfirmPw),
               ),
 
@@ -144,28 +248,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  // 1. If _isAgreed is false, setting onPressed to null disables the button.
-                  onPressed: _isAgreed
-                      ? () {
-                    // Perform registration logic here
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Registration successful!')),
-                    );
-                  }
-                      : null,
+                  onPressed: (_isAgreed && !isLoading) ? _handleRegister : null,
                   style: ElevatedButton.styleFrom(
-                    // 2. Swaps colors automatically to give visual feedback when disabled
                     backgroundColor: _isAgreed ? const Color(0xFFCCFF00) : const Color(0xFF1E1E1E),
                     disabledBackgroundColor: const Color(0xFF1E1E1E),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                   ),
-                  child: Row(
+                  child: isLoading
+                      ? const CircularProgressIndicator(color: Colors.black)
+                      : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         'CREATE ACCOUNT',
                         style: TextStyle(
-                          // 3. Swaps text color dynamically based on state
                           color: _isAgreed ? Colors.black : Colors.white24,
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -276,10 +372,12 @@ class _CustomInput extends StatelessWidget {
   final bool isPassword;
   final bool obscure;
   final VoidCallback? onToggle;
+  final TextEditingController controller;
 
   const _CustomInput({
     required this.hint,
     required this.icon,
+    required this.controller,
     this.isPassword = false,
     this.obscure = false,
     this.onToggle,
@@ -288,6 +386,7 @@ class _CustomInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: controller,
       obscureText: obscure,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(

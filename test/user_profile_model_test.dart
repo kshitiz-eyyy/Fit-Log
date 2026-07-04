@@ -24,7 +24,7 @@ void main() {
         id: 'u456',
         name: 'Jane Doe',
         contact: '1234567890',
-        email: 'jane@test.com',
+        email: 'jane@test.com', bio: '', fitnessGoal: '', role: '',
       );
 
       final map = user.toMap();

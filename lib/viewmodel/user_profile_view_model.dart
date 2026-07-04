@@ -3,12 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../model/user_profile_model.dart';
-import '../repo/user_profile_repo.dart';
-import '../repo/user_profile_repo_impl.dart';
+import '../model/user_model.dart';
+import '../repo/user_repo_impl.dart';
 
 class UserProfileViewModel extends ChangeNotifier {
-  final UserRepo _userRepo = UserRepoImpl();
+  final UserRepoImpl _userRepo = UserRepoImpl();
 
   String athleteName = "Loading Athlete...";
   String athleteEmail = "athlete@fitlog.com";
@@ -22,9 +21,8 @@ class UserProfileViewModel extends ChangeNotifier {
   bool workoutRemindersEnabled = true;
   bool isDataSyncLoading = true;
 
-  String getCurrentUserId() {
-    User? liveFirebaseUser = FirebaseAuth.instance.currentUser;
-    return liveFirebaseUser?.uid ?? "Eb3LsmAGcqNpd5pfwO28TpPyFWL2";
+  String? getCurrentUserId() {
+    return FirebaseAuth.instance.currentUser?.uid;
   }
 
   Future<void> fetchLiveProfileData() async {
@@ -36,9 +34,15 @@ class UserProfileViewModel extends ChangeNotifier {
       workoutRemindersEnabled = prefs.getBool('setting_reminders') ?? true;
       notifyListeners();
 
-      String targetUid = getCurrentUserId();
+      String? targetUid = getCurrentUserId();
+      if (targetUid == null) {
+         isDataSyncLoading = false;
+         notifyListeners();
+         return;
+      }
+
       User? liveFirebaseUser = FirebaseAuth.instance.currentUser;
-      athleteEmail = liveFirebaseUser?.email ?? "kritikatripathi0094@gmail.com";
+      athleteEmail = liveFirebaseUser?.email ?? "";
 
       UserModel userModel = await _userRepo.getUserByID(targetUid);
 
@@ -62,11 +66,13 @@ class UserProfileViewModel extends ChangeNotifier {
     required String bio,
     required String fitnessGoal,
   }) async {
+    String? targetUid = getCurrentUserId();
+    if (targetUid == null) return;
+
     isDataSyncLoading = true;
     notifyListeners();
 
     try {
-      String targetUid = getCurrentUserId();
       UserModel updatedUser = UserModel(
         id: targetUid,
         name: name,
@@ -108,7 +114,8 @@ class UserProfileViewModel extends ChangeNotifier {
 
   Future<void> addNewFitnessGoal(String goalTitle) async {
     if (goalTitle.trim().isEmpty) return;
-    String targetUid = getCurrentUserId();
+    String? targetUid = getCurrentUserId();
+    if (targetUid == null) return;
 
     await FirebaseFirestore.instance
         .collection('users')
@@ -123,7 +130,9 @@ class UserProfileViewModel extends ChangeNotifier {
   }
 
   Future<void> markGoalAsCompleted(String docId) async {
-    String targetUid = getCurrentUserId();
+    String? targetUid = getCurrentUserId();
+    if (targetUid == null) return;
+
     await FirebaseFirestore.instance
         .collection('users')
         .doc(targetUid)
@@ -133,5 +142,10 @@ class UserProfileViewModel extends ChangeNotifier {
       'status': 'completed',
       'completed_at': FieldValue.serverTimestamp(),
     });
+  }
+
+  Future<void> signOut() async {
+    await _userRepo.logout();
+    notifyListeners();
   }
 }

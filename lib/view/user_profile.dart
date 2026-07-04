@@ -1,12 +1,16 @@
 import 'dart:io';
+import 'package:fitlog/view/edit_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:fitlog/theme/app_theme.dart';
 import 'package:fitlog/view/fitlog_premium_screen.dart';
 import 'package:fitlog/view/change_password_screen.dart';
 import 'package:fitlog/view/rate_screen.dart';
+import 'package:fitlog/view/track_membershiscreen.dart';
+import '../viewmodel/theme_view_model.dart';
 import '../viewmodel/user_profile_view_model.dart';
-import 'favourite_exercise.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -136,10 +140,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppTheme.colorsOf(context);
+    final themeViewModel = context.watch<ThemeViewModel>();
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F0F),
+      backgroundColor: colors.background,
       body: _viewModel.isDataSyncLoading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFFCCFF00)))
+          ? Center(child: CircularProgressIndicator(color: colors.neonAccent))
           : SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -320,6 +327,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               },
             ),
             const SizedBox(height: 20),
+            Text("APPEARANCE", style: TextStyle(color: colors.neonAccent, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1)),
+            const SizedBox(height: 8),
+            _buildSwitchTile(Icons.dark_mode_outlined, "Dark Theme", "Default dark mode with neon accents", themeViewModel.isDarkMode, (val) {
+              themeViewModel.setDarkMode(val);
+              _showToastSnackBar(val ? "Dark theme enabled." : "Light theme enabled.");
+            }),
+            const SizedBox(height: 12),
             const Text("SECURITY & OPERATIONS", style: TextStyle(color: Color(0xFFCCFF00), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1)),
             const SizedBox(height: 8),
             _buildSwitchTile(Icons.fingerprint, "Biometric Lock", "Verify using facial patterns or touch sensors", _viewModel.biometricAuthEnabled, (val) {
@@ -340,23 +354,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _buildActionTile(Icons.star_rate_rounded, "App Feedback & Experience", "Rate your training journey so far", () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => const RateScreen()));
             }),
-
-            const SizedBox(height: 14),
-            _buildActionTile(
-                Icons.favorite,
-                "Favourited Exercises",
-                "View your curated workout collection",
-                    () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) =>  FavouriteExerciseScreen())
-                  );
-                }
-            ),
+            _buildActionTile(Icons.card_membership, "Membership Tracking", "View cycle days and subscription status", () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const TrackMembershipScreen()));
+            }),
 
             const SizedBox(height: 14),
             OutlinedButton(
-              onPressed: _showEditProfileDialog,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+                ).then((_) {
+                  _viewModel.fetchLiveProfileData(); // Refresh data when returning
+                });
+              },
               style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.grey), padding: const EdgeInsets.symmetric(vertical: 12)),
               child: const Text("EDIT METRIC BIO CHANNELS", style: TextStyle(color: Colors.white, fontSize: 12)),
             )
