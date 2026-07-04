@@ -115,15 +115,13 @@ class ExerciseListScreen extends StatelessWidget {
                       ),
                       const Spacer(),
                       IconButton(
-                        icon: Icon(isFavourite ? Icons.favorite : Icons.favorite_border, color: Colors.redAccent),onPressed: () {
-                        // Debug line: See what's actually happening with auth
-                        print("DEBUG: Current Auth State: ${FirebaseAuth.instance.currentUser}");
-
+                        icon: Icon(isFavourite ? Icons.favorite : Icons.favorite_border, color: Colors.redAccent),onPressed: () async {
                         final user = FirebaseAuth.instance.currentUser;
+
                         if (user != null) {
-                          vm.toggleFavourite(exercise, user.uid);
+                          await vm.toggleFavourite(exercise, user.uid);
                         } else {
-                          print("ERROR: User is null, check your Login flow.");
+                          print("ERROR: No user logged in.");
                         }
                       },
                       ),

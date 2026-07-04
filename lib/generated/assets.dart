@@ -48,6 +48,9 @@ class $AssetsImagesGen {
   final AssetGenImage cablereardeltfly = const AssetGenImage(
     'assets/images/cablereardeltfly.png',
   );
+  final AssetGenImage calender = const AssetGenImage(
+    'assets/images/calender.png',
+  );
   final AssetGenImage calfraises = const AssetGenImage(
     'assets/images/calfraises.png',
   );
