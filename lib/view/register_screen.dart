@@ -1,412 +1,357 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../viewmodel/user_view_model.dart';
-import '../model/user_model.dart';
-import 'terms_and_conditions_screen.dart';
-import 'fitlog_login.dart';
+import '../viewmodel/edit_profile_viewmodel.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+class EditProfileScreen extends StatefulWidget {
+  const EditProfileScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _EditProfileScreenState extends State<EditProfileScreen> {
+  // Colors from the design
+  static const Color darkBackground = Color(0xFF121212);
+  static const Color surfaceDark = Color(0xFF1E1E1E);
+  static const Color primaryOrange = Color(0xFFFF6D00);
+  static const Color secondaryLime = Color(0xFFC6FF00);
+  static const Color textGray = Color(0xFFBDBDBD);
+  static const Color discardRed = Color(0xFFEF5350);
+
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
-  final TextEditingController _contactController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _heightController = TextEditingController();
+  final TextEditingController _weightController = TextEditingController();
+  String _selectedGoal = 'Weight Loss & Conditioning';
 
-  bool _isAgreed = false;
-  bool _obscurePw = true;
-  bool _obscureConfirmPw = true;
+  bool _isInitialized = false;
 
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
-    _contactController.dispose();
+    _ageController.dispose();
+    _heightController.dispose();
+    _weightController.dispose();
     super.dispose();
   }
 
-  void _handleRegister() async {
-    final name = _nameController.text.trim();
-    final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
-    final confirmPassword = _confirmPasswordController.text.trim();
-    final contact = _contactController.text.trim();
-
-    if (name.isEmpty || email.isEmpty || password.isEmpty || contact.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields')),
-      );
-      return;
-    }
-
-    if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match')),
-      );
-      return;
-    }
-
-    final viewModel = context.read<UserViewModel>();
-    final userId = await viewModel.register(email, password);
-
-    if (userId.isNotEmpty) {
-      final userModel = UserModel(
-        id: userId,
-        name: name,
-        contact: contact,
-        email: email,
-        handle: name.toLowerCase().replaceAll(' ', '_'),
-        bio: 'Consistency beats talent every single day.',
-        fitnessGoal: 'Hypertrophy Conditioning',
-        role: 'user',
-      );
-
-      final success = await viewModel.addUser(userModel);
-
-      if (success) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Registration successful!')),
-          );
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const FitLogLogin()),
-            (route) => false,
-          );
-        }
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(viewModel.error ?? 'Failed to save user data')),
-          );
-        }
-      }
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(viewModel.error ?? 'Registration failed')),
-        );
-      }
+  void _initializeControllers(EditProfileViewModel viewModel) {
+    if (!_isInitialized && viewModel.user != null) {
+      final user = viewModel.user!;
+      _nameController.text = user.name;
+      _emailController.text = user.email;
+      _ageController.text = user.age?.toString() ?? '';
+      _heightController.text = user.height ?? '';
+      _weightController.text = user.weight ?? '';
+      _selectedGoal = user.fitnessGoal;
+      _isInitialized = true;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = context.watch<UserViewModel>().loading;
-    return Scaffold(
-      backgroundColor: const Color(0xFF121212),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-              // Header Logo
-              const Center(
-                child: Text(
-                  'FITLOG',
-                  style: TextStyle(
-                    color: Color(0xFFCCFF00),
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900,
-                    fontStyle: FontStyle.italic,
-                    letterSpacing: 2,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 40),
+    return ChangeNotifierProvider(
+      create: (_) => EditProfileViewModel(),
+      child: Consumer<EditProfileViewModel>(
+        builder: (context, viewModel, child) {
+          _initializeControllers(viewModel);
 
-              const Text(
-                'CREATE ACCOUNT',
+          return Scaffold(
+            backgroundColor: darkBackground,
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.pop(context),
+              ),
+              title: const Text(
+                'SETTINGS',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2.0,
                 ),
               ),
-              const SizedBox(height: 8),
-              const Text(
-                'Enter your details to start your performance journey.',
-                style: TextStyle(color: Colors.grey, fontSize: 16),
-              ),
-              const SizedBox(height: 30),
-
-              // Full Name
-              const _FieldLabel(label: 'FULL NAME'),
-              _CustomInput(
-                hint: 'ENTER NAME',
-                icon: Icons.person_outline,
-                controller: _nameController,
-              ),
-
-              // Email Address
-              const _FieldLabel(label: 'EMAIL ADDRESS'),
-              _CustomInput(
-                hint: 'ENTER EMAIL',
-                icon: Icons.email_outlined,
-                controller: _emailController,
-              ),
-
-              // Contact Number
-              const _FieldLabel(label: 'CONTACT NUMBER'),
-              _CustomInput(
-                hint: 'ENTER CONTACT',
-                icon: Icons.phone_outlined,
-                controller: _contactController,
-              ),
-
-              // Password
-              const _FieldLabel(label: 'PASSWORD'),
-              _CustomInput(
-                hint: '●●●●●●●●',
-                icon: Icons.lock_outline,
-                isPassword: true,
-                obscure: _obscurePw,
-                controller: _passwordController,
-                onToggle: () => setState(() => _obscurePw = !_obscurePw),
-              ),
-
-              // Confirm Password
-              const _FieldLabel(label: 'CONFIRM PASSWORD'),
-              _CustomInput(
-                hint: '●●●●●●●●',
-                icon: Icons.lock_outline,
-                isPassword: true,
-                obscure: _obscureConfirmPw,
-                controller: _confirmPasswordController,
-                onToggle: () => setState(() => _obscureConfirmPw = !_obscureConfirmPw),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Terms & Conditions Checkbox
-              Row(
+              centerTitle: true,
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.notifications_outlined, color: Colors.white),
+                  onPressed: () {},
+                ),
+              ],
+            ),
+            body: viewModel.isLoading && !_isInitialized
+                ? const Center(child: CircularProgressIndicator(color: secondaryLime))
+                : SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              child: Column(
                 children: [
-                  Theme(
-                    data: ThemeData(unselectedWidgetColor: Colors.white24),
-                    child: Checkbox(
-                      value: _isAgreed,
-                      activeColor: const Color(0xFFCCFF00),
-                      checkColor: Colors.black,
-                      onChanged: (val) => setState(() => _isAgreed = val!),
+                  // Profile Picture
+                  Center(
+                    child: Stack(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: secondaryLime, width: 2),
+                          ),
+                          child: CircleAvatar(
+                            radius: 50,
+                            backgroundColor: Colors.grey,
+                            backgroundImage: viewModel.user?.profileImageUrl != null
+                                ? NetworkImage(viewModel.user!.profileImageUrl!)
+                                : const NetworkImage('https://via.placeholder.com/150'),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: const BoxDecoration(
+                              color: secondaryLime,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.camera_alt,
+                              color: Colors.black,
+                              size: 18,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  Expanded(
-                    child: RichText(
-                      text: TextSpan(
-                        style: const TextStyle(color: Colors.white, fontSize: 14),
-                        children: [
-                          const TextSpan(text: 'I AGREE TO THE '),
-                          WidgetSpan(
-                            alignment: PlaceholderAlignment.baseline,
-                            baseline: TextBaseline.alphabetic,
-                            child: GestureDetector(
-                              onTap: () async {
-                                final bool? accepted = await Navigator.push<bool>(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const TermsAndConditionsScreen(),
-                                  ),
-                                );
+                  const SizedBox(height: 12),
+                  const Text(
+                    'PERSONAL DETAILS',
+                    style: TextStyle(
+                      color: textGray,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
 
-                                if (accepted == true) {
-                                  setState(() {
-                                    _isAgreed = true;
-                                  });
-                                }
-                              },
-                              child: const Text(
-                                'TERMS & CONDITIONS',
-                                style: TextStyle(
-                                  color: Color(0xFFCCFF00),
-                                  fontWeight: FontWeight.bold,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
+                  // Form Fields
+                  _buildLabel('FULL NAME'),
+                  _buildTextField(controller: _nameController),
+                  const SizedBox(height: 24),
+
+                  _buildLabel('EMAIL ADDRESS'),
+                  _buildTextField(controller: _emailController, keyboardType: TextInputType.emailAddress),
+                  const SizedBox(height: 24),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildLabel('AGE'),
+                            _buildTextField(controller: _ageController, keyboardType: TextInputType.number),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        flex: 1,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildLabel('HEIGHT'),
+                            _buildTextField(controller: _heightController, hint: 'e.g. 182 cm'),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildLabel('WEIGHT'),
+                            _buildTextField(controller: _weightController, hint: 'e.g. 78 kg'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  _buildLabel('PRIMARY FITNESS GOAL'),
+                  _buildDropdownField(_selectedGoal, (String? newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        _selectedGoal = newValue;
+                      });
+                    }
+                  }),
+                  const SizedBox(height: 56),
+
+                  // Save Changes Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 64,
+                    child: ElevatedButton(
+                      onPressed: viewModel.isLoading
+                          ? null
+                          : () async {
+                        final success = await viewModel.updateProfile(
+                          name: _nameController.text,
+                          email: _emailController.text,
+                          age: int.tryParse(_ageController.text) ?? 0,
+                          height: _heightController.text,
+                          weight: _weightController.text,
+                          fitnessGoal: _selectedGoal,
+                        );
+                        if (success && mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Profile updated successfully')),
+                          );
+                        } else if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(viewModel.error ?? 'Failed to update profile')),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryOrange,
+                        foregroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: viewModel.isLoading
+                          ? const CircularProgressIndicator(color: Colors.black)
+                          : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'SAVE CHANGES',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.black, width: 2),
+                            ),
+                            child: const Icon(
+                              Icons.check,
+                              color: Colors.black,
+                              size: 20,
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
+                  const SizedBox(height: 24),
+
+                  // Discard Changes
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text(
+                      'DISCARD CHANGES',
+                      style: TextStyle(
+                        color: discardRed,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
                 ],
               ),
-
-              const SizedBox(height: 30),
-
-              // Create Account Button (Locks/Unlocks dynamically)
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: (_isAgreed && !isLoading) ? _handleRegister : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _isAgreed ? const Color(0xFFCCFF00) : const Color(0xFF1E1E1E),
-                    disabledBackgroundColor: const Color(0xFF1E1E1E),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                  ),
-                  child: isLoading
-                      ? const CircularProgressIndicator(color: Colors.black)
-                      : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'CREATE ACCOUNT',
-                        style: TextStyle(
-                          color: _isAgreed ? Colors.black : Colors.white24,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Icon(
-                        Icons.arrow_forward,
-                        color: _isAgreed ? Colors.black : Colors.white24,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // Sign In Link
-              Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text('ALREADY HAVE AN ACCOUNT? ',
-                        style: TextStyle(color: Colors.grey, fontSize: 14)),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.maybePop(context);
-                      },
-                      child: const Text(
-                        'SIGN IN',
-                        style: TextStyle(
-                          color: Color(0xFFCCFF00),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 40),
-
-              // Step Progress Indicators
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFCCFF00),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    width: 20,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: Colors.white12,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    width: 20,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: Colors.white12,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
-}
 
-class _FieldLabel extends StatelessWidget {
-  final String label;
-  const _FieldLabel({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildLabel(String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0, top: 16),
+      padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
-        label,
+        text,
         style: const TextStyle(
-          color: Colors.white70,
-          fontSize: 14,
+          color: textGray,
+          fontSize: 11,
           fontWeight: FontWeight.bold,
+          letterSpacing: 1.0,
         ),
       ),
     );
   }
-}
 
-class _CustomInput extends StatelessWidget {
-  final String hint;
-  final IconData icon;
-  final bool isPassword;
-  final bool obscure;
-  final VoidCallback? onToggle;
-  final TextEditingController controller;
+  Widget _buildTextField({
+    required TextEditingController controller,
+    TextInputType keyboardType = TextInputType.text,
+    String? hint,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: surfaceDark,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        style: const TextStyle(color: Colors.white, fontSize: 14),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: const TextStyle(color: textGray, fontSize: 14),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        ),
+      ),
+    );
+  }
 
-  const _CustomInput({
-    required this.hint,
-    required this.icon,
-    required this.controller,
-    this.isPassword = false,
-    this.obscure = false,
-    this.onToggle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      obscureText: obscure,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: const Color(0xFF1E1E1E),
-        hintText: hint,
-        hintStyle: const TextStyle(color: Colors.white24),
-        prefixIcon: Icon(icon, color: Colors.white54),
-        suffixIcon: isPassword
-            ? IconButton(
-          icon: Icon(
-            obscure ? Icons.visibility_off : Icons.visibility,
-            color: Colors.white54,
+  Widget _buildDropdownField(String value, void Function(String?) onChanged) {
+    return Container(
+      height: 56,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: surfaceDark,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          canvasColor: surfaceDark,
+        ),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: value,
+            isExpanded: true,
+            icon: const Icon(Icons.keyboard_arrow_down, color: textGray),
+            style: const TextStyle(color: Colors.white, fontSize: 14),
+            items: <String>[
+              'Weight Loss & Conditioning',
+              'Hypertrophy Conditioning',
+              'Strength Training',
+              'Endurance Training',
+            ].map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+            onChanged: onChanged,
           ),
-          onPressed: onToggle,
-        )
-            : null,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(4),
-          borderSide: BorderSide.none,
         ),
       ),
     );

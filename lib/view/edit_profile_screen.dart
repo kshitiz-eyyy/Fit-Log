@@ -87,195 +87,197 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             body: viewModel.isLoading && !_isInitialized
                 ? const Center(child: CircularProgressIndicator(color: secondaryLime))
                 : SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-                    child: Column(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              child: Column(
+                children: [
+                  // Profile Picture
+                  Center(
+                    child: Stack(
                       children: [
-                        // Profile Picture
-                        Center(
-                          child: Stack(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: secondaryLime, width: 2),
-                                ),
-                                child: CircleAvatar(
-                                  radius: 50,
-                                  backgroundColor: Colors.grey,
-                                  backgroundImage: viewModel.user?.profileImageUrl != null
-                                      ? NetworkImage(viewModel.user!.profileImageUrl!)
-                                      : const NetworkImage('https://via.placeholder.com/150'),
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Container(
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: const BoxDecoration(
-                                    color: secondaryLime,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.camera_alt,
-                                    color: Colors.black,
-                                    size: 18,
-                                  ),
-                                ),
-                              ),
-                            ],
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: secondaryLime, width: 2),
+                          ),
+                          child: CircleAvatar(
+                            radius: 50,
+                            backgroundColor: Colors.grey,
+                            backgroundImage: viewModel.user?.profileImageUrl != null
+                                ? NetworkImage(viewModel.user!.profileImageUrl!)
+                                : const NetworkImage('https://via.placeholder.com/150'),
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          'PERSONAL DETAILS',
-                          style: TextStyle(
-                            color: textGray,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-
-                        // Form Fields
-                        _buildLabel('FULL NAME'),
-                        _buildTextField(controller: _nameController),
-                        const SizedBox(height: 24),
-
-                        _buildLabel('EMAIL ADDRESS'),
-                        _buildTextField(controller: _emailController, keyboardType: TextInputType.emailAddress),
-                        const SizedBox(height: 24),
-
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _buildLabel('AGE'),
-                                  _buildTextField(controller: _ageController, keyboardType: TextInputType.number),
-                                ],
-                              ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: const BoxDecoration(
+                              color: secondaryLime,
+                              shape: BoxShape.circle,
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              flex: 1,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _buildLabel('HEIGHT'),
-                                  _buildTextField(controller: _heightController, hint: 'e.g. 182 cm'),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _buildLabel('WEIGHT'),
-                                  _buildTextField(controller: _weightController, hint: 'e.g. 78 kg'),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-
-                        _buildLabel('PRIMARY FITNESS GOAL'),
-                        _buildDropdownField(_selectedGoal, (String? newValue) {
-                          if (newValue != null) {
-                            setState(() {
-                              _selectedGoal = newValue;
-                            });
-                          }
-                        }),
-                        const SizedBox(height: 56),
-
-                        // Save Changes Button
-                        SizedBox(
-                          width: double.infinity,
-                          height: 64,
-                          child: ElevatedButton(
-                            onPressed: viewModel.isLoading
-                                ? null
-                                : () async {
-                                    final success = await viewModel.updateProfile(
-                                      name: _nameController.text,
-                                      email: _emailController.text,
-                                      age: int.tryParse(_ageController.text) ?? 0,
-                                      height: _heightController.text,
-                                      weight: _weightController.text,
-                                      fitnessGoal: _selectedGoal,
-                                    );
-                                    if (success && mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Profile updated successfully')),
-                                      );
-                                    } else if (mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text(viewModel.error ?? 'Failed to update profile')),
-                                      );
-                                    }
-                                  },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryOrange,
-                              foregroundColor: Colors.black,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              elevation: 0,
-                            ),
-                            child: viewModel.isLoading
-                                ? const CircularProgressIndicator(color: Colors.black)
-                                : Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Text(
-                                        'SAVE CHANGES',
-                                        style: TextStyle(
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.w900,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Container(
-                                        padding: const EdgeInsets.all(2),
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(color: Colors.black, width: 2),
-                                        ),
-                                        child: const Icon(
-                                          Icons.check,
-                                          color: Colors.black,
-                                          size: 20,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Discard Changes
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text(
-                            'DISCARD CHANGES',
-                            style: TextStyle(
-                              color: discardRed,
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.0,
+                            child: const Icon(
+                              Icons.camera_alt,
+                              color: Colors.black,
+                              size: 18,
                             ),
                           ),
                         ),
-                        const SizedBox(height: 32),
                       ],
                     ),
                   ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'PERSONAL DETAILS',
+                    style: TextStyle(
+                      color: textGray,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Form Fields
+                  _buildLabel('FULL NAME'),
+                  _buildTextField(controller: _nameController),
+                  const SizedBox(height: 24),
+
+                  _buildLabel('EMAIL ADDRESS'),
+                  _buildTextField(controller: _emailController, keyboardType: TextInputType.emailAddress),
+                  const SizedBox(height: 24),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildLabel('AGE'),
+                            _buildTextField(controller: _ageController, keyboardType: TextInputType.number),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        flex: 1,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildLabel('HEIGHT'),
+                            _buildTextField(controller: _heightController, hint: 'e.g. 182 cm'),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildLabel('WEIGHT'),
+                            _buildTextField(controller: _weightController, hint: 'e.g. 78 kg'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  _buildLabel('PRIMARY FITNESS GOAL'),
+                  _buildDropdownField(_selectedGoal, (String? newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        _selectedGoal = newValue;
+                      });
+                    }
+                  }),
+                  const SizedBox(height: 56),
+
+                  // Save Changes Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 64,
+                    child: ElevatedButton(
+                      onPressed: viewModel.isLoading
+                          ? null
+                          : () async {
+                        final messenger = ScaffoldMessenger.of(context);
+                        final success = await viewModel.updateProfile(
+                          name: _nameController.text,
+                          email: _emailController.text,
+                          age: int.tryParse(_ageController.text) ?? 0,
+                          height: _heightController.text,
+                          weight: _weightController.text,
+                          fitnessGoal: _selectedGoal,
+                        );
+                        if (!mounted) return;
+                        if (success) {
+                          messenger.showSnackBar(
+                            const SnackBar(content: Text('Profile updated successfully')),
+                          );
+                        } else {
+                          messenger.showSnackBar(
+                            SnackBar(content: Text(viewModel.error ?? 'Failed to update profile')),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryOrange,
+                        foregroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: viewModel.isLoading
+                          ? const CircularProgressIndicator(color: Colors.black)
+                          : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'SAVE CHANGES',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.black, width: 2),
+                            ),
+                            child: const Icon(
+                              Icons.check,
+                              color: Colors.black,
+                              size: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Discard Changes
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text(
+                      'DISCARD CHANGES',
+                      style: TextStyle(
+                        color: discardRed,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                ],
+              ),
+            ),
           );
         },
       ),
@@ -357,4 +359,3 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 }
-

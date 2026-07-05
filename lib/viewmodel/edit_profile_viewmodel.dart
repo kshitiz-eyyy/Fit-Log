@@ -4,30 +4,33 @@ import '../model/user_model.dart';
 import '../repo/user_repo_impl.dart';
 
 class EditProfileViewModel extends ChangeNotifier {
-  final UserRepoImpl _userRepo = UserRepoImpl();
-  
+  final UserRepoImpl _repo = UserRepoImpl();
   UserModel? _user;
-  UserModel? get user => _user;
-
   bool _isLoading = false;
-  bool get isLoading => _isLoading;
-
   String? _error;
+
+  UserModel? get user => _user;
+  bool get isLoading => _isLoading;
   String? get error => _error;
 
   EditProfileViewModel() {
-    fetchUserData();
+    fetchUser();
   }
 
-  Future<void> fetchUserData() async {
+  Future<void> fetchUser() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      _error = "User not logged in";
+      notifyListeners();
+      return;
+    }
+
     _isLoading = true;
+    _error = null;
     notifyListeners();
 
     try {
-      final userId = FirebaseAuth.instance.currentUser?.uid;
-      if (userId != null) {
-        _user = await _userRepo.getUserByID(userId);
-      }
+      _user = await _repo.getUserByID(uid);
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -47,6 +50,7 @@ class EditProfileViewModel extends ChangeNotifier {
     if (_user == null) return false;
 
     _isLoading = true;
+    _error = null;
     notifyListeners();
 
     try {
@@ -59,7 +63,7 @@ class EditProfileViewModel extends ChangeNotifier {
         fitnessGoal: fitnessGoal,
       );
 
-      await _userRepo.editProfile(updatedUser);
+      await _repo.editProfile(updatedUser);
       _user = updatedUser;
       _isLoading = false;
       notifyListeners();

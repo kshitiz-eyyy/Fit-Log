@@ -105,7 +105,6 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
       final userModel = UserModel(
         id: userId,
         name: handle,
-        handle: handle,
         contact: phone,
         email: email,
         bio: bio.isNotEmpty ? bio : 'Consistency beats talent every single day.',
@@ -123,7 +122,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const FitLogLogin()),
-            (route) => false,
+                (route) => false,
           );
         }
       } else {
@@ -385,20 +384,20 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                         child: isLoading
                             ? const CircularProgressIndicator(color: Colors.black)
                             : const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'INITIALIZE PERFORMANCE',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w900,
-                                    ),
-                                  ),
-                                  SizedBox(width: 8),
-                                  Icon(Icons.arrow_forward, color: Colors.black, size: 20),
-                                ],
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'INITIALIZE PERFORMANCE',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w900,
                               ),
+                            ),
+                            SizedBox(width: 8),
+                            Icon(Icons.arrow_forward, color: Colors.black, size: 20),
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(height: 24),

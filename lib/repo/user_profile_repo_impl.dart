@@ -4,9 +4,14 @@ import 'user_profile_repo.dart';
 import '../model/user_profile_model.dart';
 
 class UserRepoImpl implements UserRepo {
-  final FirebaseAuth auth = FirebaseAuth.instance;
-  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final FirebaseAuth auth;
+  final FirebaseFirestore firestore;
 
+  UserRepoImpl({
+    FirebaseAuth? auth,
+    FirebaseFirestore? firestore,
+  })  : auth = auth ?? FirebaseAuth.instance,
+        firestore = firestore ?? FirebaseFirestore.instance;
   @override
   Future<void> addUser(UserModel userModel) {
     return firestore
