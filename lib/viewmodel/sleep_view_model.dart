@@ -34,7 +34,7 @@ class SleepViewModel extends ChangeNotifier {
   Future<void> _init() async {
     final history = await _repository.getWeeklyHistory();
     final lastHours = await _repository.getLastSleepSession();
-
+    
     _data = _data.copyWith(
       weeklyHistory: history,
       lastNightHours: lastHours,
@@ -93,15 +93,15 @@ class SleepViewModel extends ChangeNotifier {
       if (_autoSleepStartTime != null) {
         final duration = now.difference(_autoSleepStartTime!);
         final hours = duration.inMinutes / 60.0;
-
+        
         _data = _data.copyWith(lastNightHours: double.parse(hours.toStringAsFixed(1)));
-
+        
         // Update history
         final newHistory = List<double>.from(_data.weeklyHistory);
         int todayIndex = (now.weekday - 1) % 7;
         newHistory[todayIndex] = (hours / 8.0).clamp(0.0, 1.0);
         _data = _data.copyWith(weeklyHistory: newHistory);
-
+        
         _repository.saveSleepSession(hours);
       }
     }

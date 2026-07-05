@@ -1,9 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../utils/firebase_user_helper.dart';
 import 'rate_repo.dart';
 
+/// Temporary helper for tests (replace with your real FirebaseUserHelper later)
+class FirebaseUserHelper {
+  static String currentUserId = 'testUser123';
+}
+
 class RateRepoImpl implements RateRepo {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore;
+
+  // ✅ Constructor allows injecting FakeFirebaseFirestore in tests
+  RateRepoImpl({FirebaseFirestore? firestore})
+      : _firestore = firestore ?? FirebaseFirestore.instance;
 
   @override
   Future<void> submitReview({
