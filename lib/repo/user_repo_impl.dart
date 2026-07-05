@@ -17,12 +17,34 @@ class UserRepoImpl implements UserRepo {
         .collection("users")
         .doc(userModel.id)
         .set(userModel.toMap());
+    @override
+  Future<void> terminateAccount() async {
+    final user = auth.currentUser;
+    if (user != null) {
+      final uid = user.uid;
+      // Delete from Firestore first
+      await firestore.collection("users").doc(uid).delete();
+      // Delete from Auth
+      await user.delete();
+    }
   }
+}
 
   @override
   Future<void> deleteUser(String id) {
     return firestore.collection("users").doc(id).delete();
+    @override
+  Future<void> terminateAccount() async {
+    final user = auth.currentUser;
+    if (user != null) {
+      final uid = user.uid;
+      // Delete from Firestore first
+      await firestore.collection("users").doc(uid).delete();
+      // Delete from Auth
+      await user.delete();
+    }
   }
+}
 
   @override
   Future<void> editProfile(UserModel userModel) {
@@ -30,12 +52,34 @@ class UserRepoImpl implements UserRepo {
         .collection("users")
         .doc(userModel.id)
         .update(userModel.toMap());
+    @override
+  Future<void> terminateAccount() async {
+    final user = auth.currentUser;
+    if (user != null) {
+      final uid = user.uid;
+      // Delete from Firestore first
+      await firestore.collection("users").doc(uid).delete();
+      // Delete from Auth
+      await user.delete();
+    }
   }
+}
 
   @override
   Future<void> forgetPassword(String email) {
     return auth.sendPasswordResetEmail(email: email);
+    @override
+  Future<void> terminateAccount() async {
+    final user = auth.currentUser;
+    if (user != null) {
+      final uid = user.uid;
+      // Delete from Firestore first
+      await firestore.collection("users").doc(uid).delete();
+      // Delete from Auth
+      await user.delete();
+    }
   }
+}
 
   @override
   Future<List<UserModel>> getAllUser() async {
@@ -43,7 +87,18 @@ class UserRepoImpl implements UserRepo {
     return snapshot.docs
         .map((doc) => UserModel.fromMap(doc.data()))
         .toList();
+    @override
+  Future<void> terminateAccount() async {
+    final user = auth.currentUser;
+    if (user != null) {
+      final uid = user.uid;
+      // Delete from Firestore first
+      await firestore.collection("users").doc(uid).delete();
+      // Delete from Auth
+      await user.delete();
+    }
   }
+}
 
   @override
   Future<UserModel> getUserByID(String id) async {
@@ -52,9 +107,31 @@ class UserRepoImpl implements UserRepo {
 
     if (data == null) {
       throw Exception("User not found");
+      @override
+  Future<void> terminateAccount() async {
+    final user = auth.currentUser;
+    if (user != null) {
+      final uid = user.uid;
+      // Delete from Firestore first
+      await firestore.collection("users").doc(uid).delete();
+      // Delete from Auth
+      await user.delete();
     }
-    return UserModel.fromMap(data);
   }
+}
+    return UserModel.fromMap(data);
+    @override
+  Future<void> terminateAccount() async {
+    final user = auth.currentUser;
+    if (user != null) {
+      final uid = user.uid;
+      // Delete from Firestore first
+      await firestore.collection("users").doc(uid).delete();
+      // Delete from Auth
+      await user.delete();
+    }
+  }
+}
 
   @override
   Future<String> login(String email, String password) async {
@@ -66,14 +143,47 @@ class UserRepoImpl implements UserRepo {
 
     if (userId == null) {
       throw Exception("Login failed");
+      @override
+  Future<void> terminateAccount() async {
+    final user = auth.currentUser;
+    if (user != null) {
+      final uid = user.uid;
+      // Delete from Firestore first
+      await firestore.collection("users").doc(uid).delete();
+      // Delete from Auth
+      await user.delete();
     }
-    return userId;
   }
+}
+    return userId;
+    @override
+  Future<void> terminateAccount() async {
+    final user = auth.currentUser;
+    if (user != null) {
+      final uid = user.uid;
+      // Delete from Firestore first
+      await firestore.collection("users").doc(uid).delete();
+      // Delete from Auth
+      await user.delete();
+    }
+  }
+}
 
   @override
   Future<void> logout() {
     return auth.signOut();
+    @override
+  Future<void> terminateAccount() async {
+    final user = auth.currentUser;
+    if (user != null) {
+      final uid = user.uid;
+      // Delete from Firestore first
+      await firestore.collection("users").doc(uid).delete();
+      // Delete from Auth
+      await user.delete();
+    }
   }
+}
 
   @override
   Future<String> register(String email, String password) async {
@@ -85,7 +195,40 @@ class UserRepoImpl implements UserRepo {
 
     if (userId == null) {
       throw Exception("Registration failed");
+      @override
+  Future<void> terminateAccount() async {
+    final user = auth.currentUser;
+    if (user != null) {
+      final uid = user.uid;
+      // Delete from Firestore first
+      await firestore.collection("users").doc(uid).delete();
+      // Delete from Auth
+      await user.delete();
     }
+  }
+}
     return userId;
+    @override
+  Future<void> terminateAccount() async {
+    final user = auth.currentUser;
+    if (user != null) {
+      final uid = user.uid;
+      // Delete from Firestore first
+      await firestore.collection("users").doc(uid).delete();
+      // Delete from Auth
+      await user.delete();
+    }
+  }
+}
+  @override
+  Future<void> terminateAccount() async {
+    final user = auth.currentUser;
+    if (user != null) {
+      final uid = user.uid;
+      // Delete from Firestore first
+      await firestore.collection("users").doc(uid).delete();
+      // Delete from Auth
+      await user.delete();
+    }
   }
 }
