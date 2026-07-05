@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:fitlog/view/splash_screen.dart';
 import 'package:fitlog/viewmodel/user_view_model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fitlog/view/chatbot.dart';
@@ -53,7 +54,7 @@ class FitLogApp extends StatelessWidget {
             ),
           ),
         ),
-        home: FitnessCoachChatScreen()
+        home: DashboardScreen()
     );
   }
 }

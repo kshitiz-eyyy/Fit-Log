@@ -53,13 +53,13 @@ class FeaturesScreen extends StatelessWidget {
       title: 'Calorie Tracker',
       description: 'Log daily meals and maintain your caloric deficit/surplus.',
       icon: Icons.local_fire_department,
-      imagePath: 'assets/images/calorie.png', // ✅ Added image path
+      imagePath: 'assets/images/calorie_icon.png', // ✅ Added image path
     ),
     FeatureItem(
       title: 'Sleep Tracking',
       description: 'Monitor your recovery and sleep cycles for peak performance.',
       icon: Icons.bedtime,
-      imagePath: 'assets/images/sleep.png', // ✅ Added image path
+      imagePath: 'assets/images/sleep_icon.png', // ✅ Added image path
     ),
     FeatureItem(
       title: 'Performance',
