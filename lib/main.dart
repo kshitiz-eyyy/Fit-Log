@@ -9,6 +9,7 @@ import 'package:fitlog/view/terms_and_conditions_screen.dart';
 import 'package:fitlog/view/track_membershiscreen.dart';
 import 'package:fitlog/view/user_dashboard.dart';
 import 'package:fitlog/view/welcome_screen.dart';
+import 'package:fitlog/viewmodel/user_profile_view_model.dart';
 import 'package:fitlog/viewmodel/user_view_model.dart';
 
 import 'package:fitlog/view/meal_tracking_screen.dart';
