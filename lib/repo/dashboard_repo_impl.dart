@@ -1,13 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../model/dashboard_model.dart';
 import 'dashboard_repo.dart';
 
 class DashboardRepoImpl implements DashboardRepo {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final String _currentUserId = "Eb3LsmAGcqNpd5pfwO28TpPyFWL2";
+  
+  String get _currentUserId => FirebaseAuth.instance.currentUser?.uid ?? "";
 
   @override
   Future<DashboardStateModel> fetchDashboardMetrics() async {
+    if (_currentUserId.isEmpty) return DashboardStateModel.initial();
+
     final doc = await _firestore.collection('users').doc(_currentUserId).get();
     if (!doc.exists) {
       return DashboardStateModel.initial();
@@ -24,6 +28,7 @@ class DashboardRepoImpl implements DashboardRepo {
       internalCaloriesEaten: data['internalCaloriesEaten'] ?? 0,
       currentTargetCalories: data['target_calories'] ?? 2000,
       hydrationAmount: (data['hydrationAmount'] ?? 0.0).toDouble(),
+      hydrationGoal: (data['hydration_goal'] ?? 3.5).toDouble(),
       hydrationReminderActive: data['hydrationReminderActive'] ?? false,
       volumeProgress: (data['volumeProgress'] ?? 0.0).toDouble(),
       volumeTarget: (data['volumeTarget'] ?? 1000.0).toDouble(),

@@ -241,7 +241,7 @@ class _DashboardContent extends StatelessWidget {
     final state = viewModel.state;
     double caloriePercentage = (state.internalCaloriesEaten / state.currentTargetCalories).clamp(0.0, 1.0);
     int caloriesRemaining = max(0, state.currentTargetCalories - state.internalCaloriesEaten);
-    double waterRemaining = max(0.0, 3.5 - state.hydrationAmount);
+    double waterRemaining = max(0.0, state.hydrationGoal - state.hydrationAmount);
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F0F0F),
@@ -488,7 +488,7 @@ class _DashboardContent extends StatelessWidget {
                                     ],
                                   ),
                                   Text("${state.hydrationAmount} L", style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900)),
-                                  const Text("Daily Target: 3.5 Liters", style: TextStyle(color: Colors.grey, fontSize: 10)),
+                                  Text("Daily Target: ${state.hydrationGoal} Liters", style: const TextStyle(color: Colors.grey, fontSize: 10)),
                                 ],
                               ),
                             ),

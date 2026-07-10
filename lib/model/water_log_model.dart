@@ -2,19 +2,22 @@ import 'package:flutter/material.dart'; // 🟢 FIXED: This resolves the "Undefi
 
 class WaterConfig {
   final double dailyGoal;
+  final double currentIntake;
   final bool isReminderActive;
   final String frequency;
 
   WaterConfig({
     required this.dailyGoal,
+    required this.currentIntake,
     required this.isReminderActive,
     required this.frequency,
   });
 
   factory WaterConfig.fromFirestore(Map<String, dynamic>? data) {
     return WaterConfig(
-      dailyGoal: (data?['hydration_amount'] as num?)?.toDouble() ?? 3.5,
-      isReminderActive: data?['hydration_reminder_active'] as bool? ?? false,
+      dailyGoal: (data?['hydration_goal'] as num?)?.toDouble() ?? 3.5,
+      currentIntake: (data?['hydrationAmount'] as num?)?.toDouble() ?? 0.0,
+      isReminderActive: data?['hydrationReminderActive'] as bool? ?? false,
       frequency: data?['hydration_reminder_frequency'] as String? ?? 'Every 1 hour',
     );
   }
@@ -36,4 +39,26 @@ class WaterLogItem {
     required this.amountLiters,
     required this.accentColor,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'time': time,
+      'amountString': amountString,
+      'amountLiters': amountLiters,
+      'accentColor': accentColor.value,
+    };
+  }
+
+  factory WaterLogItem.fromMap(Map<String, dynamic> map) {
+    return WaterLogItem(
+      id: map['id'] ?? '',
+      title: map['title'] ?? '',
+      time: map['time'] ?? '',
+      amountString: map['amountString'] ?? '',
+      amountLiters: (map['amountLiters'] as num?)?.toDouble() ?? 0.0,
+      accentColor: Color(map['accentColor'] as int? ?? 0xFF00E5FF),
+    );
+  }
 }

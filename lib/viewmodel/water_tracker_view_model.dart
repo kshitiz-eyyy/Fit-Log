@@ -44,8 +44,14 @@ class WaterTrackerViewModel extends ChangeNotifier {
 
     WaterConfig config = await _repository.fetchUserWaterConfig(userId);
     _goal = config.dailyGoal;
+    _currentIntake = config.currentIntake;
     _remindersEnabled = config.isReminderActive;
     _frequency = config.frequency;
+
+    // Load logs for the day
+    final fetchedLogs = await _repository.fetchWaterLogs(userId);
+    _logs.clear();
+    _logs.addAll(fetchedLogs);
 
     _isLoadingConfig = false;
     notifyListeners();
@@ -74,6 +80,7 @@ class WaterTrackerViewModel extends ChangeNotifier {
 
     // Persists target numbers up to the current authenticated user profile
     await _repository.updateUserCurrentIntake(userId, _currentIntake);
+    await _repository.saveWaterLogs(userId, _logs);
   }
 
   Future<void> toggleReminders(bool value) async {

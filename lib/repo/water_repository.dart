@@ -12,4 +12,10 @@ abstract class WaterRepository {
 
   /// Saves the chosen notification interval text straight to Firestore
   Future<void> updateUserFrequencySetting(String userId, String frequency);
+
+  /// Fetches logs for the specific user and date
+  Future<List<WaterLogItem>> fetchWaterLogs(String userId);
+
+  /// Saves the entire list of logs for the day
+  Future<void> saveWaterLogs(String userId, List<WaterLogItem> logs);
 }

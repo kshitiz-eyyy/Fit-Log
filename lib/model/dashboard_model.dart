@@ -9,6 +9,7 @@ class DashboardStateModel {
   final int internalCaloriesEaten;
   final int currentTargetCalories;
   final double hydrationAmount;
+  final double hydrationGoal;
   final bool hydrationReminderActive;
   final double volumeProgress;
   final double volumeTarget;
@@ -28,6 +29,7 @@ class DashboardStateModel {
     required this.internalCaloriesEaten,
     required this.currentTargetCalories,
     required this.hydrationAmount,
+    required this.hydrationGoal,
     required this.hydrationReminderActive,
     required this.volumeProgress,
     required this.volumeTarget,
@@ -49,6 +51,7 @@ class DashboardStateModel {
       internalCaloriesEaten: 0,
       currentTargetCalories: 2000,
       hydrationAmount: 0.0,
+      hydrationGoal: 3.5,
       hydrationReminderActive: false,
       volumeProgress: 0.0,
       volumeTarget: 1000.0,

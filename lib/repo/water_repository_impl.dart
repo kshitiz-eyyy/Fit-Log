@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import '../model/water_log_model.dart';
 import 'water_repository.dart'; // Import the interface here
 
@@ -9,11 +10,13 @@ class WaterRepositoryImpl implements WaterRepository {
   WaterRepositoryImpl({FirebaseFirestore? firestore})
       : _firestore = firestore ?? FirebaseFirestore.instance;
 
+  String get _today => DateFormat('yyyy-MM-dd').format(DateTime.now());
+
   @override
   Future<WaterConfig> fetchUserWaterConfig(String userId) async {
     try {
       if (userId.isEmpty) {
-        return WaterConfig(dailyGoal: 3.5, isReminderActive: false, frequency: 'Every 1 hour');
+        return WaterConfig(dailyGoal: 3.5, currentIntake: 0.0, isReminderActive: false, frequency: 'Every 1 hour');
       }
 
       DocumentSnapshot doc = await _firestore.collection('users').doc(userId).get();
@@ -24,7 +27,7 @@ class WaterRepositoryImpl implements WaterRepository {
     } catch (e) {
       print("Error fetching user water config: $e");
     }
-    return WaterConfig(dailyGoal: 3.5, isReminderActive: false, frequency: 'Every 1 hour');
+    return WaterConfig(dailyGoal: 3.5, currentIntake: 0.0, isReminderActive: false, frequency: 'Every 1 hour');
   }
 
   @override
@@ -32,7 +35,7 @@ class WaterRepositoryImpl implements WaterRepository {
     if (userId.isEmpty) return;
     try {
       await _firestore.collection('users').doc(userId).update({
-        'hydration_reminder_active': active,
+        'hydrationReminderActive': active,
       });
     } catch (e) {
       print("Error updating reminder flag: $e");
@@ -44,7 +47,7 @@ class WaterRepositoryImpl implements WaterRepository {
     if (userId.isEmpty) return;
     try {
       await _firestore.collection('users').doc(userId).update({
-        'current_water_intake': currentIntake,
+        'hydrationAmount': currentIntake,
       });
     } catch (e) {
       print("Error updating hydration amount: $e");
@@ -61,6 +64,45 @@ class WaterRepositoryImpl implements WaterRepository {
       print("🟢 Firebase Updated: Saved reminder frequency ($frequency)");
     } catch (e) {
       print("🔴 Firebase Error updating frequency: $e");
+    }
+  }
+
+  @override
+  Future<List<WaterLogItem>> fetchWaterLogs(String userId) async {
+    if (userId.isEmpty) return [];
+    try {
+      final doc = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('water_logs')
+          .doc(_today)
+          .get();
+
+      if (doc.exists && doc.data() != null) {
+        final List<dynamic> logsData = doc.data()!['logs'] ?? [];
+        return logsData.map((l) => WaterLogItem.fromMap(l as Map<String, dynamic>)).toList();
+      }
+    } catch (e) {
+      print("Error fetching water logs: $e");
+    }
+    return [];
+  }
+
+  @override
+  Future<void> saveWaterLogs(String userId, List<WaterLogItem> logs) async {
+    if (userId.isEmpty) return;
+    try {
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('water_logs')
+          .doc(_today)
+          .set({
+        'logs': logs.map((l) => l.toMap()).toList(),
+        'last_updated': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      print("Error saving water logs: $e");
     }
   }
 }
